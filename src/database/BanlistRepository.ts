@@ -25,7 +25,8 @@ export class BanlistRepository extends Repository {
     return (await this.query(query)).map(a => this.constructBanObject(a))
   }
 
-  async add(ip: string, login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
+  async add(ip: string, login: string, date: Date, callerLogin: string, reason?: string,
+    expireDate?: Date): Promise<void> {
     const query: string = `INSERT INTO banlist(ip, login, date, caller_id, reason, expires) 
     VALUES($1, $2, $3, $4, $5, $6);`
     const callerId = await playerRepo.getId(callerLogin)
@@ -36,7 +37,8 @@ export class BanlistRepository extends Repository {
     await this.query(query, ip, login, date, callerId, reason?.slice(0, 150), expireDate)
   }
 
-  async update(ip: string, login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
+  async update(ip: string, login: string, date: Date, callerLogin: string, reason?: string,
+    expireDate?: Date): Promise<void> {
     const query: string = `UPDATE banlist SET date=$1, caller_id=$2, reason=$3, expires=$4 WHERE ip=$5 AND login=$6;`
     const callerId = await playerRepo.getId(callerLogin)
     if (callerId === undefined) {

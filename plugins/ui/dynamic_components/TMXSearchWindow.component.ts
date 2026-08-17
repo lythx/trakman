@@ -3,8 +3,7 @@
  * @since 1.0
  */
 
-import { centeredText, closeButton, Grid, componentIds, leftAlignedText, addManialinkListener, PopupWindow } from '../UI.js'
-import { Paginator } from "../UI.js"
+import { addManialinkListener, centeredText, closeButton, componentIds, Grid, leftAlignedText, Paginator, PopupWindow } from '../UI.js'
 import { actions } from '../../actions/Actions.js'
 import config from './TMXSearchWindow.config.js'
 
@@ -46,7 +45,11 @@ export default class TMXSearchWindow extends PopupWindow<{
     tm.commands.add({
       aliases: config.command.aliases,
       help: config.command.help,
-      params: [{ name: 'query', optional: true, type: 'multiword' }],
+      params: [{
+        name: 'query',
+        optional: true,
+        type: 'multiword'
+      }],
       callback: async (info: tm.MessageInfo, query?: string): Promise<void> => {
         let maps
         if (query?.includes(config.authorSearchSeparator)) {
@@ -60,7 +63,12 @@ export default class TMXSearchWindow extends PopupWindow<{
           return
         }
         const paginator = this.getPaginator(info.login, info.privilege, maps)
-        this.displayToPlayer(info.login, { page: 1, paginator, list: maps, privilege: info.privilege }, `1/${paginator.pageCount}`)
+        this.displayToPlayer(info.login, {
+          page: 1,
+          paginator,
+          list: maps,
+          privilege: info.privilege
+        }, `1/${paginator.pageCount}`)
       },
       privilege: config.command.privilege
     })
@@ -74,17 +82,30 @@ export default class TMXSearchWindow extends PopupWindow<{
       playerQuery.list = list
       paginator = playerQuery.paginator
       paginator.setPageForLogin(login, 1)
-      paginator.onPageChange = (login: string, page: number) => this.displayToPlayer(login,
-        { page, paginator, list, privilege }, `${page}/${pageCount}`)
+      paginator.onPageChange = (login: string, page: number) => this.displayToPlayer(login, {
+        page,
+        paginator,
+        list,
+        privilege
+      }, `${page}/${pageCount}`)
       paginator.setPageCount(pageCount)
     } else {
-      paginator = new Paginator(this.openId + this.paginatorIdOffset + this.nextPaginatorId,
-        this.windowWidth, this.footerHeight, pageCount)
+      paginator = new Paginator(this.openId + this.paginatorIdOffset + this.nextPaginatorId, this.windowWidth,
+        this.footerHeight, pageCount)
       this.nextPaginatorId += 10
       this.nextPaginatorId = this.nextPaginatorId % 3000
-      this.playerQueries.push({ paginator, login, list, privilege })
-      paginator.onPageChange = (login: string, page: number) => this.displayToPlayer(login,
-        { page, paginator, list, privilege }, `${page}/${pageCount}`)
+      this.playerQueries.push({
+        paginator,
+        login,
+        list,
+        privilege
+      })
+      paginator.onPageChange = (login: string, page: number) => this.displayToPlayer(login, {
+        page,
+        paginator,
+        list,
+        privilege
+      }, `${page}/${pageCount}`)
     }
     return paginator
   }
@@ -96,7 +117,10 @@ export default class TMXSearchWindow extends PopupWindow<{
       if (obj === undefined) { continue }
       const page = obj.paginator.getPageByLogin(login)
       this.displayToPlayer(login, {
-        page, paginator: obj.paginator, list: obj.list, privilege: obj.privilege
+        page,
+        paginator: obj.paginator,
+        list: obj.list,
+        privilege: obj.privilege
       }, `${page}/${obj.paginator.pageCount}`)
     }
   }
@@ -108,7 +132,12 @@ export default class TMXSearchWindow extends PopupWindow<{
       return
     }
     const paginator = this.getPaginator(info.login, info.privilege, maps)
-    this.displayToPlayer(info.login, { page: 1, paginator, list: maps, privilege: info.privilege }, `1/${paginator.pageCount}`)
+    this.displayToPlayer(info.login, {
+      page: 1,
+      paginator,
+      list: maps,
+      privilege: info.privilege
+    }, `1/${paginator.pageCount}`)
   }
 
   protected onClose(info: tm.ManialinkClickInfo): void {
@@ -120,7 +149,11 @@ export default class TMXSearchWindow extends PopupWindow<{
     this.hideToPlayer(info.login)
   }
 
-  protected async constructContent(login: string, params?: { page: number, privilege: number, list?: tm.TMXSearchResult[] }): Promise<string> {
+  protected async constructContent(login: string, params?: {
+    page: number,
+    privilege: number,
+    list?: tm.TMXSearchResult[]
+  }): Promise<string> {
     const maps = params?.list ?? []
     const startIndex = (config.rows * config.columns) * ((params?.page ?? 1) - 1)
     const mapsToDisplay = Math.min(maps.length - startIndex, config.rows * config.columns)
@@ -136,7 +169,8 @@ export default class TMXSearchWindow extends PopupWindow<{
         author = ''
       }
       const actionId = this.getActionId(maps[index].id, name)
-      const header = this.getHeader(index, maps[index].id, actionId, w, h, tm.utils.fixProtocol(maps[index].pageUrl), params?.privilege ?? 0)
+      const header = this.getHeader(index, maps[index].id, actionId, w, h, tm.utils.fixProtocol(maps[index].pageUrl),
+        params?.privilege ?? 0)
       const rowH = (h - this.margin) / 4
       const width = (w - this.margin * 3) - config.iconWidth
       const dateW = width - (config.timeWidth + config.awardsWidth + this.margin * 4 + config.iconWidth * 2)
@@ -168,8 +202,10 @@ export default class TMXSearchWindow extends PopupWindow<{
              image="${config.icons[4]}"/>
             <frame posn="${config.iconWidth + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${config.timeWidth} ${rowH - this.margin}" bgcolor="${config.contentBackground}"/>
-              ${centeredText(tm.utils.getTimeString(maps[index].authorTime), config.timeWidth, rowH - this.margin,
-        { textScale: config.textScale, padding: config.padding })}
+              ${centeredText(tm.utils.getTimeString(maps[index].authorTime), config.timeWidth, rowH - this.margin, {
+        textScale: config.textScale,
+        padding: config.padding
+      })}
             </frame>
           </frame>
           <frame posn="${config.timeWidth + config.iconWidth + this.margin * 2} ${-rowH * 3} 2">
@@ -178,7 +214,10 @@ export default class TMXSearchWindow extends PopupWindow<{
              image="${config.icons[5]}"/>
             <frame posn="${config.iconWidth + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${config.awardsWidth} ${rowH - this.margin}" bgcolor="${config.contentBackground}"/>
-              ${centeredText(maps[index].awards.toString(), config.awardsWidth, rowH - this.margin, { textScale: config.textScale, padding: config.padding })}
+              ${centeredText(maps[index].awards.toString(), config.awardsWidth, rowH - this.margin, {
+        textScale: config.textScale,
+        padding: config.padding
+      })}
             </frame>
           </frame>
           <frame posn="${config.timeWidth + config.awardsWidth + this.margin * 4 + config.iconWidth * 2} ${-rowH * 3} 2">
@@ -187,8 +226,10 @@ export default class TMXSearchWindow extends PopupWindow<{
              image="${config.icons[6]}"/>
             <frame posn="${config.iconWidth + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${dateW} ${rowH - this.margin}" bgcolor="${config.contentBackground}"/>
-              ${centeredText(tm.utils.formatDate(maps[index].uploadDate), dateW,
-          rowH - this.margin, { textScale: config.textScale, padding: config.padding })}
+              ${centeredText(tm.utils.formatDate(maps[index].uploadDate), dateW, rowH - this.margin, {
+        textScale: config.textScale,
+        padding: config.padding
+      })}
             </frame>
           </frame>
         </frame>`
@@ -196,12 +237,15 @@ export default class TMXSearchWindow extends PopupWindow<{
     return this.grid.constructXml(new Array(mapsToDisplay).fill(cell))
   }
 
-  protected constructFooter(login: string, params?: { paginator: Paginator }): string {
+  protected constructFooter(login: string, params?: {
+    paginator: Paginator
+  }): string {
     return closeButton(this.closeId, this.windowWidth, this.footerHeight) + ((params === undefined) ? '' :
       (params.paginator).constructXml(login))
   }
 
-  private async handleMapClick(mapId: string, mapName: string, login: string, nickname: string, privilege: number, title: string): Promise<boolean> {
+  private async handleMapClick(mapId: string, mapName: string, login: string, nickname: string, privilege: number,
+    title: string): Promise<boolean> {
     if (privilege < config.addPrivilege && !tm.config.controller.allowPublicAdd) { return false }
     if (tm.config.controller.voteOnPublicAdd && privilege < config.addPrivilege) {
       const result: boolean = await actions.publicAdd(login, nickname, title, mapName)
@@ -217,15 +261,15 @@ export default class TMXSearchWindow extends PopupWindow<{
 
   private getActionId(mapId: string, mapName: string): number {
     const mapActionId = this.mapActionIds.indexOf(mapId)
-    if (mapActionId !== -1) { return mapActionId + this.openId + this.mapAddId }
-    else {
+    if (mapActionId !== -1) { return mapActionId + this.openId + this.mapAddId } else {
       this.mapActionIds.push(mapId)
       this.mapNames.push(mapName)
       return this.mapActionIds.length + this.openId + this.mapAddId - 1
     }
   }
 
-  private getHeader(mapIndex: number, mapId: string, actionId: number, w: number, h: number, url: string, privilege: number): string {
+  private getHeader(mapIndex: number, mapId: string, actionId: number, w: number, h: number, url: string,
+    privilege: number): string {
     const width = (w - this.margin * 4) - config.iconWidth * 2
     const height = h - this.margin
     const isInMapList = (tm.maps.get(mapId) !== undefined) || this.requestedMaps.includes(mapId)
@@ -242,7 +286,8 @@ export default class TMXSearchWindow extends PopupWindow<{
            image="${config.icons[0]}"/>
           <frame posn="${config.iconWidth + this.margin} 0 1">
             <quad posn="0 0 3" sizen="${width} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
-            ${leftAlignedText(`${config.texts.map}${mapIndex + 1}`, width, height / 4 - this.margin, { textScale: config.textScale })}
+            ${leftAlignedText(`${config.texts.map}${mapIndex + 1}`, width, height / 4 - this.margin,
+      { textScale: config.textScale })}
           </frame>
           <frame posn="${config.iconWidth + this.margin * 2 + width} 0 1">
             <quad posn="0 0 7.9" sizen="${config.iconWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>

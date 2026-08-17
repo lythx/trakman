@@ -7,5 +7,12 @@ export interface ButtonData {
   padding: number,
   equalTexts?: boolean,
   actionId?: number,
-  link?: string
+  link?: string,
+  manialink?: string,
+  addPlayerId?: boolean
+  /**
+   * Enables per-player rendering. Buttons using per-player rendering should override the
+   * `UiButton.renderForPlayer()` function (see `MedalButton.ts`)
+   */
+  perPlayer?: boolean
 }

@@ -1,13 +1,14 @@
 import icons from './Icons.js'
 import raceUi from './RaceUi.js'
 import resultUi from './ResultUi.js'
+
 const p = tm.utils.palette
 
 /**
  * In this config you can easily add static buttons to your UI layout.
- * 
+ *
  * REQUIRED PROPS:
- * 
+ *
  * - displayed (bool) - Whether to display the button
  * - icon (str) - Icon URL
  * - posX (num) - X position of the button (0 is the middle of the screen)
@@ -17,8 +18,8 @@ const p = tm.utils.palette
  * - zIndex (num) - Z "position" of the button (determines stacking order of elements)
  * - text1 (str) - Upper text
  * - text2 (str) - Lower text (leave as empty string if you need only one text line)
- * OPTIONAL PROPS: 
- * 
+ * OPTIONAL PROPS:
+ *
  * - iconWidth (num) - Icon width
  * - iconHeight (num) - Icon height
  * - topPadding (num) - Gap between the top border of the background and the top border of the icon
@@ -36,55 +37,47 @@ export default {
   /**
    * RaceUi icons
    */
-  race: [
-    {
-      displayed: false,
-      icon: icons.placeholder,
-      posX: 44.9,
-      posY: 24.2,
-      width: 4,
-      height: 6.45,
-      zIndex: 1,
-      text1: `$${p.purple}DISCORD`,
-      text2: 'SERVER',
-      iconWidth: 3,
-      iconHeight: 3,
-      topPadding: 0.3,
-      equalTexts: false,
-      // actionId: ,
-      background: raceUi.background,
-      // link: '',
-      // text1Scale: , 
-      // text2Scale: ,
-      text1PositionOffset: 1.75,
-      text2PositionOffset: 1.75,
-    }
-  ],
+  race: [{
+    displayed: false,
+    icon: icons.placeholder,
+    posX: 44.9,
+    posY: 24.2,
+    width: 4,
+    height: 6.45,
+    zIndex: 1,
+    text1: `$${p.purple}DISCORD`,
+    text2: 'SERVER',
+    iconWidth: 3,
+    iconHeight: 3,
+    topPadding: 0.3,
+    equalTexts: false, // actionId: ,
+    background: raceUi.background, // link: '',
+    // text1Scale: ,
+    // text2Scale: ,
+    text1PositionOffset: 1.75,
+    text2PositionOffset: 1.75
+  }],
   /**
    * ResultUi icons
    */
-  result: [
-    {
-      displayed: false,
-      icon: icons.placeholder,
-      posX: 44.9,
-      posY: 22.85,
-      width: 4,
-      height: 6.1,
-      zIndex: 1,
-      text1: `$${p.purple}DISCORD`,
-      text2: 'SERVER',
-      iconWidth: 3,
-      iconHeight: 3,
-      topPadding: 0.3,
-      equalTexts: false,
-      // actionId: ,
-      background: resultUi.background,
-      link: '',
-      // text1Scale: , 
-      // text2Scale: ,
-      text1PositionOffset: 1.75,
-      text2PositionOffset: 1.75,
-    }
-  ]
+  result: [{
+    displayed: false,
+    icon: icons.placeholder,
+    posX: 44.9,
+    posY: 22.85,
+    width: 4,
+    height: 6.1,
+    zIndex: 1,
+    text1: `$${p.purple}DISCORD`,
+    text2: 'SERVER',
+    iconWidth: 3,
+    iconHeight: 3,
+    topPadding: 0.3,
+    equalTexts: false, // actionId: ,
+    background: resultUi.background,
+    link: '', // text1Scale: ,
+    // text2Scale: ,
+    text1PositionOffset: 1.75,
+    text2PositionOffset: 1.75
+  }]
 }

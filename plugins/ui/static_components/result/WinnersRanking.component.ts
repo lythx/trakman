@@ -3,7 +3,7 @@
  * @since 0.4
  */
 
-import { componentIds, List, StaticHeader, StaticComponent } from '../../UI.js'
+import { componentIds, List, StaticComponent, StaticHeader } from '../../UI.js'
 import { stats } from '../../../stats/Stats.js'
 import config from './WinnersRanking.config.js'
 
@@ -17,7 +17,10 @@ export default class WinnersRanking extends StaticComponent {
     super(componentIds.winnersRanking)
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, this.getHeight() - (this.header.options.height + config.margin),
-      config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
+      config.columnProportions, {
+        background: config.background,
+        headerBg: this.header.options.textBackground
+      })
     stats.wins.onUpdate(() => {
       const xml = this.display()
       if (xml !== undefined) { tm.sendManialink(xml) }
@@ -40,7 +43,10 @@ export default class WinnersRanking extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    return { xml: this.xml, login }
+    return {
+      xml: this.xml,
+      login
+    }
   }
 
   constructXml(): void {
@@ -50,7 +56,8 @@ export default class WinnersRanking extends StaticComponent {
       <frame posn="${config.posX} ${config.posY} 2">
         ${this.header.constructXml(config.title, config.icon, config.side)}
         <frame posn="0 ${-this.header.options.height - config.margin} 2">
-          ${this.list.constructXml(list.map(a => a.wins.toString()), list.map(a => tm.utils.safeString(tm.utils.strip(a.nickname, false))))}
+          ${this.list.constructXml(list.map(a => a.wins.toString()),
+      list.map(a => tm.utils.safeString(tm.utils.strip(a.nickname, false))))}
         </frame>
       </frame>
     </manialink>`

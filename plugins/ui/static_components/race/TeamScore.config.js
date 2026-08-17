@@ -5,16 +5,14 @@ export default {
   height: 5.5,
   width: cfg.width,
   margin: cfg.margin,
-  title: "Team Score",
+  title: 'Team Score',
   icon: icons.teamsMode,
-  entries: 3, 
-  columnProportions: [
-    1,
-    1,
-    2.8,
-    4
-  ],
-  text: { specialFont: true, textScale: 0.5 },
+  entries: 3,
+  columnProportions: [1, 1, 2.8, 4],
+  text: {
+    specialFont: true,
+    textScale: 0.5
+  },
   colours: {
     left: tm.utils.palette.purple + '8',
     middle: cfg.background,

@@ -1,20 +1,41 @@
 import config from './Config.js'
 
-let onlineList: { readonly login: string, nickname: string, count: number }[] = []
+let onlineList: {
+  readonly login: string,
+  nickname: string,
+  count: number
+}[] = []
 let initialVotes: tm.Vote[] = []
-let topList: { readonly login: string, nickname: string, count: number }[] = []
-const updateListeners: ((changes: readonly Readonly<{ login: string, nickname: string, count: number }>[]) => void)[] = []
-const nicknameChangeListeners: ((changes: readonly Readonly<{ login: string, nickname: string }>[]) => void)[] = []
+let topList: {
+  readonly login: string,
+  nickname: string,
+  count: number
+}[] = []
+const updateListeners: ((changes: readonly Readonly<{
+  login: string,
+  nickname: string,
+  count: number
+}>[]) => void)[] = []
+const nicknameChangeListeners: ((changes: readonly Readonly<{
+  login: string,
+  nickname: string
+}>[]) => void)[] = []
 
 const addToOnlineList = async (login: string, nickname: string) => {
   const id: number | undefined = await tm.db.getPlayerId(login)
-  const res: { count: number }[] | Error = await tm.db.query(`SELECT count(*)::int FROM votes
+  const res: {
+    count: number
+  }[] | Error = await tm.db.query(`SELECT count(*)::int FROM votes
       WHERE player_id=$1`, id)
   if (res instanceof Error) {
     tm.log.error(`Failed to fetch vote count for player ${login}`, res.message, res.stack)
     return
   }
-  onlineList.push({ login, nickname, count: res[0].count })
+  onlineList.push({
+    login,
+    nickname,
+    count: res[0].count
+  })
 }
 
 const initialize = async () => {
@@ -37,7 +58,10 @@ const initialize = async () => {
 }
 
 tm.addListener('PlayerDataUpdated', (info) => {
-  const changedObjects: { login: string, nickname: string }[] = []
+  const changedObjects: {
+    login: string,
+    nickname: string
+  }[] = []
   for (const e of topList) {
     const newNickname = info.find(a => a.login === e.login)?.nickname
     if (newNickname !== undefined) {
@@ -70,8 +94,7 @@ const handleVote = (vote: tm.Vote) => {
     const obj = onlineList.find(a => a.login === vote.login)
     if (obj === undefined) { return }
     obj.count++
-    if (topList.length !== 0 && topList.length >= config.votesCount &&
-      obj.count <= topList[topList.length - 1].count) { return }
+    if (topList.length !== 0 && topList.length >= config.votesCount && obj.count <= topList[topList.length - 1].count) { return }
     const entry = topList.find(a => a.login === obj.login)
     if (entry !== undefined) {
       entry.count = obj.count
@@ -120,7 +143,11 @@ export const topVotes = {
   /**
    * List of players sorted by their votes count
    */
-  get list(): readonly Readonly<{ login: string, nickname: string, count: number }>[] {
+  get list(): readonly Readonly<{
+    login: string,
+    nickname: string,
+    count: number
+  }>[] {
     return topList
   },
 
@@ -128,7 +155,11 @@ export const topVotes = {
    * Add a callback function to execute on top votes list update
    * @param callback Function to execute on event. It takes an array of updated objects as a parameter
    */
-  onUpdate(callback: (changes: readonly Readonly<{ login: string, nickname: string, count: number }>[]) => void): void {
+  onUpdate(callback: (changes: readonly Readonly<{
+    login: string,
+    nickname: string,
+    count: number
+  }>[]) => void): void {
     updateListeners.push(callback)
   },
 
@@ -136,7 +167,10 @@ export const topVotes = {
    * Add a callback function to execute on player nickname change
    * @param callback Function to execute on event. It takes an array of objects containing login and nickname as a parameter
    */
-  onNicknameChange(callback: (changes: readonly Readonly<{ login: string, nickname: string }>[]) => void): void {
+  onNicknameChange(callback: (changes: readonly Readonly<{
+    login: string,
+    nickname: string
+  }>[]) => void): void {
     nicknameChangeListeners.push(callback)
   }
 

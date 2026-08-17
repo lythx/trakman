@@ -12,7 +12,10 @@ export class DedimaniaClient {
   private _connected: boolean = false
   private password: string | undefined
 
-  async connect(host: string, port: number): Promise<true | { error: Error, isAuthenticationError: boolean }> {
+  async connect(host: string, port: number): Promise<true | {
+    error: Error,
+    isAuthenticationError: boolean
+  }> {
     if (process.env.DEDIMANIA_PASSWORD === undefined) {
       return {
         isAuthenticationError: true,
@@ -27,7 +30,10 @@ export class DedimaniaClient {
     const packmask: string | Error = await tm.client.call('GetServerPackMask') as any
     if (packmask instanceof Error) {
       tm.log.error('Failed to fetch server packmask', packmask.message)
-      return { error: packmask, isAuthenticationError: false }
+      return {
+        error: packmask,
+        isAuthenticationError: false
+      }
     }
     const request: DedimaniaRequest = new DedimaniaRequest('dedimania.Authenticate', [{
       struct: {
@@ -50,7 +56,8 @@ export class DedimaniaClient {
           this.receivingResponse = false
           if (this.response.isError !== null) {
             resolve({
-              error: new Error(`Dedimania server responded with an error ${this.response.errorString} Code: ${this.response.errorCode}`),
+              error: new Error(
+                `Dedimania server responded with an error ${this.response.errorString} Code: ${this.response.errorCode}`),
               isAuthenticationError: false
             })
           } else {
@@ -109,7 +116,8 @@ export class DedimaniaClient {
       const poll = (): void => {
         if (this.response.status === 'completed') {
           if (this.response.isError === true) {
-            resolve(new Error(`Dedimania server responded with an error ${this.response.errorString} Code: ${this.response.errorCode}`))
+            resolve(new Error(
+              `Dedimania server responded with an error ${this.response.errorString} Code: ${this.response.errorCode}`))
           } else {
             resolve(this.response.json)
           }

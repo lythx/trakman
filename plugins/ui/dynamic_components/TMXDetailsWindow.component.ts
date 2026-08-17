@@ -1,9 +1,9 @@
-/** 
+/**
  * @author wiseraven
  * @since 1.3.3
  */
 
-import { componentIds, Grid, type GridCellFunction, centeredText, closeButton, leftAlignedText, type GridCellObject, PopupWindow } from '../../ui/UI.js'
+import { centeredText, closeButton, componentIds, Grid, type GridCellFunction, type GridCellObject, leftAlignedText, PopupWindow } from '../../ui/UI.js'
 import config from './TMXDetailsWindow.config.js'
 import { tmx } from '../../tmx/Tmx.js'
 
@@ -24,9 +24,9 @@ export default class TMXDetailsWindow extends PopupWindow {
     tmx.onMapChange((): void => {
       this.reRender()
     })
-    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, config.rowProportions, config.grid)
+    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, config.rowProportions,
+      config.grid)
   }
-
 
   private reRender(): void {
     const logins: string[] = this.getPlayersWithWindowOpen()
@@ -36,36 +36,37 @@ export default class TMXDetailsWindow extends PopupWindow {
   }
 
   private constructScreenshot(width: number, height: number, map: tm.TMXMap): string {
-    const image: string = map === undefined
-      ? config.noScreenshot["Stadium"] // this shouldn't ever be used anyway cause the window isn't constructed if the map is undefined
+    const image: string = map === undefined ? config.noScreenshot["Stadium"] // this shouldn't ever be used anyway cause the window isn't constructed if the map is undefined
       : tm.utils.safeString(map.thumbnailUrl + `&.jpeg`)
     return `<quad posn="${config.margin + config.screenshotPadding} ${-config.margin - config.screenshotPadding} 8" sizen="${width - config.screenshotPadding * 2} ${height - config.margin * 2 - config.screenshotPadding * 2}" image="${image}"/>
-      ${centeredText(config.notLoaded, width, height, { textScale: config.notLoadedTextscale, yOffset: -1 })}`
+      ${centeredText(config.notLoaded, width, height, {
+      textScale: config.notLoadedTextscale,
+      yOffset: -1
+    })}`
   }
 
   private constructTmxRecordsXml(width: number, height: number, replays: tm.TMXReplay[] = []): string {
-    const grid = new Grid(width, height, config.tmxRecordsProportions, new Array(config.tmxRecordsAmount + 1).fill(1),
-      { margin: config.margin, background: config.gridBackground, headerBackground: config.iconBackground })
+    const grid = new Grid(width, height, config.tmxRecordsProportions, new Array(config.tmxRecordsAmount + 1).fill(1), {
+      margin: config.margin,
+      background: config.gridBackground,
+      headerBackground: config.iconBackground
+    })
     const options = { textScale: config.recordTextScale }
-    const arr: (GridCellFunction | GridCellObject)[] = [
-      (i, j, w, h) => centeredText(' Lp. ', w, h, options),
-      (i, j, w, h) => centeredText(' Time ', w, h, options),
-      (i, j, w, h) => centeredText(' Name ', w, h, options),
-      (i, j, w, h) => centeredText(' Date ', w, h, options),
-      (i, j, w, h) => centeredText(' Dl. ', w, h, options),
-    ]
+    const arr: (GridCellFunction | GridCellObject)[] = [(i, j, w, h) => centeredText(' Lp. ', w, h, options),
+      (i, j, w, h) => centeredText(' Time ', w, h, options), (i, j, w, h) => centeredText(' Name ', w, h, options),
+      (i, j, w, h) => centeredText(' Date ', w, h, options), (i, j, w, h) => centeredText(' Dl. ', w, h, options)]
     const indexCell: GridCellObject = {
       callback: (i, j, w, h) => centeredText(i.toString(), w, h, options),
       background: config.iconBackground
     }
-    const timeCell: GridCellFunction = (i, j, w, h) => centeredText(replays[i - 1] !== undefined ?
-      tm.utils.getTimeString(replays[i - 1]?.time) : config.defaultTime, w, h, options)
-    const nameCell: GridCellFunction = (i, j, w, h) =>
-      tm.utils.isMultibyte(replays[i - 1]?.name)
-        ? leftAlignedText(tm.utils.safeString(config.defaultTime), w, h, options)
-        : leftAlignedText(tm.utils.safeString(replays[i - 1]?.name ?? config.defaultTime), w, h, options)
-    const dateCell: GridCellFunction = (i, j, w, h) => centeredText(replays[i - 1] !== undefined ?
-      tm.utils.formatDate(replays[i - 1]?.recordDate, true) : config.defaultTime, w, h, options)
+    const timeCell: GridCellFunction = (i, j, w, h) => centeredText(
+      replays[i - 1] !== undefined ? tm.utils.getTimeString(replays[i - 1]?.time) : config.defaultTime, w, h, options)
+    const nameCell: GridCellFunction = (i, j, w, h) => tm.utils.isMultibyte(replays[i - 1]?.name) ?
+      leftAlignedText(tm.utils.safeString(config.defaultTime), w, h, options) :
+      leftAlignedText(tm.utils.safeString(replays[i - 1]?.name ?? config.defaultTime), w, h, options)
+    const dateCell: GridCellFunction = (i, j, w, h) => centeredText(
+      replays[i - 1] !== undefined ? tm.utils.formatDate(replays[i - 1]?.recordDate, true) : config.defaultTime, w, h,
+      options)
     const downloadCell: GridCellObject = {
       callback: (i, j, w, h) => replays[i - 1] !== undefined ?
         `<quad posn="${config.margin} ${-config.margin} 5" sizen="${w - config.margin * 2} ${h - config.margin * 2}" 
@@ -143,9 +144,7 @@ export default class TMXDetailsWindow extends PopupWindow {
         <quad posn="${p} ${-p} 3" sizen="${w + p * 2} ${h + p * 2}" bgcolor="${config.description.textBackground}"/>
         <frame posn="${p * 2} ${-p * 2} 1">
           <label posn="0 0 3" sizen="${w} ${h}"
-          text="${config.description.format}${length === 0
-        ? config.description.defaultText : description
-      }" autonewline="1"/>
+          text="${config.description.format}${length === 0 ? config.description.defaultText : description}" autonewline="1"/>
         </frame>`
   }
 

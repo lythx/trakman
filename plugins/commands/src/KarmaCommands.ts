@@ -19,13 +19,11 @@ tm.addListener('PlayerChat', (info): void => {
   processVote(info.text as keyof typeof options, info)
 })
 
-tm.commands.add(
-  {
-    aliases: config.aliases,
-    help: config.help,
-    callback: async (info): Promise<void> => {
-      processVote(info.aliasUsed as keyof typeof options, info)
-    },
-    privilege: 0,
-  }
-)
+tm.commands.add({
+  aliases: config.aliases,
+  help: config.help,
+  callback: async (info): Promise<void> => {
+    processVote(info.aliasUsed as keyof typeof options, info)
+  },
+  privilege: 0
+})

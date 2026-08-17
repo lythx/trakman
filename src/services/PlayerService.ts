@@ -1,47 +1,51 @@
-import { Client } from '../client/Client.js'
-import { PlayerRepository } from '../database/PlayerRepository.js'
-import { PrivilegeRepository } from '../database/PrivilegeRepository.js'
-import { MapService } from './MapService.js'
-import { Logger } from '../Logger.js'
-import { Utils } from '../Utils.js'
-import { Events } from '../Events.js'
-import { RecordService } from './RecordService.js'
-import { titles } from '../../config/Titles.js'
+import { Client } from "../client/Client.js";
+import { PlayerRepository } from "../database/PlayerRepository.js";
+import { PrivilegeRepository } from "../database/PrivilegeRepository.js";
+import { MapService } from "./MapService.js";
+import { Logger } from "../Logger.js";
+import { Utils } from "../Utils.js";
+import { Events } from "../Events.js";
+import { RecordService } from "./RecordService.js";
+import { titles } from "../../config/Titles.js";
 
 /**
  * This service manages online players on the server and players table in the database
  */
 export class PlayerService {
-
-  private static _players: tm.Player[] = []
-  private static readonly repo: PlayerRepository = new PlayerRepository()
-  private static readonly privilegeRepo = new PrivilegeRepository()
-  private static newLocalsAmount = 0
-  private static ranks: string[]
-  private static _totalPlayerCount: number
+  private static _players: tm.Player[] = [];
+  private static readonly repo: PlayerRepository = new PlayerRepository();
+  private static readonly privilegeRepo = new PrivilegeRepository();
+  private static newLocalsAmount = 0;
+  private static ranks: string[];
+  private static _totalPlayerCount: number;
 
   /**
    * Fetches ranks, players and creates playerlist
    */
   static async initialize(): Promise<void> {
-    this.ranks = await this.repo.getRanks()
-    await this.addAllFromList()
+    this.ranks = await this.repo.getRanks();
+    await this.addAllFromList();
     const res: any[] | Error = await tm.db.query(`SELECT count(*) ::int
-                                                  FROM players;`)
+                                                  FROM players;`);
     if (res instanceof Error) {
-      await tm.log.fatal(`Failed to fetch player count.`, res.message, res.stack)
-    } else { this._totalPlayerCount = res[0].count }
-    Events.addListener('LocalRecord', (info: tm.RecordInfo): void => {
-      if ((info.previous?.position === undefined || info.previous?.position > RecordService.maxLocalsAmount) && info.position <= RecordService.maxLocalsAmount) {
-        this.newLocalsAmount++
+      await tm.log.fatal(`Failed to fetch player count.`, res.message, res.stack);
+    } else {
+      this._totalPlayerCount = res[0].count;
+    }
+    Events.addListener("LocalRecord", (info: tm.RecordInfo): void => {
+      if (
+        (info.previous?.position === undefined || info.previous?.position > RecordService.maxLocalsAmount) &&
+        info.position <= RecordService.maxLocalsAmount
+      ) {
+        this.newLocalsAmount++;
       }
-    })
-    Events.addListener(['MapAdded', 'MapRemoved'], () => {
-      void this.calculateAveragesAndRanks()
-    })
-    Events.addListener('BeginMap', (): void => {
-      this.newLocalsAmount = 0
-    })
+    });
+    Events.addListener(["MapAdded", "MapRemoved"], () => {
+      void this.calculateAveragesAndRanks();
+    });
+    Events.addListener("BeginMap", (): void => {
+      this.newLocalsAmount = 0;
+    });
   }
 
   /**
@@ -49,22 +53,35 @@ export class PlayerService {
    * Only called in the beginning as a start job
    */
   private static async addAllFromList(): Promise<void> {
-    const playerList: any[] | Error = await Client.call('GetPlayerList', [{ int: 250 }, { int: 0 }])
+    const playerList: any[] | Error = await Client.call("GetPlayerList", [{ int: 250 }, { int: 0 }]);
     if (playerList instanceof Error) {
-      Logger.fatal('Error when fetching players from the server', playerList.message)
-      return
+      Logger.fatal("Error when fetching players from the server", playerList.message);
+      return;
     }
     for (const player of playerList) {
-      const info: any | Error = await Client.call('GetDetailedPlayerInfo', [{ string: player.Login }])
+      const info: any | Error = await Client.call("GetDetailedPlayerInfo", [{ string: player.Login }]);
       if (info instanceof Error) {
-        Logger.fatal(`Error when fetching player information from the server for ${Utils.strip(
-          player.NickName)} (${player.Login})`, info.message)
-        return
+        Logger.fatal(
+          `Error when fetching player information from the server for ${Utils.strip(
+            player.NickName,
+          )} (${player.Login})`,
+          info.message,
+        );
+        return;
       }
       // OnlineRights is 0 for nations and 3 for united ?XD
-      await this.join(player.Login, player.NickName, info.Path, info.IsSpectator, info.PlayerId,
-        info.IPAddress.split(':')[0], info.OnlineRights === 3, info.LadderStats.PlayerRankings[0].Score,
-        info.LadderStats.PlayerRankings[0].Ranking, true)
+      await this.join(
+        player.Login,
+        player.NickName,
+        info.Path,
+        info.IsSpectator,
+        info.PlayerId,
+        info.IPAddress.split(":")[0],
+        info.OnlineRights === 3,
+        info.LadderStats.PlayerRankings[0].Score,
+        info.LadderStats.PlayerRankings[0].Ranking,
+        true,
+      );
     }
   }
 
@@ -75,13 +92,19 @@ export class PlayerService {
    * @param countryCode Player nation code
    */
   static getTitle(login: string, privilege: number, country: string, countryCode: string): string {
-    const loginTitle = titles.logins[login as keyof typeof titles.logins]
-    if (loginTitle !== undefined) { return loginTitle }
-    const countryTitle = titles.countries[country as keyof typeof titles.countries]
-    if (countryTitle !== undefined) { return countryTitle }
-    const countryCodeTitle = titles.countries[countryCode as keyof typeof titles.countries]
-    if (countryCodeTitle !== undefined) { return countryCodeTitle }
-    return titles.privileges[privilege as keyof typeof titles.privileges]
+    const loginTitle = titles.logins[login as keyof typeof titles.logins];
+    if (loginTitle !== undefined) {
+      return loginTitle;
+    }
+    const countryTitle = titles.countries[country as keyof typeof titles.countries];
+    if (countryTitle !== undefined) {
+      return countryTitle;
+    }
+    const countryCodeTitle = titles.countries[countryCode as keyof typeof titles.countries];
+    if (countryCodeTitle !== undefined) {
+      return countryCodeTitle;
+    }
+    return titles.privileges[privilege as keyof typeof titles.privileges];
   }
 
   /**
@@ -96,20 +119,31 @@ export class PlayerService {
    * @param serverStart True if executed on server start
    * @returns Player object
    */
-  static async join(login: string, nickname: string, fullRegion: string, isSpectator: boolean, id: number, ip: string,
-    isUnited: boolean, ladderPoints: number, ladderRank: number, serverStart?: true): Promise<tm.Player> {
-    let { region, country, countryCode } = Utils.getRegionInfo(fullRegion)
-    if (countryCode === undefined) { // This actually happens sometimes yes thanks nadeo
-      Logger.warn(`Player ${Utils.strip(nickname)} (${login}) has undefined nation. Setting it to OTH.`)
-      Logger.debug(`Login: "${login}", Region: "${fullRegion}".`)
-      countryCode = 'OTH'
-      region = 'Other Countries'
-      country = 'Other Countries'
+  static async join(
+    login: string,
+    nickname: string,
+    fullRegion: string,
+    isSpectator: boolean,
+    id: number,
+    ip: string,
+    isUnited: boolean,
+    ladderPoints: number,
+    ladderRank: number,
+    serverStart?: true,
+  ): Promise<tm.Player> {
+    let { region, country, countryCode } = Utils.getRegionInfo(fullRegion);
+    if (countryCode === undefined) {
+      // This actually happens sometimes yes thanks nadeo
+      Logger.warn(`Player ${Utils.strip(nickname)} (${login}) has undefined nation. Setting it to OTH.`);
+      Logger.debug(`Login: "${login}", Region: "${fullRegion}".`);
+      countryCode = "OTH";
+      region = "Other Countries";
+      country = "Other Countries";
     }
-    const playerData: tm.OfflinePlayer | undefined = await this.repo.get(login)
-    const privilege: number = await this.privilegeRepo.get(login)
-    let player: tm.Player
-    const index: number = this.ranks.indexOf(login)
+    const playerData: tm.OfflinePlayer | undefined = await this.repo.get(login);
+    const privilege: number = await this.privilegeRepo.get(login);
+    let player: tm.Player;
+    const index: number = this.ranks.indexOf(login);
     if (playerData === undefined) {
       player = {
         id,
@@ -126,22 +160,22 @@ export class PlayerService {
         isSpectator,
         isTemporarySpectator: isSpectator,
         isPureSpectator: isSpectator,
-        hasPlayerSlot: isSpectator,
+        hasPlayerSlot: !isSpectator,
         ip,
         region,
         isUnited,
         average: RecordService.maxLocalsAmount,
         ladderPoints,
         ladderRank,
-        rank: index === -1 ? undefined : (index + 1),
+        rank: index === -1 ? undefined : index + 1,
         spectators: new Set<string>(),
         title: this.getTitle(login, privilege, country, countryCode),
         roundsPoints: 0,
         roundTimes: [],
-        isCupFinalist: false
-      }
-      this._totalPlayerCount++
-      await this.repo.add(player) // need to await so owner privilege gets set after player is added
+        isCupFinalist: false,
+      };
+      this._totalPlayerCount++;
+      await this.repo.add(player); // need to await so owner privilege gets set after player is added
     } else {
       player = {
         login,
@@ -157,13 +191,13 @@ export class PlayerService {
         isSpectator,
         isTemporarySpectator: isSpectator,
         isPureSpectator: isSpectator,
-        hasPlayerSlot: isSpectator,
+        hasPlayerSlot: !isSpectator,
         id,
         ip,
         region,
         isUnited,
         lastOnline: playerData.lastOnline,
-        rank: index === -1 ? undefined : (index + 1),
+        rank: index === -1 ? undefined : index + 1,
         average: playerData.average,
         ladderPoints,
         ladderRank,
@@ -171,35 +205,50 @@ export class PlayerService {
         title: this.getTitle(login, privilege, country, countryCode),
         roundsPoints: 0,
         roundTimes: [],
-        isCupFinalist: false
-      }
-      await this.repo.updateOnJoin(player.login, player.nickname, player.region, player.visits, player.isUnited) // need to await so owner privilege gets set after player is added
+        isCupFinalist: false,
+      };
+      await this.repo.updateOnJoin(player.login, player.nickname, player.region, player.visits, player.isUnited); // need to await so owner privilege gets set after player is added
     }
-    this._players.push(player)
+    this._players.push(player);
     if (serverStart === undefined) {
-      Logger.info(`${player.isSpectator ? 'Spectator' : 'Player'} ${Utils.strip(
-        player.nickname)} (${player.login}) joined the server, visits: ${player.visits}, ` + `region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`)
+      Logger.info(
+        `${player.isSpectator ? "Spectator" : "Player"} ${Utils.strip(
+          player.nickname,
+        )} (${player.login}) joined the server, visits: ${player.visits}, ` +
+          `region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`,
+      );
     }
-    return player
+    return player;
   }
 
   /**
    * Updates the player information in runtime memory and the database
    * @param players Objects containing player login and infos to change
    */
-  static async updateInfo(...players: { login: string, nickname?: string, region?: string, title?: string }[]): Promise<void> {
+  static async updateInfo(
+    ...players: {
+      login: string;
+      nickname?: string;
+      region?: string;
+      title?: string;
+    }[]
+  ): Promise<void> {
     for (const p of players) {
-      const obj: tm.Player | tm.OfflinePlayer | undefined = this._players.find(
-        a => a.login === p.login) ?? await this.repo.get(p.login)
-      if (obj === undefined) { continue }
-      if (p.title !== undefined && (obj as any).title !== undefined) { (obj as any).title = p.title }
-      const { region, countryCode } = Utils.getRegionInfo(p.region ?? obj.region)
+      const obj: tm.Player | tm.OfflinePlayer | undefined =
+        this._players.find((a) => a.login === p.login) ?? (await this.repo.get(p.login));
+      if (obj === undefined) {
+        continue;
+      }
+      if (p.title !== undefined && (obj as any).title !== undefined) {
+        (obj as any).title = p.title;
+      }
+      const { region, countryCode } = Utils.getRegionInfo(p.region ?? obj.region);
       if (p.nickname !== undefined && p.nickname !== obj.nickname) {
-        Logger.trace(`Updated the nickname for ${p.login} from Dedimania.`)
-        await this.repo.updateNickname(p.login, p.nickname ?? obj.nickname)
+        Logger.trace(`Updated the nickname for ${p.login} from Dedimania.`);
+        await this.repo.updateNickname(p.login, p.nickname ?? obj.nickname);
       }
       if (countryCode !== undefined) {
-        await this.repo.updateRegion(p.login, region)
+        await this.repo.updateRegion(p.login, region);
       }
     }
   }
@@ -209,28 +258,33 @@ export class PlayerService {
    * @param login Player login
    */
   static leave(login: string): tm.LeaveInfo | Error {
-    const date: Date = new Date()
-    const playerIndex: number = this._players.findIndex(a => a.login === login)
+    const date: Date = new Date();
+    const playerIndex: number = this._players.findIndex((a) => a.login === login);
     if (playerIndex === -1) {
-      const errStr = `Error removing player ${login} from memory, player is not in the memory`
-      Logger.error(errStr)
-      return new Error(errStr)
+      const errStr = `Error removing player ${login} from memory, player is not in the memory`;
+      Logger.error(errStr);
+      return new Error(errStr);
     }
-    const player: tm.Player = this._players[playerIndex]
-    const sessionTime: number = Date.now() - player.joinTimestamp
-    const totalTimePlayed: number = sessionTime + player.timePlayed
+    const player: tm.Player = this._players[playerIndex];
+    const sessionTime: number = Date.now() - player.joinTimestamp;
+    const totalTimePlayed: number = sessionTime + player.timePlayed;
     const leaveInfo: tm.LeaveInfo = {
-      ...player, timePlayed: totalTimePlayed, sessionTime
-    }
+      ...player,
+      timePlayed: totalTimePlayed,
+      sessionTime,
+    };
     // remove spec
     if (player.isSpectator) {
-      this._players.forEach(a => a.spectators.delete(player.login))
+      this._players.forEach((a) => a.spectators.delete(player.login));
     }
-    void this.repo.updateOnLeave(player.login, totalTimePlayed, date)
-    this._players.splice(playerIndex, 1)
-    Logger.info(`${Utils.strip(player.nickname)} (${player.login}) has quit after playing for ${Utils.getVerboseTime(
-      sessionTime)}`)
-    return leaveInfo
+    void this.repo.updateOnLeave(player.login, totalTimePlayed, date);
+    this._players.splice(playerIndex, 1);
+    Logger.info(
+      `${Utils.strip(player.nickname)} (${player.login}) has quit after playing for ${Utils.getVerboseTime(
+        sessionTime,
+      )}`,
+    );
+    return leaveInfo;
   }
 
   /**
@@ -240,13 +294,13 @@ export class PlayerService {
   static resetCheckpoints(login?: string) {
     if (login === undefined) {
       for (const e of this._players) {
-        e.currentCheckpoints.length = 0
+        e.currentCheckpoints.length = 0;
       }
-      return
+      return;
     }
-    const player = this.get(login)
+    const player = this.get(login);
     if (player !== undefined) {
-      player.currentCheckpoints.length = 0
+      player.currentCheckpoints.length = 0;
     }
   }
 
@@ -255,44 +309,55 @@ export class PlayerService {
    * @param player Player object
    * @param cp Checkpoint object
    */
-  static addCP(player: tm.Player, cp: tm.Checkpoint): Error | boolean | {
-    lapTime: number, isFinish: boolean, lapCheckpoints: number[]
-  } {
-    const laps = tm.maps.current.lapsAmount
+  static addCP(
+    player: tm.Player,
+    cp: tm.Checkpoint,
+  ):
+    | Error
+    | boolean
+    | {
+        lapTime: number;
+        isFinish: boolean;
+        lapCheckpoints: number[];
+      } {
+    const laps = tm.maps.current.lapsAmount;
     if (cp.index === 0) {
-      if (laps === 1 && MapService.current.checkpointsPerLap === 1) {  // finish if 0 cp map
-        player.currentCheckpoints.length = 0
-        return true
+      if (laps === 1 && MapService.current.checkpointsPerLap === 1) {
+        // finish if 0 cp map
+        player.currentCheckpoints.length = 0;
+        return true;
       }
-      player.currentCheckpoints.unshift(cp)
-      player.currentCheckpoints.length = 1 // reset checkpoints array on cp1
-      return false
+      player.currentCheckpoints.unshift(cp);
+      player.currentCheckpoints.length = 1; // reset checkpoints array on cp1
+      return false;
     }
     if (player.currentCheckpoints.length === 0) {
-      return new Error('Index not coherent with checkpoints length')
+      return new Error("Index not coherent with checkpoints length");
     } // handle people passing some cps before controller start
-    const endLap: number = player.currentCheckpoints[0].lap + laps
+    const endLap: number = player.currentCheckpoints[0].lap + laps;
     if (cp.lap < endLap) {
-      player.currentCheckpoints.push(cp)
+      player.currentCheckpoints.push(cp);
       if (MapService.current.isInLapsMode && (cp.index + 1) % MapService.current.checkpointsPerLap === 0) {
-        const startIndex = cp.index - MapService.current.checkpointsPerLap
-        const startTime = player.currentCheckpoints[startIndex]?.time ?? 0
+        const startIndex = cp.index - MapService.current.checkpointsPerLap;
+        const startTime = player.currentCheckpoints[startIndex]?.time ?? 0;
         return {
-          lapTime: cp.time - startTime, isFinish: false,
-          lapCheckpoints: player.currentCheckpoints.slice(startIndex + 1, -1).map(a => a.time - startTime)
-        }
+          lapTime: cp.time - startTime,
+          isFinish: false,
+          lapCheckpoints: player.currentCheckpoints.slice(startIndex + 1, -1).map((a) => a.time - startTime),
+        };
       }
-      return false
+      return false;
     } else {
       if (MapService.current.isInLapsMode) {
-        const startIndex = cp.index - MapService.current.checkpointsPerLap
-        const startTime = player.currentCheckpoints[startIndex]?.time ?? 0
+        const startIndex = cp.index - MapService.current.checkpointsPerLap;
+        const startTime = player.currentCheckpoints[startIndex]?.time ?? 0;
         return {
-          lapTime: cp.time - startTime, isFinish: true,
-          lapCheckpoints: player.currentCheckpoints.slice(startIndex + 1).map(a => a.time - startTime)
-        }
+          lapTime: cp.time - startTime,
+          isFinish: true,
+          lapCheckpoints: player.currentCheckpoints.slice(startIndex + 1).map((a) => a.time - startTime),
+        };
       }
-      return true
+      return true;
     }
   }
 
@@ -302,36 +367,41 @@ export class PlayerService {
    * @returns True if successful, false if the player is not in the runtime memory
    */
   static setPlayerInfo(info: tm.InfoChangedInfo): boolean {
-    const player: tm.Player | undefined = this._players.find(a => a.login === info.login)
-    if (player === undefined) { return false }
-    player.isSpectator = info.isSpectator
-    player.isPureSpectator = info.isPureSpectator
-    player.isTemporarySpectator = info.isTemporarySpectator
-    player.hasPlayerSlot = info.hasPlayerSlot
+    const player: tm.Player | undefined = this._players.find((a) => a.login === info.login);
+    if (player === undefined) {
+      return false;
+    }
+    player.isSpectator = info.isSpectator;
+    player.isPureSpectator = info.isPureSpectator;
+    player.isTemporarySpectator = info.isTemporarySpectator;
+    player.hasPlayerSlot = info.hasPlayerSlot;
     // update spectators
-    const spectated: tm.Player | undefined = info.currentTargetId % 255 === 0 ? undefined : this._players.find(a => a.id === info.currentTargetId)
-    let specChanged = true
+    const spectated: tm.Player | undefined =
+      info.currentTargetId % 255 === 0 ? undefined : this._players.find((a) => a.id === info.currentTargetId);
+    let specChanged = true;
     if (spectated === undefined) {
       if (!player.isSpectator && info.currentTargetId % 255 !== 0) {
-        Logger.error(`The player that ${player.login} is spectating does not exist.`)
+        Logger.error(`The player that ${player.login} is spectating does not exist.`);
       }
     } else if (spectated.spectators.has(player.login)) {
-      specChanged = false
+      specChanged = false;
     } else {
-      spectated.spectators.add(player.login)
-      Logger.debug(`Player ${player.login} is now spectating player ${spectated.login}.`)
+      spectated.spectators.add(player.login);
+      Logger.debug(`Player ${player.login} is now spectating player ${spectated.login}.`);
     }
     if (specChanged) {
-      this._players.forEach(a => {
+      this._players.forEach((a) => {
         if (a !== spectated) {
-          a.spectators.delete(player.login)
+          a.spectators.delete(player.login);
         }
-      })
+      });
     }
-    if (info.teamId === -1) { player.team = undefined } else {
-      player.team = info.teamId === 0 ? 'blue' : 'red'
+    if (info.teamId === -1) {
+      player.team = undefined;
+    } else {
+      player.team = info.teamId === 0 ? "blue" : "red";
     }
-    return true
+    return true;
   }
 
   /**
@@ -340,47 +410,60 @@ export class PlayerService {
    * @returns Number of wins
    */
   static async addWin(login: string): Promise<number> {
-    const player: any = this.get(login) ?? await this.fetch(login)
-    await this.repo.updateOnWin(login, ++player.wins)
-    Logger.trace(`Player ${Utils.strip(player.nickname)} (${player.login}) won for the ${Utils.getOrdinalSuffix(
-      player.wins)} time.`)
-    return player.wins
+    const player: any = this.get(login) ?? (await this.fetch(login));
+    await this.repo.updateOnWin(login, ++player.wins);
+    Logger.trace(
+      `Player ${Utils.strip(player.nickname)} (${player.login}) won for the ${Utils.getOrdinalSuffix(
+        player.wins,
+      )} time.`,
+    );
+    return player.wins;
   }
 
   /**
    * Calculates and updates averages and ranks in players table and runtime
    */
   static async calculateAveragesAndRanks(): Promise<void> {
-    const logins = RecordService.localRecords.slice(0, RecordService.maxLocalsAmount + this.newLocalsAmount)
-    .map(a => a.login)
-    const localRecords = RecordService.localRecords
-    const initialLocals = RecordService.initialLocals
-    const amount: number = MapService.mapCount
-    const averages = await this.repo.getAverage(logins)
-    const arr: { login: string, average: number }[] = []
+    const logins = RecordService.localRecords
+      .slice(0, RecordService.maxLocalsAmount + this.newLocalsAmount)
+      .map((a) => a.login);
+    const localRecords = RecordService.localRecords;
+    const initialLocals = RecordService.initialLocals;
+    const amount: number = MapService.mapCount;
+    const averages = await this.repo.getAverage(logins);
+    const arr: {
+      login: string;
+      average: number;
+    }[] = [];
     for (const avg of averages) {
       // Get rank from the start of the race
-      let previousRank: number = initialLocals.findIndex(a => a.login === avg.login) + 1
+      let previousRank: number = initialLocals.findIndex((a) => a.login === avg.login) + 1;
       // If player doesn't have rank set it to locals amount
-      if (previousRank === 0) { previousRank = RecordService.maxLocalsAmount }
-      // Get rank from the end of the race
-      const newRank: number = localRecords.findIndex(a => a.login === avg.login) + 1
-      // Calculate average
-      const average: number = (amount * avg.average + newRank - previousRank) / amount
-      const onlinePlayer: tm.Player | undefined = this.get(avg.login)
-      if (onlinePlayer !== undefined) { // Set average in runtime if player is online
-        onlinePlayer.average = average
+      if (previousRank === 0) {
+        previousRank = RecordService.maxLocalsAmount;
       }
-      arr.push({ login: avg.login, average })
-      await this.repo.updateAverage(avg.login, average) // Set average in the database
+      // Get rank from the end of the race
+      const newRank: number = localRecords.findIndex((a) => a.login === avg.login) + 1;
+      // Calculate average
+      const average: number = (amount * avg.average + newRank - previousRank) / amount;
+      const onlinePlayer: tm.Player | undefined = this.get(avg.login);
+      if (onlinePlayer !== undefined) {
+        // Set average in runtime if player is online
+        onlinePlayer.average = average;
+      }
+      arr.push({
+        login: avg.login,
+        average,
+      });
+      await this.repo.updateAverage(avg.login, average); // Set average in the database
     }
     // Get ranks for all players
-    this.ranks = await this.repo.getRanks()
+    this.ranks = await this.repo.getRanks();
     for (const e of this._players) {
-      const index = this.ranks.indexOf(e.login)
-      e.rank = index === -1 ? undefined : (index + 1)
+      const index = this.ranks.indexOf(e.login);
+      e.rank = index === -1 ? undefined : index + 1;
     }
-    Events.emit('RanksAndAveragesUpdated', arr)
+    Events.emit("RanksAndAveragesUpdated", arr);
   }
 
   /**
@@ -388,16 +471,16 @@ export class PlayerService {
    * @param login Player login
    * @returns Player object or undefined if player is not in the database
    */
-  static fetch(login: string): Promise<tm.OfflinePlayer | undefined>
+  static fetch(login: string): Promise<tm.OfflinePlayer | undefined>;
   /**
    * Fetches multiple players from the database. This method should be used to get players who are not online
    * If some player is not present in the database he won't be returned. Returned array is not in initial order
    * @param logins Array of player logins
    * @returns Player objects array
    */
-  static fetch(logins: string[]): Promise<tm.OfflinePlayer[]>
+  static fetch(logins: string[]): Promise<tm.OfflinePlayer[]>;
   static fetch(logins: string | string[]): Promise<tm.OfflinePlayer | undefined | tm.OfflinePlayer[]> {
-    return this.repo.get(logins as any)
+    return this.repo.get(logins as any);
   }
 
   /**
@@ -405,40 +488,64 @@ export class PlayerService {
    * @param login Player login
    * @returns Player object or undefined if the player isn't online
    */
-  static get(login: string): Readonly<tm.Player & { currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]> }> | undefined
+  static get(login: string):
+    | Readonly<
+        tm.Player & {
+          currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]>;
+        }
+      >
+    | undefined;
   /**
    * Gets multiple players information from runtime memory. Only online players are stored
    * If some player is not online he won't be returned. Returned array is not in initial order
    * @param logins Array of player logins
    * @returns Array of player objects
    */
-  static get(logins: string[]): Readonly<tm.Player & { currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]> }>[]
-  static get(logins: string | string[]): Readonly<tm.Player & { currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]> }> | undefined | Readonly<tm.Player & { currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]> }>[] {
-    if (typeof logins === 'string') {
-      return this._players.find(a => a.login === logins)
+  static get(logins: string[]): Readonly<
+    tm.Player & {
+      currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]>;
     }
-    return this._players.filter(a => logins.includes(a.login))
+  >[];
+  static get(logins: string | string[]):
+    | Readonly<
+        tm.Player & {
+          currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]>;
+        }
+      >
+    | undefined
+    | Readonly<
+        tm.Player & {
+          currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]>;
+        }
+      >[] {
+    if (typeof logins === "string") {
+      return this._players.find((a) => a.login === logins);
+    }
+    return this._players.filter((a) => logins.includes(a.login));
   }
 
   /**
    * All online players
    */
-  static get players(): Readonly<tm.Player & { currentCheckpoints: Readonly<tm.Checkpoint>[] }>[] {
-    return [...this._players]
+  static get players(): Readonly<
+    tm.Player & {
+      currentCheckpoints: Readonly<tm.Checkpoint>[];
+    }
+  >[] {
+    return [...this._players];
   }
 
   /**
    * Number of online players
    */
   static get playerCount(): number {
-    return this._players.length
+    return this._players.length;
   }
 
   /**
    * Number of all players who visited the server
    */
   static get totalPlayerCount(): number {
-    return this._totalPlayerCount
+    return this._totalPlayerCount;
   }
-
 }

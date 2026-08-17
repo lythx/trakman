@@ -3,7 +3,7 @@
  * @since 0.3
  */
 
-import { closeButton, componentIds, Grid, centeredText, Paginator, type GridCellFunction, type GridCellObject, PopupWindow } from '../../ui/UI.js'
+import { centeredText, closeButton, componentIds, Grid, type GridCellFunction, type GridCellObject, Paginator, PopupWindow } from '../../ui/UI.js'
 import { checkpointRecords } from '../../checkpoint_records/CheckpointRecords.js'
 import config from './CheckpointRecords.config.js'
 
@@ -18,9 +18,12 @@ class CheckpointRecords extends PopupWindow {
   }
 
   constructor() {
-    super(componentIds.checkpointRecords, config.icon, config.title, (tm.getGameMode() === 'Stunts' ? config.stuntsNavbar : config.navbar))
-    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, new Array(config.entries + 1).fill(1), config.grid)
-    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, Math.ceil(tm.maps.current.checkpointsAmount / config.entries))
+    super(componentIds.checkpointRecords, config.icon, config.title,
+      (tm.getGameMode() === 'Stunts' ? config.stuntsNavbar : config.navbar))
+    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
+      new Array(config.entries + 1).fill(1), config.grid)
+    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
+      Math.ceil(tm.maps.current.checkpointsAmount / config.entries))
     this.paginator.onPageChange = (login: string, page: number) => {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
@@ -61,15 +64,13 @@ class CheckpointRecords extends PopupWindow {
     this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
   }
 
-  protected async constructContent(login: string, params: { page: number }): Promise<string> {
-    const headers: GridCellFunction[] = [
-      (i, j, w, h) => centeredText(' Index ', w, h),
-      (i, j, w, h) => centeredText(' Nickname ', w, h),
-      (i, j, w, h) => centeredText(' Login ', w, h),
-      (i, j, w, h) => centeredText(' Date ', w, h),
-      (i, j, w, h) => centeredText(' Best ', w, h),
-      (i, j, w, h) => centeredText(' Personal ', w, h)
-    ]
+  protected async constructContent(login: string, params: {
+    page: number
+  }): Promise<string> {
+    const headers: GridCellFunction[] = [(i, j, w, h) => centeredText(' Index ', w, h),
+      (i, j, w, h) => centeredText(' Nickname ', w, h), (i, j, w, h) => centeredText(' Login ', w, h),
+      (i, j, w, h) => centeredText(' Date ', w, h), (i, j, w, h) => centeredText(' Best ', w, h),
+      (i, j, w, h) => centeredText(' Personal ', w, h)]
     const cps = checkpointRecords.mapCheckpoints
     const cpIndex = config.entries * (params.page - 1)
     const personalCps = checkpointRecords.playerCheckpoints
@@ -90,8 +91,7 @@ class CheckpointRecords extends PopupWindow {
 
     const dateCell: GridCellFunction = (i, j, w, h) => {
       const cp = cps[i + cpIndex - 1]
-      return centeredText((cp === undefined || cp === null) ? '' :
-        tm.utils.formatDate(cp.date, true), w, h)
+      return centeredText((cp === undefined || cp === null) ? '' : tm.utils.formatDate(cp.date, true), w, h)
     }
 
     const bestSectorCell: GridCellFunction = (i, j, w, h) => {
@@ -121,7 +121,8 @@ class CheckpointRecords extends PopupWindow {
         } else if (difference === 0) {
           differenceString = `($${this.diffColours.equal + tm.utils.getTimeString(difference)}$FFF)`
         } else {
-          differenceString = `($${this.diffColours.worse}${worseSign}${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
+          differenceString = `($${this.diffColours.worse}${worseSign}${tm.utils.getTimeString(
+            Math.abs(difference))}$FFF)`
         }
       }
       return centeredText(differenceString + ' ' + tm.utils.getTimeString(cp), w, h)

@@ -15,11 +15,10 @@ const returnCoppers = (login: string) => {
   if (prize === undefined) {
     throw new Error(`Prize undefined while returning coppers in betting plugin`)
   }
-  void tm.utils.payCoppers(login, tm.utils.getCoppersAfterTax(prize), tm.utils.strVar(config.copperReturnMessage,
-    {
-      amount: prize,
-      serverName: tm.utils.strip(tm.config.server.name, false)
-    }))
+  void tm.utils.payCoppers(login, tm.utils.getCoppersAfterTax(prize), tm.utils.strVar(config.copperReturnMessage, {
+    amount: prize,
+    serverName: tm.utils.strip(tm.config.server.name, false)
+  }))
 }
 
 const onTimeRunOut = (wasInterrupted = false) => {
@@ -65,7 +64,7 @@ const acceptBet = async (player: tm.Player) => {
   if (paymentStatus === true) {
     betLogins.push(player.login)
     tm.sendMessage(tm.utils.strVar(config.messages.accept, {
-      name: tm.utils.strip(player.nickname),
+      name: tm.utils.strip(player.nickname)
     }))
     betPlaceWindow.hideToPlayer(player.login)
   }
@@ -78,8 +77,9 @@ betPlaceWindow.onBetAccept = acceptBet
 if (config.isEnabled) {
   tm.addListener('Startup', () => {
     const msg = isActive ? config.messages.startupEnabled : config.messages.startupDisabled
-    for (const e of tm.players.list.filter(a => a.privilege >= config.activatePrivilege))
+    for (const e of tm.players.list.filter(a => a.privilege >= config.activatePrivilege)) {
       tm.sendMessage(msg, e.login)
+    }
   })
 
   tm.addListener('ServerStateChanged', (state) => {
@@ -130,11 +130,10 @@ if (config.isEnabled) {
       return
     }
     tm.utils.payCoppers(bestRecord.login, tm.utils.getCoppersAfterTax(prize * betLogins.length),
-      tm.utils.strVar(config.winMessage,
-        {
-          amount: prize * betLogins.length,
-          serverName: tm.utils.strip(tm.config.server.name, false)
-        }))
+      tm.utils.strVar(config.winMessage, {
+        amount: prize * betLogins.length,
+        serverName: tm.utils.strip(tm.config.server.name, false)
+      }))
     tm.sendMessage(tm.utils.strVar(config.messages.win, {
       name: tm.utils.strip(bestRecord.nickname),
       prize: prize * betLogins.length
@@ -178,7 +177,11 @@ if (config.isEnabled) {
   tm.commands.add({
     aliases: config.bet.aliases,
     help: config.bet.help,
-    params: [{ name: 'prize', type: 'int', optional: true }],
+    params: [{
+      name: 'prize',
+      type: 'int',
+      optional: true
+    }],
     callback(info, newPrize?: number) {
       if (!isOpen) {
         tm.sendMessage(config.messages.closed, info.login)
@@ -189,8 +192,7 @@ if (config.isEnabled) {
         acceptBet(info)
       } else if (newPrize !== undefined) {
         if (newPrize < config.minimumAmount) {
-          tm.sendMessage(tm.utils.strVar(config.messages.amountTooLow,
-            { minimum: config.minimumAmount }), info.login)
+          tm.sendMessage(tm.utils.strVar(config.messages.amountTooLow, { minimum: config.minimumAmount }), info.login)
           return
         }
         startBet(info, newPrize)

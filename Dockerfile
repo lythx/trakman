@@ -29,7 +29,8 @@ RUN mv GameData/Config/dedicated_cfg.txt dedicated_cfg.txt.bk && \
     mkdir -p Tracksbk/MatchSettings && \
     mkdir -p Tracksbk/Campaigns/Nations && \
     mv GameData/Tracks/MatchSettings/Nations/NationsBlue.txt Tracksbk/MatchSettings/MatchSettings.txt && \
-    mv GameData/Tracks/Campaigns/Nations/Blue Tracksbk/Campaigns/Nations/
+    mv GameData/Tracks/Campaigns/Nations/Blue Tracksbk/Campaigns/Nations/ && \
+    rm -rf GameData/Tracks
 # expose volumes
 VOLUME /app/server/GameData/Config
 VOLUME /app/server/GameData/Tracks

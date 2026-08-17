@@ -3,11 +3,13 @@
  * @since 0.3
  */
 
-import { Grid, componentIds, type GridCellFunction, centeredText, closeButton, PopupWindow, Paginator } from '../UI.js'
+import { centeredText, closeButton, componentIds, Grid, type GridCellFunction, Paginator, PopupWindow } from '../UI.js'
 import config from './Changelog.config.js'
 import fs from 'fs/promises'
 
-export default class Changelog extends PopupWindow<{ page: number }> {
+export default class Changelog extends PopupWindow<{
+  page: number
+}> {
 
   private readonly versions: {
     version: string
@@ -31,7 +33,8 @@ export default class Changelog extends PopupWindow<{ page: number }> {
     this.paginator.onPageChange = (login, page) => {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
-    this.grid = new Grid(this.contentWidth, this.contentHeight, new Array(config.entries).fill(1), [1], { margin: config.marginBig })
+    this.grid = new Grid(this.contentWidth, this.contentHeight, new Array(config.entries).fill(1), [1],
+      { margin: config.marginBig })
     this.readChangelog()
   }
 
@@ -55,7 +58,11 @@ export default class Changelog extends PopupWindow<{ page: number }> {
         }
       }).slice(2, 2 + config.lineCount).join('\n')
       if (![version, date, content].includes(undefined as any)) {
-        this.versions.push({ version, date, content })
+        this.versions.push({
+          version,
+          date,
+          content
+        })
       }
     }
     this.paginator.setPageCount(Math.ceil(this.versions.length / config.entries))
@@ -67,7 +74,9 @@ export default class Changelog extends PopupWindow<{ page: number }> {
     this.displayToPlayer(info.login, { page }, `${page}/${this.paginator.pageCount}`)
   }
 
-  protected constructContent(login: string, { page }: { page: number }): string {
+  protected constructContent(login: string, { page }: {
+    page: number
+  }): string {
     const index = config.entries * (page - 1)
     const cells: GridCellFunction[] = []
     const cell: GridCellFunction = (i, j, w, h) => {
@@ -86,10 +95,16 @@ export default class Changelog extends PopupWindow<{ page: number }> {
     const dateW = w - (versionWidth + this.margin)
     return `<format textsize="1"/>
       <quad posn="0 0 3" sizen="${versionWidth} ${headerH}" bgcolor="${this.headerBackground}"/>
-      ${centeredText(`$s$${tm.utils.palette.green}${title}`, versionWidth, headerH, { padding: this.margin, textScale: config.textScale })}
+      ${centeredText(`$s$${tm.utils.palette.green}${title}`, versionWidth, headerH, {
+      padding: this.margin,
+      textScale: config.textScale
+    })}
       <frame posn="${versionWidth + this.margin} 0 2">
         <quad posn="0 0 2" sizen="${dateW} ${headerH}" bgcolor="${this.headerBackground}"/>
-        ${centeredText(`$s${date}`, dateW, headerH, { padding: this.margin, textScale: config.textScale })}
+        ${centeredText(`$s${date}`, dateW, headerH, {
+      padding: this.margin,
+      textScale: config.textScale
+    })}
       </frame>
       <frame posn="0 ${-headerH - this.margin} 2">
         <quad posn="0 0 2" sizen="${w} ${h - (headerH + this.margin)}" bgcolor="${config.tileBackground}"/>
@@ -99,7 +114,9 @@ export default class Changelog extends PopupWindow<{ page: number }> {
       </frame>`
   }
 
-  protected constructFooter(login: string, { page }: { page: number }): string {
+  protected constructFooter(login: string, { page }: {
+    page: number
+  }): string {
     return closeButton(this.closeId, this.windowWidth, this.footerHeight) + this.paginator.constructXml(page)
   }
 

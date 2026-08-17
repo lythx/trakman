@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { RecordList, componentIds, StaticHeader, StaticComponent, type RLImage } from '../../UI.js'
+import { componentIds, RecordList, type RLImage, StaticComponent, StaticHeader } from '../../UI.js'
 import config from './RoundsPointsRanking.config.js'
 
 export default class RoundsPointsRanking extends StaticComponent {
@@ -17,15 +17,15 @@ export default class RoundsPointsRanking extends StaticComponent {
     this.getRecordList()
     this.renderOnEvent('PlayerJoin', (info: tm.JoinInfo) => {
       if (tm.rounds.pointsRanking.filter(a => a.roundsPoints !== 0)
-        .some(a => a.login === info.login)) { return this.display() }
+      .some(a => a.login === info.login)) { return this.display() }
     })
     this.renderOnEvent('PlayerLeave', (info: tm.LeaveInfo) => {
       if (tm.rounds.pointsRanking.filter(a => a.roundsPoints !== 0)
-        .some(a => a.login === info.login)) { return this.display() }
+      .some(a => a.login === info.login)) { return this.display() }
     })
     this.renderOnEvent('PlayerDataUpdated', (info) => {
       if (info.some(a => tm.rounds.pointsRanking
-        .filter(b => b.roundsPoints !== 0).some(b => b.login === a.login))) { return this.display() }
+      .filter(b => b.roundsPoints !== 0).some(b => b.login === a.login))) { return this.display() }
     })
     this.renderOnEvent('PlayerFinish', () => this.display())
     this.onPanelHide((player) => {
@@ -65,9 +65,13 @@ export default class RoundsPointsRanking extends StaticComponent {
     let height = this.getHeight()
     let entries = this.getEntries()
     this.recordList?.destroy?.()
-    this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
-      entries, this.side, this.getTopCount(), tm.records.maxLocalsAmount, config.displayNoRecordEntry,
-      { dontParseTime: true, columnProportions: config.columnProportions, noRecordEntryText: config.noRecordEntryText })
+    this.recordList = new RecordList('race', this.id, config.width,
+      height - (this.header.options.height + config.margin), entries, this.side, this.getTopCount(),
+      tm.records.maxLocalsAmount, config.displayNoRecordEntry, {
+        dontParseTime: true,
+        columnProportions: config.columnProportions,
+        noRecordEntryText: config.noRecordEntryText
+      })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       if (this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(info.login)
@@ -94,12 +98,15 @@ export default class RoundsPointsRanking extends StaticComponent {
         ${this.header.constructXml(config.title, config.icon, this.side)}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
           ${this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, tm.rounds.pointsRanking
-        .filter(a => a.roundsPoints !== 0)
-        .map(a => ({
-          name: a.nickname, time: a.roundsPoints, login: a.login,
-          checkpoints: a.roundTimes.map(a => a === -1 ? undefined : a), image: this.getCupImage(a)
-        }))
-        .slice(0, tm.records.maxLocalsAmount))}
+      .filter(a => a.roundsPoints !== 0)
+      .map(a => ({
+        name: a.nickname,
+        time: a.roundsPoints,
+        login: a.login,
+        checkpoints: a.roundTimes.map(a => a === -1 ? undefined : a),
+        image: this.getCupImage(a)
+      }))
+      .slice(0, tm.records.maxLocalsAmount))}
         </frame>
       </frame>
     </manialink>`,

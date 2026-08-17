@@ -1,6 +1,6 @@
 import config from './Config.js'
 import songList from './SongList.js'
-import type { Song, SongAddedCallback, SongRemovedCallback, QueueChangedCallback, Caller } from './Types.js'
+import type { Caller, QueueChangedCallback, Song, SongAddedCallback, SongRemovedCallback } from './Types.js'
 import SongList from './ui/SongList.component.js'
 import MusicWidget from './ui/MusicWidget.component.js'
 import fs from 'fs/promises'
@@ -24,7 +24,7 @@ export const music = {
 
   /**
    * Add a callback function to execute on a song queue change
-   * @param callback Function to execute on event. 
+   * @param callback Function to execute on event.
    * It takes song queue and optional change information object as parameters.
    */
   onQueueChanged(callback: QueueChangedCallback) {
@@ -33,7 +33,7 @@ export const music = {
 
   /**
    * Add a callback function to execute when a new song gets added to the song list
-   * @param callback Function to execute on event. 
+   * @param callback Function to execute on event.
    * It takes song object and caller object as parameters. (Caller is the player who added the song)
    */
   onSongAdded(callback: SongAddedCallback) {
@@ -42,7 +42,7 @@ export const music = {
 
   /**
    * Add a callback function to execute when a song gets removed from the song list
-   * @param callback Function to execute on event. 
+   * @param callback Function to execute on event.
    * It takes song object and caller object as parameters. (Caller is the player who removed the song)
    */
   onSongRemoved(callback: SongRemovedCallback) {
@@ -65,13 +65,19 @@ export const music = {
       return 'name taken'
     }
     url = tm.utils.fixProtocol(url)
-    const song: Song = { name, author, url, isJuked: false }
+    const song: Song = {
+      name,
+      author,
+      url,
+      isJuked: false
+    }
     queue.push(song)
     emitEvent(songAddCallbacks, song, caller)
     const status = addToQueue(name, false, caller)
     if (typeof status !== 'string') {
       emitEvent(queueChangeCallbacks, queue, {
-        song, action: 'added'
+        song,
+        action: 'added'
       })
     }
     void updateSongsConfigFile('add', song)
@@ -90,13 +96,11 @@ export const music = {
       return false
     }
     const song = queue.splice(index, 1)[0]
-    if (index === 0) {
-      updateNextSong(queue[0]?.url)
-    }
     listUi.updateSongs(current, queue)
     emitEvent(songRemoveCallbacks, song, caller)
     emitEvent(queueChangeCallbacks, queue, {
-      song, action: 'removed'
+      song,
+      action: 'removed'
     })
     void updateSongsConfigFile('remove', song)
     return true
@@ -108,8 +112,8 @@ export const music = {
    * @param caller Caller player object
    * @returns Song object if it got added, error message if unsuccessful
    */
-  addSongToQueue(songName: string, caller?: Caller):
-    Readonly<Song> | 'already queued' | 'not in songlist' | 'no privilege' {
+  addSongToQueue(songName: string,
+    caller?: Caller): Readonly<Song> | 'already queued' | 'not in songlist' | 'no privilege' {
     return addToQueue(songName, true, caller)
   },
 
@@ -143,7 +147,10 @@ if (config.isEnabled) {
       tm.log.warn(`Song name duplicates present in SongList, to fix them edit SongList.js file or use ingame commands.`)
       updateSongsConfigFile()
     }
-    queue.push(...songs.map(a => ({ ...a, isJuked: false })))
+    queue.push(...songs.map(a => ({
+      ...a,
+      isJuked: false
+    })))
     listUi.updateSongs(current, queue)
     const msg = config.messages
     listUi.onSongJuked = (song, info) => {
@@ -175,7 +182,7 @@ if (config.isEnabled) {
     emitEvent(queueChangeCallbacks, queue)
   })
 
-  tm.addListener('BeginMap', () => {
+  tm.addListener('EndMap', () => {
     if (current !== undefined) {
       current.isJuked = false
       current.caller = undefined
@@ -187,11 +194,11 @@ if (config.isEnabled) {
       }
     }
     current = queue[0]
+    updateNextSong(current?.url)
     queue.shift()
     listUi.updateSongs(current, queue)
     listUi.updatePreviousSongs(history)
     widgetUi.setCurrentSong(current)
-    updateNextSong(queue[0]?.url)
     emitEvent(queueChangeCallbacks, queue)
   }, true)
   const msg = config.messages
@@ -206,7 +213,8 @@ if (config.isEnabled) {
       if (status === true) {
         tm.sendMessage(tm.utils.strVar(msg.add, {
           nickname: tm.utils.strip(info.nickname),
-          song: name, author
+          song: name,
+          author
         }), add.public ? undefined : info.login)
       } else if (status === 'name taken') {
         tm.sendMessage(tm.utils.strVar(msg.addNameError, { name }), info.login)
@@ -240,7 +248,11 @@ if (config.isEnabled) {
   tm.commands.add({
     aliases: ol.aliases,
     help: ol.help,
-    params: [{ name: 'query', type: 'multiword', optional: true }],
+    params: [{
+      name: 'query',
+      type: 'multiword',
+      optional: true
+    }],
     callback: (info, query?: string) => {
       if (query === undefined || query.trim().length === 0) {
         listUi.open(info)
@@ -260,7 +272,7 @@ if (config.isEnabled) {
     callback: (info) => {
       shuffleQueue(info)
       tm.sendMessage(tm.utils.strVar(msg.shuffle, {
-        nickname: tm.utils.strip(info.nickname),
+        nickname: tm.utils.strip(info.nickname)
       }), sh.public ? undefined : info.login)
     },
     privilege: sh.privilege
@@ -274,8 +286,8 @@ function emitEvent<T extends ((...args: any) => any)[]>(eventCallbacks: T, ...pa
   }
 }
 
-function addToQueue(songName: string, emitEvents: boolean, caller?: Caller):
-  Song | "already queued" | "not in songlist" | "no privilege" {
+function addToQueue(songName: string, emitEvents: boolean,
+  caller?: Caller): Song | "already queued" | "not in songlist" | "no privilege" {
   const songIndex = queue.findIndex(a => a.name === songName)
   if (songIndex === -1) {
     return 'not in songlist'
@@ -293,9 +305,6 @@ function addToQueue(songName: string, emitEvents: boolean, caller?: Caller):
   song.caller = caller
   const newIndex = queue.findIndex(a => a.isJuked === false)
   queue.splice(newIndex, 0, song)
-  if (newIndex === 0) {
-    updateNextSong(song.url)
-  }
   listUi.updateSongs(current, queue)
   if (caller !== undefined) {
     tm.log.trace(`${tm.utils.strip(caller.nickname)} (${caller.login}) queued song ${song.name} by ${song.author}`)
@@ -304,37 +313,36 @@ function addToQueue(songName: string, emitEvents: boolean, caller?: Caller):
   }
   if (emitEvents) {
     emitEvent(queueChangeCallbacks, queue, {
-      song, action: 'addedToQueue'
+      song,
+      action: 'addedToQueue'
     })
   }
   return song
 }
 
 /**
-  * Removes a song from the song queue
-  * @param songName Song name
-  * @param caller Caller player object
-  * @returns Song object if it got removed, error message if unsuccessful
-  */
+ * Removes a song from the song queue
+ * @param songName Song name
+ * @param caller Caller player object
+ * @returns Song object if it got removed, error message if unsuccessful
+ */
 function removeFromQueue(name: string, caller?: Caller): Readonly<Song> | 'not queued' {
   if (!queue.filter(a => a.isJuked === true).some(a => a.name === name)) { return 'not queued' }
   const index: number = queue.findIndex(a => a.name === name)
   if (caller !== undefined) {
-    tm.log.trace(`${tm.utils.strip(caller.nickname)} (${caller.login}) removed song ` +
-      `${tm.utils.strip(queue[index].name)} by ${queue[index].author} from the queue`)
+    tm.log.trace(`${tm.utils.strip(caller.nickname)} (${caller.login}) removed song ` + `${tm.utils.strip(
+      queue[index].name)} by ${queue[index].author} from the queue`)
   } else {
     tm.log.trace(`Song ${tm.utils.strip(queue[index].name)} by ${queue[index].author} has been removed from the queue`)
   }
   const song = queue.splice(index, 1)[0]
-  if (index === 0) {
-    updateNextSong(queue[0].url)
-  }
   song.isJuked = false
   song.caller = undefined
   queue.push(song)
   listUi.updateSongs(current, queue)
   emitEvent(queueChangeCallbacks, queue, {
-    song, action: 'removedFromQueue'
+    song,
+    action: 'removedFromQueue'
   })
   return song
 }
@@ -344,11 +352,17 @@ function shuffleQueue(caller?: Caller): boolean {
     return false
   }
   queue = queue
-    .map(a => ({ song: { ...a, isJuked: false, caller: undefined }, rand: Math.random() }))
-    .sort((a, b): number => a.rand - b.rand)
-    .map(a => a.song)
+  .map(a => ({
+    song: {
+      ...a,
+      isJuked: false,
+      caller: undefined
+    },
+    rand: Math.random()
+  }))
+  .sort((a, b): number => a.rand - b.rand)
+  .map(a => a.song)
   listUi.updateSongs(current, queue)
-  updateNextSong(queue[0]?.url)
   emitEvent(queueChangeCallbacks, queue)
   if (caller !== undefined) {
     tm.log.info(`${tm.utils.strip(caller.nickname)} (${caller.login}) shuffled the song list`)
@@ -360,10 +374,7 @@ function shuffleQueue(caller?: Caller): boolean {
 
 function updateNextSong(url: string) {
   if (url === undefined) { return }
-  tm.client.callNoRes('SetForcedMusic', [
-    { boolean: config.overrideMapMusic },
-    { string: url }
-  ])
+  tm.client.callNoRes('SetForcedMusic', [{ boolean: config.overrideMapMusic }, { string: url }])
 }
 
 function fixDuplicateNames(): boolean {
@@ -387,13 +398,17 @@ function fixDuplicateNames(): boolean {
 
 async function updateSongsConfigFile(action?: 'add' | 'remove', song?: Song): Promise<void> {
   if (action === 'add' && song !== undefined) {
-    songs.push({ name: song.name, author: song.author, url: song.url })
+    songs.push({
+      name: song.name,
+      author: song.author,
+      url: song.url
+    })
   } else if (action === 'remove' && song !== undefined) {
     songs = songs.filter(a => a.name !== song.name)
   }
   try {
     await fs.writeFile(config.songListPath, 'export default ' + JSON.stringify(songs, null, 2))
-  } catch (err: any) {
+  } catch(err: any) {
     tm.log.error(`Cannot update song list in config. ${err?.message}`)
   }
 }

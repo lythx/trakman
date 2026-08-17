@@ -8,7 +8,10 @@ import { GameService } from "./GameService.js"
 export abstract class VoteService {
 
   private static readonly repo: VoteRepository = new VoteRepository()
-  private static _votes: { uid: string, votes: tm.Vote[] }[] = []
+  private static _votes: {
+    uid: string,
+    votes: tm.Vote[]
+  }[] = []
   private static _currentVotes: tm.Vote[] = []
 
   /**
@@ -19,7 +22,10 @@ export abstract class VoteService {
     const maps = [MapService.current, ...MapService.queue]
     for (let i: number = 0; i < maps.length; i++) {
       const uid: string = maps[i].id
-      this._votes.push({ uid, votes: res.filter(a => a.mapId === uid) })
+      this._votes.push({
+        uid,
+        votes: res.filter(a => a.mapId === uid)
+      })
     }
     this._currentVotes = this._votes[0].votes
     Events.addListener('JukeboxChanged', () => {
@@ -38,16 +44,27 @@ export abstract class VoteService {
   /**
    * Adds a vote on the current map to runtime memory and database
    * @param player Player object
-   * @param vote Vote value 
+   * @param vote Vote value
    */
-  static add(player: { login: string, nickname?: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): void
+  static add(player: {
+    login: string,
+    nickname?: string
+  }, vote: -3 | -2 | -1 | 1 | 2 | 3): void
   /**
    * Adds multiple votes on the current map to runtime memory and database
-   * @param votes Vote objects 
+   * @param votes Vote objects
    */
-  static add(votes: { login: string, vote: -3 | -2 | -1 | 1 | 2 | 3 }[]): void
-  static add(arg: { login: string, nickname?: string } |
-    { login: string, vote: -3 | -2 | -1 | 1 | 2 | 3 }[], vote?: -3 | -2 | -1 | 1 | 2 | 3): void {
+  static add(votes: {
+    login: string,
+    vote: -3 | -2 | -1 | 1 | 2 | 3
+  }[]): void
+  static add(arg: {
+    login: string,
+    nickname?: string
+  } | {
+    login: string,
+    vote: -3 | -2 | -1 | 1 | 2 | 3
+  }[], vote?: -3 | -2 | -1 | 1 | 2 | 3): void {
     if (GameService.state === 'transition') { return }
     const date: Date = new Date()
     const map = { ...MapService.current }
@@ -64,7 +81,12 @@ export abstract class VoteService {
           v.date = date
           added.push(v)
         } else {
-          const obj = { login: e.login, mapId: map.id, date, vote: e.vote }
+          const obj = {
+            login: e.login,
+            mapId: map.id,
+            date,
+            vote: e.vote
+          }
           voteArr.push(obj)
           updated.push(obj)
         }
@@ -80,7 +102,9 @@ export abstract class VoteService {
       if (v?.vote === vote) {
         return // Return if same vote already exists
       }
-      Logger.trace(`${Utils.strip(player?.nickname ?? player.login)} (${player.login}) has voted ${vote} for map ${Utils.strip(map.name)} (${map.id})`)
+      Logger.trace(
+        `${Utils.strip(player?.nickname ?? player.login)} (${player.login}) has voted ${vote} for map ${Utils.strip(
+          map.name)} (${map.id})`)
       if (v !== undefined) {
         v.date = date
         v.vote = vote
@@ -89,7 +113,12 @@ export abstract class VoteService {
         Events.emit('KarmaVote', [v])
         return
       }
-      const obj = { login: player.login, mapId: map.id, date, vote }
+      const obj = {
+        login: player.login,
+        mapId: map.id,
+        date,
+        vote
+      }
       voteArr.push(obj)
       void this.repo.add(obj)
       this.updateMapVoteData(map.id, voteArr)
@@ -98,13 +127,19 @@ export abstract class VoteService {
   }
 
   private static async updatePrefetch(): Promise<void> {
-    const arr: { uid: string, votes: tm.Vote[] }[] = []
+    const arr: {
+      uid: string,
+      votes: tm.Vote[]
+    }[] = []
     const mapsToFetch: string[] = []
     const ids: string[] = [...MapService.history, MapService.current, ...MapService.queue].map(a => a.id)
     for (let i = 0; i < ids.length; i++) {
       const v = this._votes.find(a => a.uid === ids[i])
       if (v === undefined) {
-        arr[i] = { uid: ids[i], votes: [] }
+        arr[i] = {
+          uid: ids[i],
+          votes: []
+        }
         mapsToFetch.push(ids[i])
       } else {
         arr[i] = v
@@ -121,7 +156,11 @@ export abstract class VoteService {
 
   private static updateMapVoteData(uid: string, arr: tm.Vote[]) {
     const count = arr.length
-    MapService.setVoteData({ uid, count, ratio: this.calculateVoteRatio(arr) })
+    MapService.setVoteData({
+      uid,
+      count,
+      ratio: this.calculateVoteRatio(arr)
+    })
   }
 
   private static calculateVoteRatio(votes: tm.Vote[]): number {
@@ -150,8 +189,14 @@ export abstract class VoteService {
    * @returns Array of objects containing map UID and vote objects array.
    * If some map is not in the database it won't be in the returned array
    */
-  static async fetch(mapIds: string[]): Promise<{ uid: string, votes: tm.Vote[] }[]>
-  static async fetch(mapIds: string | string[]): Promise<tm.Vote[] | undefined | { uid: string, votes: tm.Vote[] }[]> {
+  static async fetch(mapIds: string[]): Promise<{
+    uid: string,
+    votes: tm.Vote[]
+  }[]>
+  static async fetch(mapIds: string | string[]): Promise<tm.Vote[] | undefined | {
+    uid: string,
+    votes: tm.Vote[]
+  }[]> {
     return await this.repo.get(mapIds as any)
   }
 
@@ -169,8 +214,14 @@ export abstract class VoteService {
    * @returns Array of objects containing map UID and vote objects array.
    * If some map is not in the memory it won't be in the returned array.
    */
-  static get(uids: string[]): { uid: string, votes: tm.Vote[] }[]
-  static get(uids: string | string[]): tm.Vote[] | undefined | { uid: string, votes: tm.Vote[] }[] {
+  static get(uids: string[]): {
+    uid: string,
+    votes: tm.Vote[]
+  }[]
+  static get(uids: string | string[]): tm.Vote[] | undefined | {
+    uid: string,
+    votes: tm.Vote[]
+  }[] {
     if (typeof uids === 'string') {
       return this._votes.find(a => a.uid === uids)?.votes
     }
@@ -192,10 +243,13 @@ export abstract class VoteService {
   }
 
   /**
-   * All votes in runtime memory. Only votes for maps in the history, 
+   * All votes in runtime memory. Only votes for maps in the history,
    * queue and the current map are stored.
    */
-  static get votes(): Readonly<{ uid: string, readonly votes: Readonly<tm.Vote[]> }>[] {
+  static get votes(): Readonly<{
+    uid: string,
+    readonly votes: Readonly<tm.Vote[]>
+  }>[] {
     return [...this._votes]
   }
 

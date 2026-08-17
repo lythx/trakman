@@ -2,7 +2,6 @@ import fetch from "node-fetch"
 import type { UltimaniaRecord } from "./UltimaniaTypes"
 import config from './Config.js'
 
-
 async function fetchRecords(mapId: string): Promise<UltimaniaRecord[] | Error> {
   const res = await fetch(`${config.host}/maps/${mapId}/records`).catch((err: Error) => err)
   if (res instanceof Error) {
@@ -48,7 +47,10 @@ async function sendRecord(mapId: string, record: UltimaniaRecord) {
   return true
 }
 
-async function updatePlayer(player: { login: string, nickname: string }) {
+async function updatePlayer(player: {
+  login: string,
+  nickname: string
+}) {
   const body = JSON.stringify({
     login: player.login,
     nick: player.nickname

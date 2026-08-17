@@ -1,7 +1,7 @@
 export default {
-  format: "$s",
-  textBackground: "000a",
-  iconBackground: "000a",
+  format: '$s',
+  textBackground: '000a',
+  iconBackground: '000a',
   textScale: 1,
   squareWidth: 1.7,
   rectangleWidth: 12.8,

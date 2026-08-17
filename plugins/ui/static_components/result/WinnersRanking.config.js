@@ -8,13 +8,9 @@ export default {
   posX: cfg.leftPosition + cfg.marginBig + cfg.width,
   posY: cfg.topBorder,
   side: false,
-  title: "Most Wins",
+  title: 'Most Wins',
   icon: icons.bestFinishes,
   margin: cfg.margin,
   background: cfg.background,
-  columnProportions: [
-    1,
-    1.9,
-    5.1
-  ]
+  columnProportions: [1, 1.9, 5.1]
 }

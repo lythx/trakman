@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { RecordList, componentIds, StaticHeader, StaticComponent, type RLRecord } from '../../UI.js'
+import { componentIds, RecordList, type RLRecord, StaticComponent, StaticHeader } from '../../UI.js'
 import config from './LiveRanking.config.js'
 
 export default class LiveRanking extends StaticComponent {
@@ -39,7 +39,8 @@ export default class LiveRanking extends StaticComponent {
   getEntries(): number {
     if (tm.getGameMode() === 'Laps') {
       return config.lapsEntries
-    } if (tm.getGameMode() === 'Stunts') {
+    }
+    if (tm.getGameMode() === 'Stunts') {
       return config.stuntsEntries
     }
     return config.entries
@@ -52,7 +53,8 @@ export default class LiveRanking extends StaticComponent {
   getTopCount(): number {
     if (tm.getGameMode() === 'Laps') {
       return config.lapsTopCount
-    } if (tm.getGameMode() === 'Stunts') {
+    }
+    if (tm.getGameMode() === 'Stunts') {
       return config.stuntsTopCount
     }
     return config.topCount
@@ -91,17 +93,26 @@ export default class LiveRanking extends StaticComponent {
           text = `${cpCount}/${mapCps}`
         }
         return {
-          cpCount, time: 0, login: a.login, name: a.nickname,
+          cpCount,
+          time: 0,
+          login: a.login,
+          name: a.nickname,
           checkpoints: record === undefined ? a.currentCheckpoints.map(a => a.time) : record.checkpoints,
-          text, finishTime: record?.time
+          text,
+          finishTime: record?.time
         }
       }).filter(a => a !== null) as any)
-        .sort((a: any, b: any) => b.cpCount - a.cpCount) // Sort secondary by cp amount
-        .sort((a: any, b: any) => a.finishTime - b.finishTime) as RLRecord[]) // Sort primary by finish time
+      .sort((a: any, b: any) => b.cpCount - a.cpCount) // Sort secondary by cp amount
+      .sort((a: any, b: any) => a.finishTime - b.finishTime) as RLRecord[]) // Sort primary by finish time
       content = this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, list)
     } else {
       content = this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, tm.records.live
-        .map(a => ({ name: a.nickname, time: a.time, checkpoints: a.checkpoints, login: a.login })))
+      .map(a => ({
+        name: a.nickname,
+        time: a.time,
+        checkpoints: a.checkpoints,
+        login: a.login
+      })))
     }
     return {
       xml: `<manialink id="${this.id}">
@@ -129,9 +140,12 @@ export default class LiveRanking extends StaticComponent {
       noRecordEntryText = config.stuntsNoRecordEntry
     }
     this.recordList?.destroy?.()
-    this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
-      entries, this.side, this.getTopCount(), tm.records.maxLocalsAmount, config.displayNoRecordEntry,
-      { dontParseTime, noRecordEntryText })
+    this.recordList = new RecordList('race', this.id, config.width,
+      height - (this.header.options.height + config.margin), entries, this.side, this.getTopCount(),
+      tm.records.maxLocalsAmount, config.displayNoRecordEntry, {
+        dontParseTime,
+        noRecordEntryText
+      })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       if (this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(info.login)

@@ -1,5 +1,6 @@
 import config from './Config.js'
 import http from 'http'
+import fetch from 'node-fetch'
 
 const wsLogin: string | undefined = process.env.WEBSERVICES_LOGIN
 const wsPassword: string | undefined = process.env.WEBSERVICES_PASSWORD
@@ -23,6 +24,7 @@ export interface WebservicesInfo {
   country: string,
   countryCode: string
 }
+
 const regex: RegExp = /[A-Z\'^£$%&*()}{@#~?><>,|=+¬ ]/
 const currentAuthorListeners: ((data?: Readonly<WebservicesInfo>) => void)[] = []
 const nextAuthorListeners: ((data?: Readonly<WebservicesInfo>) => void)[] = []
@@ -43,12 +45,13 @@ const fetchWebservices = async (login: string): Promise<FetchReturnType> => {
   if (!config.isEnabled) {
     return new Error('Use webservices is set to false')
   }
+
   const options = {
     host: `ws.trackmania.com`,
     path: `/tmf/players/${login}/`,
     method: 'GET',
     headers: {
-      'Authorization': "Basic " + Buffer.from(`${wsLogin}:${wsPassword}`).toString('base64'),
+      'Authorization': "Basic " + Buffer.from(`${wsLogin}:${wsPassword}`).toString('base64')
     }
   }
 
@@ -59,7 +62,7 @@ const fetchWebservices = async (login: string): Promise<FetchReturnType> => {
       if (res.statusCode === 200) {
         try {
           res.on('end', (): void => { resolve(JSON.parse(data)) })
-        } catch(error) {
+        } catch (error) {
           reject(new Error(`Instead of a JSON, the request returned the following: ${data}. Error was: ${error}`))
         }
       } else {
@@ -75,6 +78,31 @@ const fetchWebservices = async (login: string): Promise<FetchReturnType> => {
   })
 }
 
+const fetchAlt = async (login: string): Promise<FetchReturnType> => {
+  try {
+    const url = `${config.altServiceURL}/player/${login}?ws=true`
+    const res = await fetch(url)
+    if (!res.ok) {
+      const errStr = `UnitedLadder responded with status ${res.status} for login ${login}`
+      tm.log.warn(errStr)
+      return new Error(errStr)
+    }
+    const json = await res.json() as any
+    return {
+      id: json?.id,
+      login: json?.login,
+      nickname: json?.nickname,
+      united: json?.united,
+      path: json?.path,
+      idZone: json?.zoneId,
+    }
+  } catch (err) {
+    const errStr = err instanceof Error ? err.message : String(err)
+    tm.log.warn(`UnitedLadder error for login ${login}: ${errStr}`)
+    return new Error(errStr)
+  }
+}
+
 /**
  * Fetches Trackmania Webservices for player information
  * @param login Player login
@@ -84,12 +112,19 @@ const fetchPlayer = async (login: string): Promise<WebservicesInfo | Error> => {
   const cacheEntry: WebservicesInfo | undefined = cachedAuthors.find(a => a.login === login)
   if (cacheEntry !== undefined) { return cacheEntry }
   if (regex.test(login)) { return new Error(`Login doesn't pass regex test`) }
-  const player = await fetchWebservices(login)
+  const player = config.altService
+    ? await fetchAlt(login)
+    : await fetchWebservices(login)
   if (player instanceof Error) { // UNKOWN PLAYER MOMENT
     return player
   } else {
+    if (player.path === null) {
+      throw new Error(`Received undefined region info from webservices for login ${login}`)
+    }
     const region = tm.utils.getRegionInfo(player.path)
-    if (region.countryCode === undefined) { throw new Error(`Received undefined country code from webservices for login ${login}`) }
+    if (region.countryCode === undefined) {
+      throw new Error(`Received undefined country code from webservices for login ${login}`)
+    }
     const info: WebservicesInfo = {
       id: Number(player.id),
       login: player.login,

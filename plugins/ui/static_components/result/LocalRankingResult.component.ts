@@ -3,7 +3,7 @@
  * @since 0.4
  */
 
-import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
+import { componentIds, RecordList, StaticComponent, StaticHeader } from '../../UI.js'
 import config from './LocalRankingResult.config.js'
 
 export default class LocalRankingResult extends StaticComponent {
@@ -14,8 +14,9 @@ export default class LocalRankingResult extends StaticComponent {
   constructor() {
     super(componentIds.localsResult)
     this.header = new StaticHeader('result')
-    this.recordList = new RecordList('result', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin),
-      config.entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry)
+    this.recordList = new RecordList('result', this.id, config.width,
+      this.getHeight() - (this.header.options.height + config.margin), config.entries, this.side, config.topCount,
+      tm.records.maxLocalsAmount, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo) => {
       if (this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(info.login)
@@ -56,8 +57,14 @@ export default class LocalRankingResult extends StaticComponent {
         ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.localCps })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
           ${this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, tm.records.local
-        .map(a => ({ name: a.nickname, time: a.time, date: a.date, checkpoints: a.checkpoints, login: a.login }))
-        .slice(0, tm.records.maxLocalsAmount))}
+      .map(a => ({
+        name: a.nickname,
+        time: a.time,
+        date: a.date,
+        checkpoints: a.checkpoints,
+        login: a.login
+      }))
+      .slice(0, tm.records.maxLocalsAmount))}
         </frame>
       </frame>
     </manialink>`,

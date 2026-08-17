@@ -3,10 +3,10 @@
  * @since 1.1
  */
 
-import { Grid, componentIds, type GridCellFunction, type GridCellObject, centeredText, closeButton, PopupWindow } from '../UI.js'
+import { centeredText, closeButton, componentIds, Grid, type GridCellFunction, type GridCellObject, PopupWindow } from '../UI.js'
 import config from './ServerInfo.config.js'
-import { arch, cpus, loadavg, totalmem, freemem, platform } from 'node:os'
-import { uptime, version, memoryUsage } from 'node:process'
+import { arch, cpus, freemem, loadavg, platform, totalmem } from 'node:os'
+import { memoryUsage, uptime, version } from 'node:process'
 import 'dotenv/config'
 
 export default class ServerInfoWindow extends PopupWindow {
@@ -43,9 +43,8 @@ export default class ServerInfoWindow extends PopupWindow {
     const serverMaxRecs: string = tm.config.controller.localRecordsLimit.toString()
     const serverMapCount: string = tm.maps.count.toString()
     const serverVisitorsCount: string = tm.players.totalCount.toString()
-    return [dedicatedUptime, dedicatedVersion, dedicatedBuild, serverName, serverLogin,
-      serverZone, serverRights, serverMaxPlayers, serverMaxSpecs, serverMaxRecs,
-      serverMapCount, serverVisitorsCount]
+    return [dedicatedUptime, dedicatedVersion, dedicatedBuild, serverName, serverLogin, serverZone, serverRights,
+      serverMaxPlayers, serverMaxSpecs, serverMaxRecs, serverMapCount, serverVisitorsCount]
   }
 
   private getHostInfo(): string[] {
@@ -62,9 +61,8 @@ export default class ServerInfoWindow extends PopupWindow {
     // Node information
     const nodeVersion: string = version
     const nodeRAMUsage = String(~~(memoryUsage().heapTotal / (1024 ** 2)) + ` MB`)
-    return [osUptime, osArch, osCPU, osCPULoad, osRAM, osKernel,
-      trakmanVersion, trakmanUptime, nodeVersion, nodeRAMUsage,
-      tm.db.dbVersion, tm.db.dbSize]
+    return [osUptime, osArch, osCPU, osCPULoad, osRAM, osKernel, trakmanVersion, trakmanUptime, nodeVersion,
+      nodeRAMUsage, tm.db.dbVersion, tm.db.dbSize]
   }
 
   protected onOpen(info: tm.ManialinkClickInfo): void {
@@ -90,18 +88,15 @@ export default class ServerInfoWindow extends PopupWindow {
   protected async constructContent(): Promise<string> {
     const serverInfo: string[] = await this.getServerInfo()
     const hostInfo: string[] = await this.getHostInfo()
-    const headers: GridCellObject[] = [
-      {
-        background: config.grid.headerBackground,
-        colspan: 2,
-        callback: (i, j, w, h): string => centeredText(config.serverCellHeader, w, h),
-      },
-      {
-        background: config.grid.headerBackground,
-        colspan: 2,
-        callback: (i, j, w, h): string => centeredText(config.hostCellHeader, w, h),
-      },
-    ]
+    const headers: GridCellObject[] = [{
+      background: config.grid.headerBackground,
+      colspan: 2,
+      callback: (i, j, w, h): string => centeredText(config.serverCellHeader, w, h)
+    }, {
+      background: config.grid.headerBackground,
+      colspan: 2,
+      callback: (i, j, w, h): string => centeredText(config.hostCellHeader, w, h)
+    }]
     const nameCell: GridCellObject = {
       background: config.nameColumnBackground,
       callback: (i, j, w, h): string => {

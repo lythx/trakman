@@ -2,8 +2,7 @@ const p = tm.utils.palette
 
 export default {
   // If false plugin cant be activated
-  isEnabled: false,
-  // This can be changed using an ingame command
+  isEnabled: false, // This can be changed using an ingame command
   isActive: false,
   betTimeSeconds: 30,
   minimumAmount: 50,
@@ -14,10 +13,8 @@ export default {
     start: `${p.highlight}#{name} ${p.donation}has started a bet with ${p.highlight}#{prize} ${p.donation}coppers.`,
     begin: `${p.donation}Bets are open. Use ${p.highlight}/bet ${p.donation}to place a bet.`,
     accept: `${p.highlight}#{name} ${p.donation}has accepted the bet.`,
-    startupEnabled: `${p.donation}Betting plugin is ${p.highlight}enabled${p.donation}.`
-      + ` Use ${p.highlight}//dbet ${p.donation}if you want to disable it.`,
-    startupDisabled: `${p.donation}Betting plugin is ${p.highlight}disabled${p.donation}.`
-      + ` Use ${p.highlight}//ebet ${p.donation}if you want to enable it.`,
+    startupEnabled: `${p.donation}Betting plugin is ${p.highlight}enabled${p.donation}.` + ` Use ${p.highlight}//dbet ${p.donation}if you want to disable it.`,
+    startupDisabled: `${p.donation}Betting plugin is ${p.highlight}disabled${p.donation}.` + ` Use ${p.highlight}//ebet ${p.donation}if you want to enable it.`,
     amountTooLow: `${p.error}Amount of bet coppers too low. Minimum amount is ${p.highlight}#{minimum}${p.error}.`,
     closed: `${p.error}Bets are closed.`
   },
@@ -32,8 +29,7 @@ export default {
     public: true,
     privilege: 0,
     prizeNeeded: `${p.error}You need to specify the bet prize.`,
-    noPrizeNeeded: `${p.error}Specified bet prize was ignored because somebody ` +
-      `else has already placed a bet. Prize is ${p.highlight}#{prize}${p.error}.`,
+    noPrizeNeeded: `${p.error}Specified bet prize was ignored because somebody ` + `else has already placed a bet. Prize is ${p.highlight}#{prize}${p.error}.`
   },
   activate: {
     aliases: ['ebet', 'enablebets'],

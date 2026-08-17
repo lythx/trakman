@@ -1,6 +1,6 @@
 import config from './Config.js'
 import type { NewUltimaniaRecord as NewUltiRecord, UltimaniaRecord as UltiRecord } from './UltimaniaTypes.js'
-import { sendRecord, updatePlayer, fetchRecords } from './UltimaniaClient.js'
+import { fetchRecords, sendRecord, updatePlayer } from './UltimaniaClient.js'
 import './ui/UltiRecords.component.js'
 
 let currentUltis: UltiRecord[] = []
@@ -45,12 +45,17 @@ const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' 
   if (score < (pb ?? -1)) { return false }
   if (pb === undefined) {
     const ultiRecordInfo: NewUltiRecord = constructRecordObject(player, score, undefined, position, undefined, date)
-    currentUltis.splice(position - 1, 0,
-      {
-        login: player.login, score, nickname: player.nickname, date
-      })
+    currentUltis.splice(position - 1, 0, {
+      login: player.login,
+      score,
+      nickname: player.nickname,
+      date
+    })
     newUltis.push({
-      login: player.login, score, nickname: player.nickname, date
+      login: player.login,
+      score,
+      nickname: player.nickname,
+      date
     })
     tm.log.info(getLogString(undefined, position, undefined, score, player))
     emitRecordEvent(ultiRecordInfo)
@@ -62,7 +67,8 @@ const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' 
     }
   } else if (score === pb) {
     const previousPosition: number = currentUltis.findIndex(a => a.login === player.login) + 1
-    const ultiRecordInfo: NewUltiRecord = constructRecordObject(player, score, score, previousPosition, previousPosition, date)
+    const ultiRecordInfo: NewUltiRecord = constructRecordObject(player, score, score, previousPosition,
+      previousPosition, date)
     tm.log.info(getLogString(previousPosition, previousPosition, score, score, player))
     emitRecordEvent(ultiRecordInfo)
     return {
@@ -78,16 +84,21 @@ const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' 
       tm.log.error(`Can't find player ${player.login} in memory`)
       return false
     }
-    const ultiRecordInfo: NewUltiRecord = constructRecordObject(player, score, previousScore,
-      position, currentUltis.findIndex(a => a.login === player.login) + 1, date)
+    const ultiRecordInfo: NewUltiRecord = constructRecordObject(player, score, previousScore, position,
+      currentUltis.findIndex(a => a.login === player.login) + 1, date)
     currentUltis = currentUltis.filter(a => a.login !== player.login)
-    currentUltis.splice(position - 1, 0,
-      {
-        login: player.login, score, nickname: player.nickname, date
-      })
+    currentUltis.splice(position - 1, 0, {
+      login: player.login,
+      score,
+      nickname: player.nickname,
+      date
+    })
     newUltis = newUltis.filter(a => a.login !== player.login)
     newUltis.push({
-      login: player.login, score, nickname: player.nickname, date
+      login: player.login,
+      score,
+      nickname: player.nickname,
+      date
     })
     tm.log.info(getLogString(previousIndex + 1, position, previousScore, score, player))
     emitRecordEvent(ultiRecordInfo)
@@ -102,21 +113,35 @@ const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' 
 }
 
 const constructRecordObject = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>,
-  score: number, previousScore: number | undefined, position: number, previousPosition: number | undefined, date: Date): NewUltiRecord => {
+  score: number, previousScore: number | undefined, position: number, previousPosition: number | undefined,
+  date: Date): NewUltiRecord => {
   return {
     ...player,
     score,
     position,
-    previous: (previousScore && previousPosition) ? { score: previousScore, position: previousPosition } : undefined,
+    previous: (previousScore && previousPosition) ? {
+      score: previousScore,
+      position: previousPosition
+    } : undefined,
     date
   }
 }
 
-const getLogString = (previousPosition: number | undefined, position: number,
-  previousTime: number | undefined, time: number, player: { login: string, nickname: string }): string[] => {
-  const rs = tm.utils.getRankingString({ position, time }, (previousPosition && previousTime) ?
-    { time: previousTime, position: previousPosition } : undefined)
-  return [`${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getOrdinalSuffix(position)} ultimania record. Score: ${tm.utils.getTimeString(time)}${rs.difference !== undefined ? ` (+${rs.difference})` : ``}`]
+const getLogString = (previousPosition: number | undefined, position: number, previousTime: number | undefined,
+  time: number, player: {
+    login: string,
+    nickname: string
+  }): string[] => {
+  const rs = tm.utils.getRankingString({
+    position,
+    time
+  }, (previousPosition && previousTime) ? {
+    time: previousTime,
+    position: previousPosition
+  } : undefined)
+  return [`${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getOrdinalSuffix(
+    position)} ultimania record. Score: ${tm.utils.getTimeString(time)}${rs.difference !== undefined ?
+    ` (+${rs.difference})` : ``}`]
 }
 
 if (config.isEnabled) {
@@ -285,7 +310,7 @@ export const ultimania = {
   /**
    * Plugin status
    */
-  isEnabled: config.isEnabled,
+  isEnabled: config.isEnabled
 
 }
 

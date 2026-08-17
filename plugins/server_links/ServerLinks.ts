@@ -45,8 +45,10 @@ if (config.isEnabled) {
 }
 
 async function updateDataFile() {
-  const res: { LadderServerLimitMin: number, LadderServerLimitMax: number } | Error =
-    await tm.client.call('GetLadderServerLimits')
+  const res: {
+    LadderServerLimitMin: number,
+    LadderServerLimitMax: number
+  } | Error = await tm.client.call('GetLadderServerLimits')
   if (res instanceof Error) {
     tm.log.error(`Error when getting server ladder limits`, res.message)
     return
@@ -104,8 +106,7 @@ async function refreshOtherServersData() {
 }
 
 function constructInfoObject(info: Partial<ServerInfo>, name: string): ServerInfo | undefined {
-  if (info.login === undefined || info.lastUpdate === undefined ||
-    Date.now() - info.lastUpdate > config.updateLimit * 1000) { return }
+  if (info.login === undefined || info.lastUpdate === undefined || Date.now() - info.lastUpdate > config.updateLimit * 1000) { return }
   return {
     login: info.login,
     lastUpdate: info.lastUpdate,

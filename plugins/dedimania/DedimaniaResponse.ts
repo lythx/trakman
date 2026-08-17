@@ -98,10 +98,11 @@ export class DedimaniaResponse {
     const changeType: any = (value: any, type: string): any => {
       const arr: any[] = []
       const obj: any = {}
-      switch (type) {
+      switch(type) {
         case 'boolean':
           return value === '1'
-        case 'int': case 'i4':
+        case 'int':
+        case 'i4':
           return parseInt(value)
         case 'double':
           return parseFloat(value)

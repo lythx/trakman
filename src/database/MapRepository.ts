@@ -29,11 +29,21 @@ interface TableEntry {
 }
 
 const moods = {
-  Sunrise: 1, Day: 2, Sunset: 3, Night: 4
+  Sunrise: 1,
+  Day: 2,
+  Sunset: 3,
+  Night: 4
 }
 
 const environments = {
-  Stadium: 1, Island: 2, Desert: 3, Rally: 4, Bay: 5, Coast: 6, Snow: 7
+  Stadium: 1,
+  Island: 2,
+  Desert: 3,
+  Rally: 4,
+  Bay: 5,
+  Coast: 6,
+  Snow: 7,
+  ...config.customEnvironments.map((name, i) => ({ [name]: i + 8 })).reduce((a, b) => ({ ...a, ...b }), {})
 }
 
 const mapIdsRepo = new MapIdsRepository()
@@ -65,16 +75,21 @@ export class MapRepository extends Repository {
     uids.forEach((map, i) => {
       if (map !== undefined) {
         values.push(
-          ([i, map.name.replaceAll('\n', ' '), map.fileName, map.author, environments[map.environment], moods[map.mood], map.bronzeTime,
-            map.silverTime, map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.defaultLapsAmount,
-            map.checkpointsPerLap, map.addDate.toISOString(), map.leaderboardRating, map.awards]).map(
-              a => a === undefined ? '\\N' : a.toString()
-                .replaceAll('\t', ' ').replaceAll('\\', '')).join('\t')) // ugly replace to prevent DB errors
+          ([i, map.name.replaceAll('\n', ' '), map.fileName, map.author, environments[map.environment as keyof typeof environments] ?? environments["Stadium"],
+            moods[map.mood],
+            map.bronzeTime, map.silverTime, map.goldTime, map.authorTime, map.copperPrice, map.isLapRace,
+            map.defaultLapsAmount, map.checkpointsPerLap, map.addDate.toISOString(), map.leaderboardRating,
+            map.awards]).map(a => a === undefined ? '\\N' : a.toString()
+              .replaceAll('\t', ' ').replaceAll('\\', '')).join('\t')) // ugly replace to prevent DB errors
       }
     })
     const bulk = values.join('\n')
-    const stream: CopyStreamQuery = this.db.stream(
+    const stream: CopyStreamQuery | Error = this.db.stream(
       'maps(id, name, filename, author, environment, mood, bronze_time, silver_time, ' + 'gold_time,author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards)')
+    if (stream instanceof Error) {
+      await Logger.fatal('Failed to mass-add maps to database', stream)
+      return
+    }
     const src = new Readable()
     src.readable = true
 
@@ -94,13 +109,13 @@ export class MapRepository extends Repository {
     if (arr.length === 0) { return }
     const query = `INSERT INTO maps(id, name, filename, author, environment, mood, 
       bronze_time, silver_time, gold_time, author_time, copper_price, is_lap_race, 
-      laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards) ${this.getInsertValuesString(17, ids.length)} ON CONFLICT DO NOTHING`
+      laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards) ${this.getInsertValuesString(17,
+      ids.length)} ON CONFLICT DO NOTHING`
     const values: any[] = []
     for (const [i, map] of arr.entries()) {
-      values.push(ids[i].id, map.name,
-        map.fileName, map.author, environments[map.environment], moods[map.mood], map.bronzeTime, map.silverTime,
-        map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.defaultLapsAmount, map.checkpointsPerLap, map.addDate,
-        map.leaderboardRating, map.awards)
+      values.push(ids[i].id, map.name, map.fileName, map.author, environments[map.environment as keyof typeof environments] ?? environments["Stadium"], moods[map.mood],
+        map.bronzeTime, map.silverTime, map.goldTime, map.authorTime, map.copperPrice, map.isLapRace,
+        map.defaultLapsAmount, map.checkpointsPerLap, map.addDate, map.leaderboardRating, map.awards)
     }
     await this.query(query, ...values)
   }
@@ -215,14 +230,34 @@ export class MapRepository extends Repository {
                              leaderboard_rating, awards)`
     const res = (await this.query(query, ...fileNames))
     if (!isArr) {
-      return res[0] === undefined ? undefined : this.constructMapObject({ ...res[0], filename: fileNames[0] })
+      return res[0] === undefined ? undefined : this.constructMapObject({
+        ...res[0],
+        filename: fileNames[0]
+      })
     }
-    return res.map((a, i) => this.constructMapObject({ ...a, filename: fileNames[i] }))
+    return res.map((a, i) => this.constructMapObject({
+      ...a,
+      filename: fileNames[i]
+    }))
   }
 
-  async getVoteCountAndRatio(mapId: string): Promise<{ ratio: number, count: number } | undefined>
-  async getVoteCountAndRatio(mapIds: string[]): Promise<{ uid: string, ratio: number, count: number }[]>
-  async getVoteCountAndRatio(mapIds: string | string[]): Promise<{ ratio: number, count: number } | { uid: string, ratio: number, count: number }[] | undefined> {
+  async getVoteCountAndRatio(mapId: string): Promise<{
+    ratio: number,
+    count: number
+  } | undefined>
+  async getVoteCountAndRatio(mapIds: string[]): Promise<{
+    uid: string,
+    ratio: number,
+    count: number
+  }[]>
+  async getVoteCountAndRatio(mapIds: string | string[]): Promise<{
+    ratio: number,
+    count: number
+  } | {
+    uid: string,
+    ratio: number,
+    count: number
+  }[] | undefined> {
     let isArr: boolean = true
     if (typeof mapIds === 'string') {
       isArr = false
@@ -240,11 +275,15 @@ export class MapRepository extends Repository {
     const res = (await this.query(query, ...ids.map(a => a.id)))
     if (!isArr) {
       return res[0] === undefined ? undefined : {
-        ratio: res[0].count === 0 ? 0 : (((res[0].sum / res[0].count) - 1) / 6) * 100, count: res[0].count
+        ratio: res[0].count === 0 ? 0 : (((res[0].sum / res[0].count) - 1) / 6) * 100,
+        count: res[0].count
       }
     }
-    return res.map(
-      a => ({ uid: a.uid, ratio: a.count === 0 ? 0 : (((a.sum / a.count) - 1) / 6) * 100, count: a.count }))
+    return res.map(a => ({
+      uid: a.uid,
+      ratio: a.count === 0 ? 0 : (((a.sum / a.count) - 1) / 6) * 100,
+      count: a.count
+    }))
   }
 
   /**
@@ -317,15 +356,27 @@ export class MapRepository extends Repository {
 
   private constructMapObject(entry: TableEntry): tm.Map {
     return {
-      id: entry.uid, name: entry.name, fileName: entry.filename, author: entry.author,
-      environment: Object.entries(environments).find(a => a[1] === entry.environment)?.[0] as any,
-      mood: Object.entries(moods).find(a => a[1] === entry.mood)?.[0] as any, bronzeTime: entry.bronze_time,
-      silverTime: entry.silver_time, goldTime: entry.gold_time, authorTime: entry.author_time,
-      copperPrice: entry.copper_price, isLapRace: entry.is_lap_race, addDate: entry.add_date,
-      defaultLapsAmount: entry.laps_amount ?? undefined, checkpointsPerLap: entry.checkpoints_amount ?? undefined,
-      awards: entry.awards ?? undefined, leaderboardRating: entry.leaderboard_rating ?? undefined,
-      voteCount: entry.vote_count, voteRatio: entry.vote_count === 0 ? -1 : entry.vote_sum / entry.vote_count,
-      isClassic: entry.leaderboard_rating === 0, isNadeo: entry.leaderboard_rating === 50000
+      id: entry.uid,
+      name: entry.name,
+      fileName: entry.filename,
+      author: entry.author,
+      environment: Object.entries(environments).find(a => a[1] === entry.environment)?.[0] as tm.Environment ?? 'Stadium',
+      mood: Object.entries(moods).find(a => a[1] === entry.mood)?.[0] as any,
+      bronzeTime: entry.bronze_time,
+      silverTime: entry.silver_time,
+      goldTime: entry.gold_time,
+      authorTime: entry.author_time,
+      copperPrice: entry.copper_price,
+      isLapRace: entry.is_lap_race,
+      addDate: entry.add_date,
+      defaultLapsAmount: entry.laps_amount ?? undefined,
+      checkpointsPerLap: entry.checkpoints_amount ?? undefined,
+      awards: entry.awards ?? undefined,
+      leaderboardRating: entry.leaderboard_rating ?? undefined,
+      voteCount: entry.vote_count,
+      voteRatio: entry.vote_count === 0 ? -1 : entry.vote_sum / entry.vote_count,
+      isClassic: entry.leaderboard_rating === 0,
+      isNadeo: entry.leaderboard_rating === 50000
     }
   }
 

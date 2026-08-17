@@ -20,5 +20,5 @@ export abstract class Repository {
     }
     return ret.slice(0, -1) as any
   }
-  
+
 }

@@ -5,20 +5,9 @@ import { Logger } from "./Logger.js"
 export class ServerConfig {
 
   private static _config: tm.ServerInfo
-  private static readonly proxyMethods: string[] = [
-    'SetCallVoteTimeOut',
-    'SetCallVoteRatio',
-    'SetCallVoteRatios',
-    'SetServerName',
-    'SetServerComment',
-    'SetServerPassword',
-    'SetServerPasswordForSpectator',
-    'SetMaxPlayers',
-    'SetMaxSpectators',
-    'SetLadderMode',
-    'SetVehicleNetQuality',
-    'SetServerOptions'
-  ]
+  private static readonly proxyMethods: string[] = ['SetCallVoteTimeOut', 'SetCallVoteRatio', 'SetCallVoteRatios',
+    'SetServerName', 'SetServerComment', 'SetServerPassword', 'SetServerPasswordForSpectator', 'SetMaxPlayers',
+    'SetMaxSpectators', 'SetLadderMode', 'SetVehicleNetQuality', 'SetServerOptions']
 
   static async initialize(): Promise<void> {
     await this.update()
@@ -34,13 +23,10 @@ export class ServerConfig {
       Logger.error(`Failed to fetch system info.`, systemRes.message)
       return
     }
-    const res = await Client.call('system.multicall',
-      [
-        { method: 'GetServerOptions' },
-        { method: 'GetDetailedPlayerInfo', params: [{ string: systemRes.ServerLogin }] },
-        { method: 'GetVersion' }
-      ]
-    )
+    const res = await Client.call('system.multicall', [{ method: 'GetServerOptions' }, {
+      method: 'GetDetailedPlayerInfo',
+      params: [{ string: systemRes.ServerLogin }]
+    }, { method: 'GetVersion' }])
     if (res instanceof Error) {
       Logger.error('Failed to fetch server info', res.message)
       return
@@ -80,17 +66,15 @@ export class ServerConfig {
       nextCallVoteTimeOut: options.NextCallVoteTimeOut,
       callVoteRatio: options.CallVoteRatio,
       allowMapDownload: options.AllowChallengeDownload,
-      autoSaveReplays: options.AutoSaveReplays,
-      // Stuff from PlayerInfo
+      autoSaveReplays: options.AutoSaveReplays, // Stuff from PlayerInfo
       login: loginInfo.Login,
       id: loginInfo.PlayerId, // Always 0
       zone: loginInfo.Path.substring(6), // Remove "World"
       ipAddress: loginInfo.IPAddress.split(':')[0], // Throw port away
-      isUnited: loginInfo.OnlineRights === 3,
-      // Stuff from GetVersion
+      isUnited: loginInfo.OnlineRights === 3, // Stuff from GetVersion
       game: version.Name,
       version: version.Version,
-      build: version.Build,
+      build: version.Build
     }
     Events.emit('ServerConfigChanged', this._config)
   }

@@ -11,14 +11,11 @@ const sendLive = async (): Promise<true | Error> => {
   const cfg: tm.ServerInfo = tm.config.server
   // Data object in any because TS coping language
   const data = {
-    serverLogin: cfg.login,
-    // Remove colours here so that we won't have to later
+    serverLogin: cfg.login, // Remove colours here so that we won't have to later
     serverName: tm.utils.strip(cfg.name, true),
     serverVersion: [cfg.game, cfg.version, cfg.build].join(),
-    manialiveVersion: config.manialiveVersion,
-    // Check if > 40 and set to 40 in that case
-    maxPlayers: cfg.currentMaxPlayers > 40 ? 40 : cfg.currentMaxPlayers,
-    // Public is 1, private is 0
+    manialiveVersion: config.manialiveVersion, // Check if > 40 and set to 40 in that case
+    maxPlayers: cfg.currentMaxPlayers > 40 ? 40 : cfg.currentMaxPlayers, // Public is 1, private is 0
     visibility: cfg.password.length === 0 ? 1 : 0,
     classHash: config.manialiveHash
   }
@@ -34,7 +31,7 @@ const sendLive = async (): Promise<true | Error> => {
     path: `/freezone/live/`,
     method: 'POST',
     headers: {
-      'Authorization': auth,
+      'Authorization': auth
     }
   }
   return new Promise<true | Error>((resolve, reject): void => {
@@ -79,8 +76,7 @@ if (config.isEnabled) {
   tm.addListener('Startup', async (): Promise<void> => {
     tm.log.trace('Connecting to ManiaLive...')
     const status: true | Error = await initialize()
-    if (status instanceof Error) { tm.log.error(status.message) }
-    else { tm.log.trace('Connected to ManiaLive') }
+    if (status instanceof Error) { tm.log.error(status.message) } else { tm.log.trace('Connected to ManiaLive') }
   })
 }
 

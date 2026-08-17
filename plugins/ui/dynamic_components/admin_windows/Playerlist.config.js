@@ -1,10 +1,11 @@
 import icons from '../../config/Icons.js'
 import ids from '../../config/ComponentIds.js'
+
 const p = tm.utils.palette
 const priv = tm.admin.privileges
 
 export default {
-  title: " Players ",
+  title: ' Players ',
   kickPrivilege: priv.kick,
   forceSpecPrivilege: priv.forceSpectator,
   privilege: 1, // Privilege required to open the window
@@ -43,29 +44,29 @@ export default {
     forcePlay: icons.forceGamingHover
   },
   entries: 15,
-  columnProportions: [
-    1.5,
-    3,
-    3,
-    2,
-    2,
-    2,
-    2,
-    2,
-    2,
-    2
-  ],
-  navbar: [
-    { name: 'Banlist', actionId: ids.banlist, privilege: tm.config.controller.privileges.ban },
-    { name: 'Blacklist', actionId: ids.blacklist, privilege: tm.config.controller.privileges.blacklist },
-    { name: 'Mutelist', actionId: ids.mutelist, privilege: tm.config.controller.privileges.mute },
-    { name: 'Guestlist', actionId: ids.guestlist, privilege: tm.config.controller.privileges.addGuest }
-  ],
+  columnProportions: [1.5, 3, 3, 2, 2, 2, 2, 2, 2, 2],
+  navbar: [{
+    name: 'Banlist',
+    actionId: ids.banlist,
+    privilege: tm.config.controller.privileges.ban
+  }, {
+    name: 'Blacklist',
+    actionId: ids.blacklist,
+    privilege: tm.config.controller.privileges.blacklist
+  }, {
+    name: 'Mutelist',
+    actionId: ids.mutelist,
+    privilege: tm.config.controller.privileges.mute
+  }, {
+    name: 'Guestlist',
+    actionId: ids.guestlist,
+    privilege: tm.config.controller.privileges.addGuest
+  }],
   selfColour: `${p.green}`,
   grid: {
-    background: "9996",
+    background: '9996',
     margin: 0.15,
-    headerBackground: "333C"
+    headerBackground: '333C'
   },
   command: {
     aliases: ['players', 'playerl', 'playerlist'],

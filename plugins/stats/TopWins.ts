@@ -1,8 +1,19 @@
 import config from './Config.js'
 
-let topList: { readonly login: string, nickname: string, wins: number }[] = []
-const updateListeners: ((changes: readonly Readonly<{ login: string, nickname: string, wins: number }>[]) => void)[] = []
-const nicknameChangeListeners: ((changes: readonly Readonly<{ login: string, nickname: string }>[]) => void)[] = []
+let topList: {
+  readonly login: string,
+  nickname: string,
+  wins: number
+}[] = []
+const updateListeners: ((changes: readonly Readonly<{
+  login: string,
+  nickname: string,
+  wins: number
+}>[]) => void)[] = []
+const nicknameChangeListeners: ((changes: readonly Readonly<{
+  login: string,
+  nickname: string
+}>[]) => void)[] = []
 
 const initialize = async () => {
   const res: any[] | Error = await tm.db.query(`SELECT login, nickname, wins FROM players
@@ -21,7 +32,10 @@ const initialize = async () => {
 tm.addListener('Startup', (): void => void initialize())
 
 tm.addListener('PlayerDataUpdated', (info) => {
-  const changedObjects: { login: string, nickname: string }[] = []
+  const changedObjects: {
+    login: string,
+    nickname: string
+  }[] = []
   for (const e of topList) {
     const newNickname = info.find(a => a.login === e.login)?.nickname
     if (newNickname !== undefined) {
@@ -39,9 +53,7 @@ tm.addListener('PlayerDataUpdated', (info) => {
 tm.addListener('EndMap', async (info) => {
   const login = info.winnerLogin
   const wins = info.winnerWins
-  if (wins === undefined || login === undefined
-    || (topList.length !== 0 && topList.length >= config.winsCount
-      && wins <= topList[topList.length - 1].wins)) { return }
+  if (wins === undefined || login === undefined || (topList.length !== 0 && topList.length >= config.winsCount && wins <= topList[topList.length - 1].wins)) { return }
   const entry = topList.find(a => a.login === login)
   let obj: typeof topList[number]
   if (entry !== undefined) {
@@ -50,7 +62,11 @@ tm.addListener('EndMap', async (info) => {
     topList.sort((a, b) => b.wins - a.wins)
   } else {
     const nickname: string | undefined = tm.players.get(login)?.nickname ?? (await tm.players.fetch(login))?.nickname
-    obj = { login, wins, nickname: nickname ?? login }
+    obj = {
+      login,
+      wins,
+      nickname: nickname ?? login
+    }
     topList.push(obj)
     topList.sort((a, b) => b.wins - a.wins)
     topList.length = Math.min(config.winsCount, topList.length)
@@ -68,7 +84,11 @@ export const topWins = {
   /**
    * List of players sorted by their wins count
    */
-  get list(): readonly Readonly<{ login: string, nickname: string, wins: number }>[] {
+  get list(): readonly Readonly<{
+    login: string,
+    nickname: string,
+    wins: number
+  }>[] {
     return topList
   },
 
@@ -76,7 +96,11 @@ export const topWins = {
    * Add a callback function to execute on top wins list update
    * @param callback Function to execute on event. It takes an array of updated objects as a parameter
    */
-  onUpdate(callback: (changes: readonly Readonly<{ login: string, nickname: string, wins: number }>[]) => void): void {
+  onUpdate(callback: (changes: readonly Readonly<{
+    login: string,
+    nickname: string,
+    wins: number
+  }>[]) => void): void {
     updateListeners.push(callback)
   },
 
@@ -84,7 +108,10 @@ export const topWins = {
    * Add a callback function to execute on player nickname change
    * @param callback Function to execute on event. It takes an array of objects containing login and nickname as a parameter
    */
-  onNicknameChange(callback: (changes: readonly Readonly<{ login: string, nickname: string }>[]) => void): void {
+  onNicknameChange(callback: (changes: readonly Readonly<{
+    login: string,
+    nickname: string
+  }>[]) => void): void {
     nicknameChangeListeners.push(callback)
   }
 

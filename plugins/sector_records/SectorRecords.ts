@@ -14,14 +14,23 @@ export const sectorRecords = {
   /**
    * @returns an array of current map best sector records or null if sector record doesn't exist
    */
-  get mapSectors(): ({ login: string, nickname: string, sector: number, date: Date } | null)[] {
+  get mapSectors(): ({
+    login: string,
+    nickname: string,
+    sector: number,
+    date: Date
+  } | null)[] {
     return getMapSectors()
   },
 
   /**
    * @returns an array of current map online players and their sector records
    */
-  get playerSectors(): ({ login: string, nickname: string, sectors: (number | null)[] })[] {
+  get playerSectors(): ({
+    login: string,
+    nickname: string,
+    sectors: (number | null)[]
+  })[] {
     return getPlayerSectors()
   },
 
@@ -29,7 +38,7 @@ export const sectorRecords = {
    * Registers a callback to execute on a given event
    * @param event Event name
    * @param callback Callback function to execute
-  */
+   */
   addListener,
 
   /**

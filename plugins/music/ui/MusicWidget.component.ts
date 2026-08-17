@@ -1,4 +1,4 @@
-import { componentIds, StaticHeader, StaticComponent, leftAlignedText } from '../../ui/UI.js'
+import { componentIds, leftAlignedText, StaticComponent, StaticHeader } from '../../ui/UI.js'
 import type { Song } from '../Types.js'
 import config from './MusicWidget.config.js'
 
@@ -23,7 +23,7 @@ export default class MusicWidget extends StaticComponent {
   setCurrentSong(song: Song | undefined) {
     this.song = song
     const xml = this.display()
-    if(xml !== undefined) {
+    if (xml !== undefined) {
       tm.sendManialink(xml)
     }
   }
@@ -39,7 +39,10 @@ export default class MusicWidget extends StaticComponent {
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
-    return { xml: this.xml, login }
+    return {
+      xml: this.xml,
+      login
+    }
   }
 
   private updateXML(): void {
@@ -73,8 +76,11 @@ export default class MusicWidget extends StaticComponent {
   private text(text: string, w: number, h: number, xOffset: number = 0, background?: string): string {
     xOffset = xOffset ?? 0
     return `<quad posn="${xOffset} 0 2" sizen="${w} ${h}" bgcolor="${background ?? config.textBackground}"/>
-    ${leftAlignedText(text, w, h,
-      { textScale: config.textScale, padding: config.textPadding, xOffset, })}`
+    ${leftAlignedText(text, w, h, {
+      textScale: config.textScale,
+      padding: config.textPadding,
+      xOffset
+    })}`
   }
 
 }

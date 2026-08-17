@@ -8,7 +8,13 @@ import config from '../../config/Config.js'
 export class RoundsService {
 
   private static teamsRoundPoints?: number
-  private static _teamScores: { blue: number; red: number } = { blue: 0, red: 0 }
+  private static _teamScores: {
+    blue: number;
+    red: number
+  } = {
+    blue: 0,
+    red: 0
+  }
   private static _roundsPointSystem: number[] = []
   private static _roundsPointsLimit: number
   private static _cupPointsLimit: number
@@ -22,10 +28,16 @@ export class RoundsService {
   private static roundFinishCount = 0
 
   static async initialize(): Promise<void> {
-    await Client.call('system.multicall', [
-      { method: 'SetCupRoundsPerChallenge', params: [{ int: 0 }] },
-      { method: 'SetUseNewRulesTeam', params: [{ boolean: true }] },
-      { method: 'SetUseNewRulesRound', params: [{ boolean: false }] }])
+    await Client.call('system.multicall', [{
+      method: 'SetCupRoundsPerChallenge',
+      params: [{ int: 0 }]
+    }, {
+      method: 'SetUseNewRulesTeam',
+      params: [{ boolean: true }]
+    }, {
+      method: 'SetUseNewRulesRound',
+      params: [{ boolean: false }]
+    }])
     const status = await this.updateRoundsSettings()
     if (status instanceof Error) {
       await Logger.fatal(status.message)
@@ -69,8 +81,7 @@ export class RoundsService {
         }
       }
     } else if (GameService.gameMode === 'Teams') {
-      const res: tm.TrackmaniaRankingInfo[] | Error =
-        await Client.call('GetCurrentRanking', [{ int: 2 }, { int: 0 }])
+      const res: tm.TrackmaniaRankingInfo[] | Error = await Client.call('GetCurrentRanking', [{ int: 2 }, { int: 0 }])
       if (res instanceof Error) {
         Logger.error(`Call to get team score failed`, res.message)
         return
@@ -81,12 +92,9 @@ export class RoundsService {
   }
 
   static async updateRoundsSettings(): Promise<true | Error> {
-    const settings = await Client.call('system.multicall', [
-      { method: 'GetRoundCustomPoints' },
-      { method: 'GetRoundPointsLimit' },
-      { method: 'GetTeamPointsLimit' },
-      { method: 'GetCupPointsLimit' },
-      { method: 'GetCupNbWinners' }])
+    const settings = await Client.call('system.multicall',
+      [{ method: 'GetRoundCustomPoints' }, { method: 'GetRoundPointsLimit' }, { method: 'GetTeamPointsLimit' },
+        { method: 'GetCupPointsLimit' }, { method: 'GetCupNbWinners' }])
     if (settings instanceof Error) {
       return new Error(`Failed to fetch round settings, server responded with error: ${settings.message}`)
     }
@@ -94,18 +102,18 @@ export class RoundsService {
     if (err !== undefined) {
       return new Error(`Failed to fetch round settings, server responded with error: ${err.message}`)
     }
-    const [roundPointSystem, roundPointsLimit, teamPointsLimit,
-      cupPointsLimit, cupMaxWinnersCount] =
-      (settings as { method: string; params: any; }[]).map(a => a.params)
+    const [roundPointSystem, roundPointsLimit, teamPointsLimit, cupPointsLimit, cupMaxWinnersCount] = (settings as {
+      method: string;
+      params: any;
+    }[]).map(a => a.params)
     this._roundsPointSystem = roundPointSystem
     this._roundsPointSystem = roundPointSystem
     this._roundsPointsLimit = roundPointsLimit.CurrentValue
     this._teamsPointsLimit = teamPointsLimit.CurrentValue
     this._cupPointsLimit = cupPointsLimit.CurrentValue
     this._cupMaxWinnersCount = cupMaxWinnersCount.CurrentValue
-    if (this._roundsPointSystem.length === 0
-      || !(this._roundsPointSystem.length === config.roundsModePointSystem.length
-        && this._roundsPointSystem.every((v, i) => v === config.roundsModePointSystem[i]))) {
+    if (this._roundsPointSystem.length === 0 || !(this._roundsPointSystem.length === config.roundsModePointSystem.length && this._roundsPointSystem.every(
+      (v, i) => v === config.roundsModePointSystem[i]))) {
       this._roundsPointSystem = config.roundsModePointSystem
       Client.callNoRes(`SetRoundCustomPoints`,
         [{ array: this._roundsPointSystem.map(a => ({ int: a })) }, { boolean: true }])
@@ -114,8 +122,7 @@ export class RoundsService {
   }
 
   static registerRoundRecord(record: tm.FinishInfo, player: tm.Player) {
-    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts' ||
-      GameService.gameMode === 'Laps') { return }
+    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts' || GameService.gameMode === 'Laps') { return }
     if (this.noRoundFinishes) {
       this.noRoundFinishes = false
       this.finishedRounds++
@@ -125,8 +132,7 @@ export class RoundsService {
   }
 
   static registerRoundPoints(player: tm.Player): number {
-    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts' ||
-      GameService.gameMode === 'Laps') { return 0 }
+    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts' || GameService.gameMode === 'Laps') { return 0 }
     const index = this._ranking.findIndex(a => a.login === player.login)
     if (index === -1) {
       Logger.error(`Player object not present in RoundsService ranking when adding points`)
@@ -184,7 +190,10 @@ export class RoundsService {
 
   static async handleBeginMap(): Promise<void> {
     this.teamsRoundPoints = undefined
-    this._teamScores = { blue: 0, red: 0 }
+    this._teamScores = {
+      blue: 0,
+      red: 0
+    }
     this.finishedRounds = 0
     if (!config.resetCupScoreOnSkipAndRestart) {
       this._ranking = []
@@ -212,8 +221,7 @@ export class RoundsService {
   static async handleEndRound(): Promise<void> {
     this.teamsRoundPoints = undefined
     if (GameService.gameMode === 'Teams') {
-      const res: tm.TrackmaniaRankingInfo[] | Error =
-        await Client.call('GetCurrentRanking', [{ int: 2 }, { int: 0 }])
+      const res: tm.TrackmaniaRankingInfo[] | Error = await Client.call('GetCurrentRanking', [{ int: 2 }, { int: 0 }])
       if (res instanceof Error) {
         Logger.error(`Call to get team score failed`, res.message)
         return
@@ -235,16 +243,27 @@ export class RoundsService {
       // this is stupid but sometimes the server just doesn't respond for no reason
       do {
         ranking = await Client.call('GetCurrentRanking', [{ int: 250 }, { int: 0 }])
-        if (attempts !== 0) Logger.error(`Could not get current ranking, trying again.`)
-        if (++attempts >= 5) await Logger.fatal(`Could not get current ranking. Error: ${ranking}`)
+        if (attempts !== 0) {
+          Logger.error(`Could not get current ranking, trying again.`)
+        }
+        if (++attempts >= 8) {
+          await Logger.fatal(`Could not get current ranking. Error: ${ranking}`)
+        } else if (attempts >= 5) {
+          // if there is no player in the ranking, it will fail until the dedicated server recalculated with BeginMap, this makes sure trakman doesn't crash in that case (PS: this is really stupid aswell)
+          Logger.warn('Could not get ranking, waiting for next BeginMap.')
+          await new Promise<void>((resolve) => {
+            tm.once('BeginMap', () => resolve())
+          })
+        }
       } while (ranking instanceof Error)
       for (const e of ranking) {
         const obj = this._ranking.find(a => a.login === e.Login)
         if (obj === undefined) { continue }
         if (obj.roundsPoints !== e.Score) {
-          if (GameService.gameMode === 'Cup' && (obj.roundsPoints === this._cupPointsLimit
-            || this._cupWinners.some(a => a.login === e.Login))) { continue }
-          Logger.debug(`${GameService.gameMode} points mismatch in RoundsService`, JSON.stringify(obj), JSON.stringify(e))
+          if (GameService.gameMode === 'Cup' && (obj.roundsPoints === this._cupPointsLimit || this._cupWinners.some(
+            a => a.login === e.Login))) { continue }
+          Logger.debug(`${GameService.gameMode} points mismatch in RoundsService`, JSON.stringify(obj),
+            JSON.stringify(e))
           const player = PlayerService.get(obj.login) as tm.Player
           obj.roundsPoints = e.Score
           if (player !== undefined) { player.roundsPoints = e.Score }
@@ -272,7 +291,7 @@ export class RoundsService {
    */
   static getRoundRecord(login: string): tm.FinishInfo | undefined
   /**
-   * Gets multiple round records. If some player has no round record 
+   * Gets multiple round records. If some player has no round record
    * his record object wont be returned. Returned array is sorted primary by time ascending, secondary by date ascending.
    * @param logins Array of player logins
    * @returns Array of round record objects
@@ -306,7 +325,7 @@ export class RoundsService {
     return { ...this._teamScores }
   }
 
-  /** 
+  /**
    * Point system for Rounds and Cup mode
    */
   static get roundsPointSystem(): number[] {
@@ -354,6 +373,5 @@ export class RoundsService {
   static get cupWinners(): Readonly<tm.Player>[] {
     return [...this._cupWinners]
   }
-
 
 }

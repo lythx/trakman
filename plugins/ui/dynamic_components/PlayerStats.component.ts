@@ -3,7 +3,7 @@
  * @since 1.3.3
  */
 
-import { Grid, componentIds, type GridCellFunction, type GridCellObject, centeredText, closeButton, PopupWindow } from '../UI.js'
+import { centeredText, closeButton, componentIds, Grid, type GridCellFunction, type GridCellObject, PopupWindow } from '../UI.js'
 import { titles } from '../../../config/Titles.js'
 import { stats } from '../../stats/Stats.js'
 import config from './PlayerStats.config.js'
@@ -17,9 +17,13 @@ export default class PlayerStatsWindow extends PopupWindow {
     tm.commands.add({
       aliases: config.command.aliases,
       help: config.command.help,
-      params: [{ name: 'login', optional: true }],
+      params: [{
+        name: 'login',
+        optional: true
+      }],
       callback: async (info: tm.MessageInfo, login?: string): Promise<void> => {
-        const player: tm.OfflinePlayer | undefined = tm.players.get(login ?? info.login) ?? await tm.players.fetch(login ?? info.login)
+        const player: tm.OfflinePlayer | undefined = tm.players.get(login ?? info.login) ?? await tm.players.fetch(
+          login ?? info.login)
         if (player === undefined) {
           tm.sendMessage(config.command.error, info.login)
           return
@@ -50,34 +54,28 @@ export default class PlayerStatsWindow extends PopupWindow {
     }
   }
 
-  protected constructContent(login: string, params?: { player: tm.OfflinePlayer }): string {
+  protected constructContent(login: string, params?: {
+    player: tm.OfflinePlayer
+  }): string {
     if (params === undefined) { return '' }
-    const data: string[] = [
-      params.player.login,
-      tm.utils.safeString(tm.utils.strip(params.player.nickname, false)),
+    const data: string[] = [params.player.login, tm.utils.safeString(tm.utils.strip(params.player.nickname, false)),
       `${params.player.country} / ${params.player.countryCode}`,
       titles.privileges[params.player.privilege as keyof typeof titles.privileges],
       (stats.averages.list.findIndex(a => a.login === params.player.login) + 1).toString(),
-      params.player.average.toString(),
-      tm.utils.getVerboseTime(params.player.timePlayed),
+      params.player.average.toString(), tm.utils.getVerboseTime(params.player.timePlayed),
       stats.records.list.find(a => a.login === params.player.login)?.amount.toString() ?? `0`,
       stats.votes.list.find(a => a.login === params.player.login)?.count.toString() ?? `0`,
       stats.sums.list.find(a => a.login === params.player.login)?.sums.slice(0, 4)
       // TODO: Find out how does the index go out of bounds here
-        .map((a, i) => `$${config.sumsColours[i]}${a}$FFF`).join(' / ') ?? `None`,
-      params.player.visits.toString(),
+      .map((a, i) => `$${config.sumsColours[i]}${a}$FFF`).join(' / ') ?? `None`, params.player.visits.toString(),
       stats.donations.list.find(a => a.login === params.player.login)?.amount.toString() ?? `0`,
-      params.player.wins.toString(),
-      params.player.isUnited ? `United` : `Nations`,
-      tm.utils.formatDate(params.player.lastOnline ?? new Date(), true)
-    ]
-    const header: GridCellObject[] = [
-      {
-        background: config.grid.headerBackground,
-        colspan: 2,
-        callback: (i, j, w, h): string => centeredText(config.cellHeader, w, h),
-      }
-    ]
+      params.player.wins.toString(), params.player.isUnited ? `United` : `Nations`,
+      tm.utils.formatDate(params.player.lastOnline ?? new Date(), true)]
+    const header: GridCellObject[] = [{
+      background: config.grid.headerBackground,
+      colspan: 2,
+      callback: (i, j, w, h): string => centeredText(config.cellHeader, w, h)
+    }]
     const nameCell: GridCellObject = {
       background: config.nameColumnBackground,
       callback: (i, j, w, h): string => {

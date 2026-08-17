@@ -1,69 +1,68 @@
 import config from './Config.js'
 
-const topList: { readonly login: string, nickname: string, sums: [number, number, number, number] }[] = []
+const topList: {
+  readonly login: string,
+  nickname: string,
+  sums: [number, number, number, number]
+}[] = []
 const updateListeners: ((changes: readonly Readonly<{
-  login: string, nickname: string,
+  login: string,
+  nickname: string,
   sums: [number, number, number, number]
 }>[]) => void)[] = []
-const nicknameChangeListeners: ((changes: readonly Readonly<{ login: string, nickname: string }>[]) => void)[] = []
+const nicknameChangeListeners: ((changes: readonly Readonly<{
+  login: string,
+  nickname: string
+}>[]) => void)[] = []
 let initialLocals: tm.LocalRecord[] = []
 let refreshNeeded = false
 
 const initialize = async () => {
   refreshNeeded = false
-  const res: { uid: string, login: string, nickname: string }[] | Error =
-    await tm.db.query(`SELECT uid, login, nickname FROM records
-  JOIN map_ids ON map_ids.id=records.map_id
-  JOIN players ON players.id=records.player_id
-  ORDER BY uid ASC,
-  time ASC,
-  date ASC;`)
+  topList.length = 0
+
+  const res: {
+    login: string,
+    nickname: string,
+    firsts: number,
+    seconds: number,
+    thirds: number,
+    others: number
+  }[] | Error = await tm.db.query(`
+    WITH ranked AS (SELECT p.login,
+                           p.nickname,
+                           RANK() OVER (
+          PARTITION BY m.id
+          ORDER BY CAST(r.time AS NUMERIC) ASC, r.date ASC, r.player_id ASC
+        ) AS rk
+                    FROM maps m
+                           JOIN records r ON r.map_id = m.id
+                           JOIN players p ON p.id = r.player_id)
+    SELECT login,
+           MAX(nickname)                           AS nickname,
+           SUM(CASE WHEN rk = 1 THEN 1 ELSE 0 END) AS firsts,
+           SUM(CASE WHEN rk = 2 THEN 1 ELSE 0 END) AS seconds,
+           SUM(CASE WHEN rk = 3 THEN 1 ELSE 0 END) AS thirds,
+           SUM(CASE WHEN rk > 3 THEN 1 ELSE 0 END) AS others
+    FROM ranked
+    GROUP BY login
+    ORDER BY firsts DESC, seconds DESC, thirds DESC, others DESC;
+  `)
+
   if (res instanceof Error) {
     await tm.log.fatal(`Failed to fetch topsums`, res.message)
     return
   }
   if (res.length === 0) { return }
-  const presentMaps = tm.maps.list.map(a => a.id).sort((a, b) => a.localeCompare(b))
-  let i = 0
-  let j = 0
-  while (i < res.length && j < presentMaps.length) {
-    const cmp = res[i].uid.localeCompare(presentMaps[j])
-    if (cmp > 0) {
-      j++
-      continue
-    }
-    if (cmp < 0) {
-      i++
-      continue
-    }
-    const uid = res[i].uid
-    let rank = 1
-    while (i < res.length && res[i].uid === uid) {
-      const login = res[i].login
-      const find = topList.find(a => a.login === login)
-      if (find !== undefined) {
-        if (rank <= 3) {
-          find.sums[rank - 1]++
-        } else {
-          find.sums[3]++
-        }
-      } else {
-        const arr: [number, number, number, number] = [0, 0, 0, 0]
-        if (rank <= 3) {
-          arr[rank - 1]++
-        } else {
-          arr[3]++
-        }
-        topList.push({
-          login: res[i].login,
-          nickname: res[i].nickname,
-          sums: arr
-        })
-      }
-      rank += 1
-      i += 1
-    }
+
+  for (const row of res) {
+    topList.push({
+      login: row.login,
+      nickname: row.nickname,
+      sums: [row.firsts, row.seconds, row.thirds, row.others]
+    })
   }
+
   sortToplist()
   topList.length = Math.min(config.sumsCount, topList.length)
   for (const e of updateListeners) { e(topList) }
@@ -81,7 +80,10 @@ tm.addListener('BeginMap', (): void => {
 })
 
 tm.addListener('PlayerDataUpdated', (info) => {
-  const changedObjects: { login: string, nickname: string }[] = []
+  const changedObjects: {
+    login: string,
+    nickname: string
+  }[] = []
   for (const e of topList) {
     const newNickname = info.find(a => a.login === e.login)?.nickname
     if (newNickname !== undefined) {
@@ -101,7 +103,7 @@ tm.addListener('LocalRecord', (info) => {
   let oldArrPos = prevRecordIndex === -1 ? undefined : prevRecordIndex
   if (oldArrPos !== undefined && oldArrPos > 2) {
     oldArrPos = 3
-  } // [1,2,3,4] 7000 
+  } // [1,2,3,4] 7000
   let newArrPos = info.position - 1
   if (info.position > 2) {
     newArrPos = 3
@@ -146,7 +148,8 @@ export const topSums = {
    * List of players sorted by their records amount
    */
   get list(): readonly Readonly<{
-    login: string, nickname: string,
+    login: string,
+    nickname: string,
     sums: Readonly<[number, number, number, number]>
   }>[] {
     return topList
@@ -157,7 +160,8 @@ export const topSums = {
    * @param callback Function to execute on event. It takes an array of updated objects as a parameter
    */
   onUpdate(callback: (changes: readonly Readonly<{
-    login: string, nickname: string,
+    login: string,
+    nickname: string,
     sums: Readonly<[number, number, number, number]>
   }>[]) => void) {
     updateListeners.push(callback)
@@ -167,7 +171,10 @@ export const topSums = {
    * Add a callback function to execute on player nickname change
    * @param callback Function to execute on event. It takes an array of objects containing login and nickname as a parameter
    */
-  onNicknameChange(callback: (changes: readonly Readonly<{ login: string, nickname: string }>[]) => void): void {
+  onNicknameChange(callback: (changes: readonly Readonly<{
+    login: string,
+    nickname: string
+  }>[]) => void): void {
     nicknameChangeListeners.push(callback)
   }
 
@@ -175,14 +182,10 @@ export const topSums = {
 
 function sortToplist() {
   topList.sort((a, b) => {
-    if (a.sums[0] < b.sums[0]) return 1
-    if (a.sums[0] > b.sums[0]) return -1
-    if (a.sums[1] < b.sums[1]) return 1
-    if (a.sums[1] > b.sums[1]) return -1
-    if (a.sums[2] < b.sums[2]) return 1
-    if (a.sums[2] > b.sums[2]) return -1
-    if (a.sums[3] < b.sums[3]) return 1
-    if (a.sums[3] > b.sums[3]) return -1
+    if (a.sums[0] !== b.sums[0]) return b.sums[0] - a.sums[0]
+    if (a.sums[1] !== b.sums[1]) return b.sums[1] - a.sums[1]
+    if (a.sums[2] !== b.sums[2]) return b.sums[2] - a.sums[2]
+    if (a.sums[3] !== b.sums[3]) return b.sums[3] - a.sums[3]
     return 0
   })
 }

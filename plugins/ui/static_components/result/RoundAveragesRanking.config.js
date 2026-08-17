@@ -8,14 +8,10 @@ export default {
   posX: cfg.rightPosition - (cfg.marginBig + cfg.width),
   posY: cfg.topBorder,
   side: true,
-  title: "Round Averages",
+  title: 'Round Averages',
   icon: icons.clockList,
   margin: cfg.margin,
   background: cfg.background,
-  columnProportions: [
-    1,
-    2.9,
-    4.1
-  ]
+  columnProportions: [1, 2.9, 4.1]
 }
 

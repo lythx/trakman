@@ -3,7 +3,7 @@
  * @since 0.4
  */
 
-import { componentIds, List, StaticHeader, StaticComponent } from '../../UI.js'
+import { componentIds, List, StaticComponent, StaticHeader } from '../../UI.js'
 import { stats } from '../../../stats/Stats.js'
 import config from './PlaytimeRanking.config.js'
 
@@ -17,7 +17,10 @@ export default class PlaytimeRanking extends StaticComponent {
     super(componentIds.playtimeRanking)
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, this.getHeight() - (this.header.options.height + config.margin),
-      config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
+      config.columnProportions, {
+        background: config.background,
+        headerBg: this.header.options.textBackground
+      })
     stats.playtimes.onUpdate((): void => {
       const xml = this.display()
       if (xml !== undefined) { tm.sendManialink(xml) }
@@ -40,7 +43,10 @@ export default class PlaytimeRanking extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    return { xml: this.xml, login }
+    return {
+      xml: this.xml,
+      login
+    }
   }
 
   constructXml() {

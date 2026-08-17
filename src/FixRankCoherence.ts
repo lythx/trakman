@@ -17,8 +17,14 @@ export const fixRankCoherence = async (): Promise<void> => {
 
 export const forceFixRankCoherence = async (): Promise<void> => {
   Logger.info(`Recalculating ranks...`)
-  const allMaps: { uid: string, id: number }[] = (await db.query(`SELECT id, uid FROM map_ids`)).rows
-  let maps: { uid: string, id: number }[]
+  const allMaps: {
+    uid: string,
+    id: number
+  }[] = (await db.query(`SELECT id, uid FROM map_ids`)).rows
+  let maps: {
+    uid: string,
+    id: number
+  }[]
   if (!config.manualMapLoading.enabled) {
     const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
     if (mapList instanceof Error) {
@@ -30,13 +36,19 @@ export const forceFixRankCoherence = async (): Promise<void> => {
     maps = allMaps
   }
   const playerIds: number[] = (await db.query(`SELECT id FROM players`)).rows.map(a => a.id)
-  const allRecords: { player_id: number, map_id: number }[] = (await db.query(`SELECT player_id, map_id FROM records
+  const allRecords: {
+    player_id: number,
+    map_id: number
+  }[] = (await db.query(`SELECT player_id, map_id FROM records
   ORDER BY map_id ASC,
   time ASC,
   date ASC;`)).rows
   const records = allRecords.filter(a => maps.some(b => b.id === a.map_id))
   const limit = config.localRecordsLimit
-  const sums: { id: number, average: number }[] = []
+  const sums: {
+    id: number,
+    average: number
+  }[] = []
   const indexesMap = new Map<number, number[]>(playerIds.map(a => [a, []]))
   for (let i = 0; i < records.length; i++) {
     indexesMap.get(records[i].player_id as number)?.push(i)
@@ -56,7 +68,10 @@ export const forceFixRankCoherence = async (): Promise<void> => {
       sum += position
     }
     sum += (maps.length - indexes.length) * limit
-    sums[i] = { average: sum / maps.length, id: playerIds[i] }
+    sums[i] = {
+      average: sum / maps.length,
+      id: playerIds[i]
+    }
   }
   if (sums.length !== 0) {
     await db.query(`UPDATE players AS p SET

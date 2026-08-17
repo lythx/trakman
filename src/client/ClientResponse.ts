@@ -16,21 +16,21 @@ export class ClientResponse {
   private _errorCode: number = 0
 
   /**
-  * Initiates an object to store buffers received from dedicated server
-  * @param targetLength first 4 bytes of response
-  * @param id second 4 bytes of response
-  */
+   * Initiates an object to store buffers received from dedicated server
+   * @param targetLength first 4 bytes of response
+   * @param id second 4 bytes of response
+   */
   constructor(targetLength: number, id: number) {
     this._targetLength = targetLength
     this._id = id
   }
 
   /**
-  * Concats new buffer with previous ones and sets status to completed if response reached its target length.
-  * If response length is greater than target length (new data contains fragment of next response)
-  * status is set to overloaded and next response buffer can be extracted using extractOverload() method
-  * @param data buffer received from dedicated server
-  */
+   * Concats new buffer with previous ones and sets status to completed if response reached its target length.
+   * If response length is greater than target length (new data contains fragment of next response)
+   * status is set to overloaded and next response buffer can be extracted using extractOverload() method
+   * @param data buffer received from dedicated server
+   */
   addData(data: Buffer): void {
     const newBuffer: Buffer = Buffer.concat([this._data, data])
     if (newBuffer.length > this._targetLength) {
@@ -90,10 +90,10 @@ export class ClientResponse {
   }
 
   /**
-  * Returns buffer fragment written after reaching target length (next response buffer)
-  * and sets status to completed
-  * @returns next response buffer
-  */
+   * Returns buffer fragment written after reaching target length (next response buffer)
+   * and sets status to completed
+   * @returns next response buffer
+   */
   extractOverload(): Buffer {
     this._status = 'completed'
     if (this._overload === null) {
@@ -137,10 +137,11 @@ export class ClientResponse {
     const parseType = (value: any, type: string): any => {
       const arr: any[] = []
       const obj: any = {}
-      switch (type) {
+      switch(type) {
         case 'boolean':
           return value === '1'
-        case 'int': case 'i4':
+        case 'int':
+        case 'i4':
           return parseInt(value)
         case 'double':
           return parseFloat(value)

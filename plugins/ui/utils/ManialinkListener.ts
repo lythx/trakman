@@ -1,4 +1,8 @@
-let listeners: { callback: ((info: tm.ManialinkClickInfo, actionIdOffset: number) => void), actionId: number, range?: number }[] = []
+let listeners: {
+  callback: ((info: tm.ManialinkClickInfo, actionIdOffset: number) => void),
+  actionId: number,
+  range?: number
+}[] = []
 
 /**
  * Adds a callback function to execute on given Action ID.
@@ -12,14 +16,22 @@ function addManialinkListener(actionId: number, callback: (info: tm.ManialinkCli
  * @param range Range of Action IDs (inludes starting Action ID)
  * @param callback Callback function, it takes ManialinkClickInfo and id offset as a parameter
  */
-function addManialinkListener(actionId: number, range: number, callback: (info: tm.ManialinkClickInfo, actionIdOffset: number) => void): void
+function addManialinkListener(actionId: number, range: number,
+  callback: (info: tm.ManialinkClickInfo, actionIdOffset: number) => void): void
 function addManialinkListener(actionId: number, rangeOrCallback: ((info: tm.ManialinkClickInfo) => void) | number,
   callback?: (info: tm.ManialinkClickInfo, actionIdOffset: number) => void): void {
   if (typeof rangeOrCallback === 'number') {
     if (rangeOrCallback < 1) { throw new Error('Manialink listener range must be > 0') }
-    listeners.push({ actionId, range: rangeOrCallback, callback: callback as any })
+    listeners.push({
+      actionId,
+      range: rangeOrCallback,
+      callback: callback as any
+    })
   } else {
-    listeners.push({ actionId, callback: rangeOrCallback })
+    listeners.push({
+      actionId,
+      callback: rangeOrCallback
+    })
   }
 }
 

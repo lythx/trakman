@@ -4,15 +4,10 @@ import icons from '../../config/Icons.js'
 export default {
   height: 8.8,
   width: cfg.width,
-  title: "Karma",
+  title: 'Karma',
   icon: icons.karmaStats,
   margin: cfg.margin,
-  icons: [
-    icons.karmaLocal,
-    icons.karmaGlobal,
-    icons.karmaPulse,
-    icons.peopleKarma
-  ],
+  icons: [icons.karmaLocal, icons.karmaGlobal, icons.karmaPulse, icons.peopleKarma],
   colours: ['0F8A', '0D6A', '0B4A', 'BO4A', 'D06A', 'F08A'],
   mkColours: ['0F0A', '0D0A', '0B0A', 'BOOA', 'D00A', 'F00A'],
   options: ['+++', '++', '+', '-', '--', '---'],

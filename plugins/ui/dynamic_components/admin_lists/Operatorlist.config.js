@@ -1,9 +1,10 @@
 import ids from '../../config/ComponentIds.js'
 import icons from '../../config/Icons.js'
+
 const p = tm.utils.palette
 
 export default {
-  title: " Server Operators ",
+  title: ' Server Operators ',
   icon: icons.playerList,
   width: 65,
   iconWidth: 2,
@@ -16,22 +17,22 @@ export default {
   selfColour: `${p.green}`,
   disabledColour: '333C',
   defaultNickname: 'N/A',
-  columnProportions: [
-    0.35,
-    1.5,
-    1.5,
-    0.5,
-    0.5
-  ],
-  navbar: [
-    { name: 'Playerlist', actionId: ids.playerList, privilege: Math.min(...Object.values(tm.config.controller.privileges)) },
-    { name: 'Adminlist', actionId: ids.adminlist },
-    { name: 'Masteradminlist', actionId: ids.masteradminlist },
-  ],
+  columnProportions: [0.35, 1.5, 1.5, 0.5, 0.5],
+  navbar: [{
+    name: 'Playerlist',
+    actionId: ids.playerList,
+    privilege: Math.min(...Object.values(tm.config.controller.privileges))
+  }, {
+    name: 'Adminlist',
+    actionId: ids.adminlist
+  }, {
+    name: 'Masteradminlist',
+    actionId: ids.masteradminlist
+  }],
   grid: {
-    background: "9996",
+    background: '9996',
     margin: 0.15,
-    headerBackground: "333C"
+    headerBackground: '333C'
   },
   command: {
     aliases: ['opl', 'oplist', 'operators', 'listops'],

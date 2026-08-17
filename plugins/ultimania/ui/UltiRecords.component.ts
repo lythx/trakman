@@ -4,7 +4,7 @@
  */
 
 import { ultimania } from "../Ultimania.js"
-import { componentIds, Paginator, Grid, centeredText, closeButton, type GridCellFunction, PopupWindow } from '../../ui/UI.js'
+import { centeredText, closeButton, componentIds, Grid, type GridCellFunction, Paginator, PopupWindow } from '../../ui/UI.js'
 import config from './UltiRecords.config.js'
 
 export default class UltiRecords extends PopupWindow {
@@ -16,7 +16,8 @@ export default class UltiRecords extends PopupWindow {
   constructor() {
     super(componentIds.ultiRecords, config.icon, config.title, config.navbar)
     const records = ultimania.records
-    this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
+    this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight,
+      Math.ceil(records.length / this.entries))
     this.paginator.onPageChange = (login: string): void => {
       this.getPagesAndOpen(login)
     }
@@ -41,7 +42,9 @@ export default class UltiRecords extends PopupWindow {
     this.getPagesAndOpen(info.login)
   }
 
-  protected constructContent(login: string, params: { page: number }): string {
+  protected constructContent(login: string, params: {
+    page: number
+  }): string {
     const records = ultimania.records
     const playerIndex: number = (params.page - 1) * this.entries - 1
     const entriesToDisplay = records.length - (playerIndex + 1)
@@ -60,7 +63,6 @@ export default class UltiRecords extends PopupWindow {
       return ret
     }
 
-
     const dateCell = (i: number, j: number, w: number, h: number): string => {
       return centeredText(tm.utils.formatDate(records[i + playerIndex].date, true), w, h)
     }
@@ -71,13 +73,9 @@ export default class UltiRecords extends PopupWindow {
 
     let grid: Grid
     let headers: GridCellFunction[] = []
-    headers = [
-      (i, j, w, h) => centeredText(' Lp. ', w, h),
-      (i, j, w, h) => centeredText(' Nickname ', w, h),
-      (i, j, w, h) => centeredText(' Login ', w, h),
-      (i, j, w, h) => centeredText(' Date ', w, h),
-      (i, j, w, h) => centeredText(' Score ', w, h),
-    ]
+    headers = [(i, j, w, h) => centeredText(' Lp. ', w, h), (i, j, w, h) => centeredText(' Nickname ', w, h),
+      (i, j, w, h) => centeredText(' Login ', w, h), (i, j, w, h) => centeredText(' Date ', w, h),
+      (i, j, w, h) => centeredText(' Score ', w, h)]
     grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(this.entries + 1).fill(1), config.grid)
     const arr = [...headers]

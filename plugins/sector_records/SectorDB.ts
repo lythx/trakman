@@ -13,8 +13,7 @@ const createQueries = [`CREATE TABLE IF NOT EXISTS best_sector_records(
   CONSTRAINT fk_map_id
     FOREIGN KEY(map_id)
       REFERENCES map_ids(id)
-);`,
-`CREATE TABLE IF NOT EXISTS sector_records(
+);`, `CREATE TABLE IF NOT EXISTS sector_records(
   map_id INT4 NOT NULL,
   player_id INT4 NOT NULL,
   sectors INT4[] NOT NULL,
@@ -41,18 +40,30 @@ for (const e of createQueries) {
 
 export const allSecsDB = {
 
-  async get(mapDBId: number, ...playerLogins: string[]): Promise<{ sectors: (number | undefined)[], login: string, nickname: string }[] | Error> {
+  async get(mapDBId: number, ...playerLogins: string[]): Promise<{
+    sectors: (number | undefined)[],
+    login: string,
+    nickname: string
+  }[] | Error> {
     if (playerLogins.length === 0) { return [] }
     const playerDBIds = await tm.db.getPlayerId(playerLogins)
     const query = `SELECT sectors, login, nickname FROM sector_records
     JOIN players ON players.id=sector_records.player_id
     WHERE map_id=$1 AND (${playerDBIds.map((_: any, i: number) => `player_id=$${i + 2} OR `).join('').slice(0, -3)});`
-    const res: { sectors: number[], login: string, nickname: string }[] | Error = (await queryDB(query, mapDBId, ...playerDBIds.map(a => a.id)))
+    const res: {
+      sectors: number[],
+      login: string,
+      nickname: string
+    }[] | Error = (await queryDB(query, mapDBId, ...playerDBIds.map(a => a.id)))
     if (res instanceof Error) {
       tm.log.error(`Error when fetching sector records of players ${playerDBIds} on map ${mapDBId}`, res.message)
       return []
     }
-    return res.map(a => ({ login: a.login, sectors: a.sectors.map(b => b === -1 ? undefined : b), nickname: a.nickname }))
+    return res.map(a => ({
+      login: a.login,
+      sectors: a.sectors.map(b => b === -1 ? undefined : b),
+      nickname: a.nickname
+    }))
   },
 
   async add(mapId: number, login: string, sectors: number[]): Promise<void> {
@@ -73,11 +84,21 @@ export const allSecsDB = {
 
 export const bestSecsDB = {
 
-  async get(mapId: string | number): Promise<{ sector: number, date: Date, login: string, nickname: string }[] | Error> {
+  async get(mapId: string | number): Promise<{
+    sector: number,
+    date: Date,
+    login: string,
+    nickname: string
+  }[] | Error> {
     const mapDBId = typeof mapId === 'number' ? mapId : await tm.db.getMapId(mapId)
     if (mapDBId === undefined) { return [] }
-    const res: { sector: number, date: Date, index: number, login: string, nickname: string }[] | Error =
-      (await queryDB(`SELECT sector, index, date, login, nickname FROM best_sector_records 
+    const res: {
+      sector: number,
+      date: Date,
+      index: number,
+      login: string,
+      nickname: string
+    }[] | Error = (await queryDB(`SELECT sector, index, date, login, nickname FROM best_sector_records 
     JOIN players ON players.id=best_sector_records.player_id
     WHERE map_id=$1;`, mapId))
     if (res instanceof Error) {
@@ -86,12 +107,18 @@ export const bestSecsDB = {
     }
     const ret: Omit<typeof res[0], 'index'>[] = []
     for (const e of res) {
-      ret[e.index] = { sector: e.sector, date: e.date, login: e.login, nickname: e.nickname }
+      ret[e.index] = {
+        sector: e.sector,
+        date: e.date,
+        login: e.login,
+        nickname: e.nickname
+      }
     }
     return ret
   },
 
-  async add(mapId: string | number, playerId: string | number, index: number, sector: number, date: Date): Promise<void> {
+  async add(mapId: string | number, playerId: string | number, index: number, sector: number,
+    date: Date): Promise<void> {
     const mapDBId = typeof mapId === 'number' ? mapId : await tm.db.getMapId(mapId)
     const playerDBId = typeof playerId === 'number' ? playerId : await tm.db.getPlayerId(playerId)
     if (mapDBId === undefined || playerDBId === undefined) { return }
@@ -99,7 +126,8 @@ export const bestSecsDB = {
     await queryDB(query, mapDBId, playerDBId, index, sector, date)
   },
 
-  async update(mapId: string | number, playerId: string | number, index: number, sector: number, date: Date): Promise<void> {
+  async update(mapId: string | number, playerId: string | number, index: number, sector: number,
+    date: Date): Promise<void> {
     const mapDBId = typeof mapId === 'number' ? mapId : await tm.db.getMapId(mapId)
     const playerDBId = typeof playerId === 'number' ? playerId : await tm.db.getPlayerId(playerId)
     if (mapDBId === undefined || playerDBId === undefined) { return }

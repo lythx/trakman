@@ -7,7 +7,7 @@ export default {
   cupEntries: 12,
   entryHeight: 2.15,
   width: cfg.width,
-  title: "Round Score",
+  title: 'Round Score',
   icon: icons.chartLocal,
   margin: cfg.margin,
   roundsTopCount: 5,

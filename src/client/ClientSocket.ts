@@ -12,8 +12,8 @@ export class ClientSocket extends net.Socket {
   private incompleteHeader: Buffer | null = null
 
   /**
-  * Setup socket listeners for client - server communication
-  */
+   * Setup socket listeners for client - server communication
+   */
   setupListeners = (): void => {
     this.on('data', (buffer: Buffer): void => {
       // handshake has no id so it has to be treated differently from normal data
@@ -28,8 +28,8 @@ export class ClientSocket extends net.Socket {
   }
 
   /**
-  * Poll handshake status
-  */
+   * Poll handshake status
+   */
   awaitHandshake = async (): Promise<true | Error> => {
     const startTimestamp: number = Date.now()
     return await new Promise((resolve): void => {
@@ -54,9 +54,9 @@ export class ClientSocket extends net.Socket {
   }
 
   /**
-  * Poll dedicated server response
-  * @returns array of values returned by server or error
-  */
+   * Poll dedicated server response
+   * @returns array of values returned by server or error
+   */
   awaitResponse = async (id: number, method: string): Promise<any | Error> => {
     const startTimestamp: number = Date.now()
     return await new Promise((resolve): void => {
@@ -90,7 +90,7 @@ export class ClientSocket extends net.Socket {
     }
   }
 
-  /** 
+  /**
    * Initiates a Response object with targetSize and id
    */
   private handleResponseStart = (buffer: Buffer): void => {

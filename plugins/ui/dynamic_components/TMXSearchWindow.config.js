@@ -1,8 +1,9 @@
 import icons from '../config/Icons.js'
+
 const p = tm.utils.palette
 
 export default {
-  title: "TMX Search Result",
+  title: 'TMX Search Result',
   addPrivilege: tm.config.controller.privileges.addMap,
   icon: icons.mapList,
   textScale: 1,
@@ -19,10 +20,8 @@ export default {
     background: 'FFFA',
     margin: 0.15
   },
-  navbar: [
-  ],
-  icons: [
-    icons.ongoingMap, // Map header icon
+  navbar: [],
+  icons: [icons.ongoingMap, // Map header icon
     icons.maniaExchange, // MX icon
     icons.tag, // Map name icon
     icons.personBuilder, // Author name icon
@@ -33,8 +32,8 @@ export default {
   iconWidth: 2,
   timeWidth: 4.5,
   awardsWidth: 2,
-  iconBackground: "222C",
-  contentBackground: "555C",
+  iconBackground: '222C',
+  contentBackground: '555C',
   plusImage: icons.addMap,
   blankImage: icons.blank,
   public: true,
@@ -43,8 +42,7 @@ export default {
     searchError: `${p.error}Failed to search for the maps.`,
     fetchError: `${p.error}Failed to fetch the map from TMX.`,
     error: `${p.error}Failed to add the map.`,
-    alreadyAdded: `${p.admin}Map ${p.highlight}#{map}${p.admin} added by #{nickname}${p.admin} is already on the server, ` +
-      `it will be ${p.admin}queued ${p.admin}instead.`,
+    alreadyAdded: `${p.admin}Map ${p.highlight}#{map}${p.admin} added by #{nickname}${p.admin} is already on the server, ` + `it will be ${p.admin}queued ${p.admin}instead.`,
     added: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has added and queued ${p.highlight}#{map}${p.admin} from TMX.`
   },
   command: {

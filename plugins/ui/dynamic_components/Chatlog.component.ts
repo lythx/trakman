@@ -3,10 +3,12 @@
  * @since 1.0
  */
 
-import { componentIds, Grid, leftAlignedText, centeredText, closeButton, Paginator, type GridCellFunction, PopupWindow } from '../UI.js'
+import { centeredText, closeButton, componentIds, Grid, type GridCellFunction, leftAlignedText, Paginator, PopupWindow } from '../UI.js'
 import config from './Chatlog.config.js'
 
-export default class ChatLog extends PopupWindow<{ page: number }> {
+export default class ChatLog extends PopupWindow<{
+  page: number
+}> {
 
   readonly grid: Grid
   readonly paginator: Paginator
@@ -46,21 +48,21 @@ export default class ChatLog extends PopupWindow<{ page: number }> {
     }
   }
 
-  protected constructContent(login: string, params: { page: number }): string {
+  protected constructContent(login: string, params: {
+    page: number
+  }): string {
     const page = params.page
     const index = (page - 1) * (config.entries - 1) - 1
     const messages = tm.chat.messages.reverse()
-    const headers: GridCellFunction[] = [
-      (i, j, w, h) => centeredText(' Date ', w, h),
-      (i, j, w, h) => centeredText(' Nickname ', w, h),
-      (i, j, w, h) => centeredText(' Login ', w, h),
-      (i, j, w, h) => centeredText(' Message ', w, h),
-    ]
+    const headers: GridCellFunction[] = [(i, j, w, h) => centeredText(' Date ', w, h),
+      (i, j, w, h) => centeredText(' Nickname ', w, h), (i, j, w, h) => centeredText(' Login ', w, h),
+      (i, j, w, h) => centeredText(' Message ', w, h)]
     const dateCell: GridCellFunction = (i, j, w, h) => {
       return centeredText(tm.utils.formatDate(messages[index + i].date, true), w, h)
     }
     const nicknameCell: GridCellFunction = (i, j, w, h) => {
-      return centeredText(tm.utils.safeString(tm.utils.safeString(tm.utils.strip(messages[index + i].nickname, false))), w, h)
+      return centeredText(tm.utils.safeString(tm.utils.safeString(tm.utils.strip(messages[index + i].nickname, false))),
+        w, h)
     }
     const loginCell: GridCellFunction = (i, j, w, h) => {
       const playerLogin = messages[index + i].login

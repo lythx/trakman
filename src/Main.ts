@@ -27,22 +27,26 @@ if (process.env.SERVER_PORT === undefined) { await Logger.fatal('SERVER_PORT is 
 await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
 Logger.trace('Connection with the dedicated server established')
 Logger.trace('Authenticating...')
-if (process.env.SUPER_ADMIN_NAME === undefined) { await Logger.fatal('SUPER_ADMIN_NAME is undefined. Check your .env file') }
-if (process.env.SUPER_ADMIN_PASSWORD === undefined) { await Logger.fatal('SUPER_ADMIN_PASSWORD is undefined. Check your .env file') }
-const authenticationStatus: any | Error = await Client.call('Authenticate', [
-  { string: process.env.SUPER_ADMIN_NAME },
-  { string: process.env.SUPER_ADMIN_PASSWORD }
-])
-if (authenticationStatus instanceof Error) { await Logger.fatal('Authentication failed. Server responded with an error:', authenticationStatus.message) }
+if (process.env.SUPER_ADMIN_NAME === undefined) {
+  await Logger.fatal('SUPER_ADMIN_NAME is undefined. Check your .env file')
+}
+if (process.env.SUPER_ADMIN_PASSWORD === undefined) {
+  await Logger.fatal('SUPER_ADMIN_PASSWORD is undefined. Check your .env file')
+}
+const authenticationStatus: any | Error = await Client.call('Authenticate',
+  [{ string: process.env.SUPER_ADMIN_NAME }, { string: process.env.SUPER_ADMIN_PASSWORD }])
+if (authenticationStatus instanceof Error) {
+  await Logger.fatal('Authentication failed. Server responded with an error:', authenticationStatus.message)
+}
 Logger.trace('Authentication success')
 Logger.trace('Initializing database...')
-Database.initialize()
+await Database.initialize()
 Logger.trace('Database initialized...')
 await fixRankCoherence()
 Logger.trace('Retrieving game info...')
 await GameService.initialize()
 Logger.trace('Game info fetched')
-// import plugins after initializing database to avoid process exiting with no error in case of query on inexistent table
+// import plugins after initializing database to avoid process exiting with no error in case of query on non-existent table
 await import('../Plugins.js')
 Logger.trace('Fetching player info...')
 await PlayerService.initialize()
@@ -106,7 +110,10 @@ setInterval(async () => {
 }, config.healthcheckInterval)
 
 Logger.info('Press Enter to execute a command as the server (include slashes)')
-const rl = readline.createInterface({ input, output })
+const rl = readline.createInterface({
+  input,
+  output
+})
 while (running) {
   await rl.question("")
   Logger.disableConsole()

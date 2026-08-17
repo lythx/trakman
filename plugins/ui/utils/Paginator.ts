@@ -12,7 +12,10 @@ export default class Paginator {
   private _buttonCount: number = 0
   /** Parent element ID */
   readonly parentId: number
-  private readonly loginPages: { readonly login: string, page: number }[] = []
+  private readonly loginPages: {
+    readonly login: string,
+    page: number
+  }[] = []
   /** Default page (will be displayed if no page is specified) */
   defaultPage: number
   /** Button width */
@@ -53,7 +56,8 @@ export default class Paginator {
    * @param defaultPage Default page (will be displayed if no page is specified)
    * @param noMidGap If true there will be no bonus gap between previous and next buttons
    */
-  constructor(parentId: number, parentWidth: number, parentHeight: number, pageCount: number, defaultPage: number = 1, noMidGap?: true) {
+  constructor(parentId: number, parentWidth: number, parentHeight: number, pageCount: number, defaultPage: number = 1,
+    noMidGap?: true) {
     this.parentId = parentId
     this.width = parentWidth
     this.height = parentHeight
@@ -62,23 +66,15 @@ export default class Paginator {
     this.yPos = -(parentHeight / 2)
     this.noMidGap = noMidGap ?? false
     if (noMidGap === undefined) {
-      this.xPos = [
-        parentWidth / 2 - (this.buttonW + this.margin) * 3,
-        parentWidth / 2 - (this.buttonW + this.margin) * 2,
-        parentWidth / 2 - (this.buttonW + this.margin) * 1,
-        parentWidth / 2 + (this.buttonW + this.margin) * 1,
-        parentWidth / 2 + (this.buttonW + this.margin) * 2,
-        parentWidth / 2 + (this.buttonW + this.margin) * 3,
-      ]
+      this.xPos = [parentWidth / 2 - (this.buttonW + this.margin) * 3,
+        parentWidth / 2 - (this.buttonW + this.margin) * 2, parentWidth / 2 - (this.buttonW + this.margin) * 1,
+        parentWidth / 2 + (this.buttonW + this.margin) * 1, parentWidth / 2 + (this.buttonW + this.margin) * 2,
+        parentWidth / 2 + (this.buttonW + this.margin) * 3]
     } else {
-      this.xPos = [
-        parentWidth / 2 - (this.buttonW + this.margin) * 2.5,
-        parentWidth / 2 - (this.buttonW + this.margin) * 1.5,
-        parentWidth / 2 - (this.buttonW + this.margin) * 0.5,
-        parentWidth / 2 + (this.buttonW + this.margin) * 0.5,
-        parentWidth / 2 + (this.buttonW + this.margin) * 1.5,
-        parentWidth / 2 + (this.buttonW + this.margin) * 2.5,
-      ]
+      this.xPos = [parentWidth / 2 - (this.buttonW + this.margin) * 2.5,
+        parentWidth / 2 - (this.buttonW + this.margin) * 1.5, parentWidth / 2 - (this.buttonW + this.margin) * 0.5,
+        parentWidth / 2 + (this.buttonW + this.margin) * 0.5, parentWidth / 2 + (this.buttonW + this.margin) * 1.5,
+        parentWidth / 2 + (this.buttonW + this.margin) * 2.5]
     }
     this.ids = Object.entries(ID).map(a => this.parentId + a[1])
     if (pageCount > 1) { this._buttonCount = 1 }
@@ -89,7 +85,10 @@ export default class Paginator {
         const playerPage = this.loginPages.find(a => a.login === info.login)
         if (playerPage === undefined) { // Should never happen
           const page: number = this.getPageFromClick(info.actionId, this.defaultPage)
-          this.loginPages.push({ login: info.login, page: page })
+          this.loginPages.push({
+            login: info.login,
+            page: page
+          })
           this._onPageChange(info.login, page, info)
           return
         }
@@ -137,7 +136,10 @@ export default class Paginator {
     if (page > this._pageCount) { page = this._pageCount }
     if (page < 1) { page = 1 }
     if (loginPage === undefined) {
-      this.loginPages.push({ login, page })
+      this.loginPages.push({
+        login,
+        page
+      })
     } else {
       loginPage.page = page
     }
@@ -168,7 +170,7 @@ export default class Paginator {
   }
 
   private getPageFromClick(id: number, page: number): number {
-    switch (id) {
+    switch(id) {
       case this.parentId + ID.previous:
         page--
         if (page < 1) { return 1 }
@@ -178,7 +180,8 @@ export default class Paginator {
         page++
         if (page > lastPage) { return lastPage }
         return page
-      } case this.parentId + ID.first:
+      }
+      case this.parentId + ID.first:
         return 1
       case this.parentId + ID.last:
         return this._pageCount
@@ -240,8 +243,7 @@ export default class Paginator {
             <quad posn="${this.xPos[1]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.jumpBackwards}" 
             imagefocus="${config.iconsHover[1]}"
             image="${config.icons[1]}"/>`
-      }
-      else if (this._buttonCount > 1) {
+      } else if (this._buttonCount > 1) {
         xml += `<quad posn="${this.xPos[1]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.first}" 
         imagefocus="${config.iconsHover[0]}"
         image="${config.icons[0]}"/>`
@@ -265,8 +267,7 @@ export default class Paginator {
           <quad posn="${this.xPos[5]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.last}" 
           imagefocus="${config.iconsHover[5]}"
           image="${config.icons[5]}"/>`
-      }
-      else if (this._buttonCount > 1) {
+      } else if (this._buttonCount > 1) {
         xml += `<quad posn="${this.xPos[4]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.last}" 
           imagefocus="${config.iconsHover[5]}"
           image="${config.icons[5]}"/>`
