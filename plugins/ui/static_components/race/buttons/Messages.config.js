@@ -4,7 +4,7 @@ import buttonCfg from './ButtonsWidget.config.js'
 export default {
   paySkip: {
     paymentFail: `${p.error}Failed to process payment.`,
-    success: `${p.highlight}#{name}${p.donation} has paid ${p.highlight}#{amount}C ${p.donation}to skip the ongoing map.` + ` Skipping in ${p.highlight}#{seconds}s${p.donation}.`
+    success: `${p.highlight}#{name}${p.donation} has paid ${p.highlight}#{amount}C ${p.donation}to ${p.highlight}skip ${p.donation}the ongoing map.` + ` Skipping in ${p.highlight}#{seconds}s${p.donation}.`
   },
   payReplay: {
     paymentFail: `${p.error}Failed to process payment.`,
@@ -12,10 +12,10 @@ export default {
     skipEvent: 'skipped',
     replayEvent: 'replayed',
     refund: `, coppers will be returned`,
-    success: `${p.highlight}#{name}${p.donation} has paid ${p.highlight}#{amount}C ${p.donation}to #{action} the ongoing map.`,
+    success: `${p.highlight}#{name}${p.donation} has paid ${p.highlight}#{amount}C ${p.donation}to #{action}.`,
     refundMail: `Refund for failed map replay on ${tm.config.server.name}`,
-    replayStr: `${p.highlight}replay${p.vote}`,
-    extendStr: `${p.highlight}extend${p.vote} the time on`
+    replayStr: `${p.highlight}replay ${p.donation}the ongoing map`,
+    extendStr: `${p.highlight}extend the time ${p.donation}on the ongoing map`
   },
   voteSkip: {
     start: `${p.highlight}#{nickname} ${p.vote}started a vote to ${p.highlight}skip ${p.vote}the ongoing map.`,
