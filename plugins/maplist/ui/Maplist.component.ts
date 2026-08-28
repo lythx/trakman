@@ -196,6 +196,85 @@ export default class MapList extends PopupWindow<{
     }, `${page}/${paginator.pageCount}`)
   }
 
+  private normalize(s: string): string {
+    return s.toLowerCase().replace(/[^a-z]/g, '')
+  }
+
+  private nadeoToDisplay(nadeo: string): string {
+    if (nadeo === 'Speed') { return 'Desert' }
+    if (nadeo === 'Alpine') { return 'Snow' }
+    return nadeo
+  }
+
+  private buildEnvAliasMap(): Map<string, string> {
+    const base: string[] = ['Stadium', 'Island', 'Desert', 'Rally', 'Bay', 'Coast', 'Snow']
+      .concat(tm.config.controller.customEnvironments ?? [])
+    const alias = new Map<string, string>()
+    for (const environment of base) {
+      const nadeo = tm.utils.environmentToNadeoEnvironment(environment as tm.Environment) as string
+      alias.set(this.normalize(environment), nadeo)
+      alias.set(this.normalize(nadeo), nadeo)
+      if (environment === 'Stadium') { alias.set(this.normalize('Stad'), 'Stadium') }
+      if (environment === 'Desert') { alias.set(this.normalize('Speed'), 'Speed') }
+      if (environment === 'Snow') { alias.set(this.normalize('Alpine'), 'Alpine') }
+    }
+    return alias
+  }
+
+  private parseEnvironment(input: string): { ok: true, nadeo: string, display: string } | { ok: false } {
+    const alias = this.buildEnvAliasMap()
+    const key = this.normalize(input)
+    if (key.length === 0) { return { ok: false } }
+    let nadeo: string | undefined = alias.get(key)
+    if (nadeo === undefined) {
+      const matches = Array.from(alias.keys())
+        .filter(k => k.startsWith(key))
+        .map(k => alias.get(k) as string)
+      const unique = Array.from(new Set(matches))
+      if (unique.length === 1) {
+        nadeo = unique[0]
+      }
+    }
+    if (nadeo === undefined) { return { ok: false } }
+    return { ok: true, nadeo, display: this.nadeoToDisplay(nadeo) }
+  }
+
+  async openWithEnvironment(login: string, envRaw: string, page: number): Promise<void> {
+    const parsed = this.parseEnvironment(envRaw)
+    if (!parsed.ok) {
+      const valid = ['Stadium', 'Island', 'Desert', 'Rally', 'Bay', 'Coast', 'Snow']
+        .concat(tm.config.controller.customEnvironments ?? [])
+        .join(', ')
+      tm.sendMessage(`Unknown environment "${envRaw}". Valid: ${valid}.`, login)
+      return
+    }
+    const list = maplist.get().filter(m => {
+      const nadeoEnv = tm.utils.environmentToNadeoEnvironment(m.environment as tm.Environment) as string
+      return this.normalize(nadeoEnv) === this.normalize(parsed.nadeo)
+    })
+    const paginator = this.getPaginator(login, list, 'environment')
+    const pageCount = Math.max(1, Math.ceil(list.length / (config.rows * config.columns)))
+    page = Math.max(1, Math.min(pageCount, page))
+    paginator.setPageForLogin(login, page)
+    const label = (config.optionTitles as any).environment ?? 'Environment'
+    const subtitle = `${label}: ${parsed.display}`
+    paginator.onPageChange = (l: string, p: number): Promise<void> => this.displayToPlayer(l, {
+      page: p,
+      paginator,
+      list
+    }, `${p}/${pageCount}`, undefined, subtitle)
+    const query = this.playerQueries.find(a => a.login === login)
+    if (query !== undefined) {
+      query.query = subtitle
+      query.list = list
+    }
+    this.displayToPlayer(login, {
+      page,
+      paginator,
+      list
+    }, `${page}/${paginator.pageCount}`, undefined, subtitle)
+  }
+
   openOnPage(login: string, page: number): void {
     const list: Readonly<tm.Map>[] = tm.maps.list
     const paginator = this.paginator
@@ -533,6 +612,29 @@ export default class MapList extends PopupWindow<{
 
 }
 
+let mapListInstance: MapList | undefined
+
+export function getMapListInstance(): MapList {
+  if (mapListInstance === undefined) {
+    mapListInstance = new MapList()
+  }
+  return mapListInstance
+}
+
+export function openMapList(login: string,
+  option: 'jukebox' | 'name' | 'karma' | 'short' | 'long' | 'best' | 'worst' | 'worstkarma' | 'nofinish' |
+  'norank' | 'noauthor' | 'oldest' | 'newest', page = 1): void {
+  void getMapListInstance().openWithOption(login, option, page)
+}
+
+export function openMapListEnv(login: string, envRaw: string, page = 1): void {
+  void getMapListInstance().openWithEnvironment(login, envRaw, page)
+}
+
+export function openMapListOnPage(login: string, page = 1): void {
+  getMapListInstance().openOnPage(login, page)
+}
+
 tm.addListener('Startup', (): void => {
-  new MapList()
+  getMapListInstance()
 })

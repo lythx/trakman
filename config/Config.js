@@ -101,5 +101,5 @@ export default {
   /** If haystack size exceeds this threshold `matchString()` will skip expensive haystack processing to optimize performance */
   matchStringReduxModeThreshold: 5000,
   /** Custom map environments. If a map has an environment that is not in this list, it will be marked as "Stadium" */
-  customEnvironments: ["Highlands", "NewSnowCar"]
+  customEnvironments: ["Highlands"]
 }
