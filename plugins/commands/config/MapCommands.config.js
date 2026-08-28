@@ -1,6 +1,7 @@
+import { loadConfig } from "../../../src/ConfigLoader.js"
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   add: {
     privilege: tm.config.controller.privileges.addMap,
     aliases: ['add', 'am', 'addmap'],
@@ -56,3 +57,5 @@ export default {
     help: `Add a map from TMX.`
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

@@ -1,9 +1,11 @@
-import { resultConfig as cfg, StaticHeader } from '../../UI.js'
+import { loadConfig } from "../../../../src/ConfigLoader.js"
+import cfg from '../../config/ResultUi.js'
+import StaticHeader from '../../utils/StaticHeader.js'
 
 /**
  * Banner image ratio is around 4:1
  */
-export default {
+const defaultConfig = {
   entries: 5,
   entryHeight: 2.15,
   image: 'https://trakman.ptrk.eu/icons/CrazyTrakman.png',
@@ -22,3 +24,5 @@ export default {
   topBorder: cfg.topBorder,
   marginBig: cfg.marginBig
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

@@ -1,8 +1,9 @@
+import { loadConfig } from "../src/ConfigLoader.js"
 import prefixes from './PrefixesAndPalette.js'
 
 const p = prefixes.palette
 
-export default {
+const defaultConfig = {
   /** Message sent to the player attempting to use a command they do not have the permission for */
   noPermission: `${p.error} You have no permission to use this command.`,
   /** Message sent to the muted player attempting to use a command that is disabled for muted players */
@@ -26,3 +27,5 @@ export default {
   /** Message sent to the player if the specified login is not found in the database */
   unknownPlayer: `${p.error}Unknown player ${p.highlight}#{name}${p.error}.`
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

@@ -1,6 +1,7 @@
+import { loadConfig } from "../../../src/ConfigLoader.js"
 import icons from '../config/Icons.js'
 
-export default {
+const defaultConfig = {
   buttonWidth: 3,
   buttonHeight: 3,
   icon: icons.close,
@@ -8,3 +9,5 @@ export default {
   padding: 0.2,
   background: '000D'
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

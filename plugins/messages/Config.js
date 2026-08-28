@@ -1,6 +1,7 @@
+import { loadConfig } from "../../src/ConfigLoader.js"
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   // Special message on every win multiple of this
   specialWin: 50,
   startup: {
@@ -81,3 +82,5 @@ export default {
     public: true
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

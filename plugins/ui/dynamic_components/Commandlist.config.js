@@ -1,9 +1,10 @@
+import { loadConfig } from "../../../src/ConfigLoader.js"
 import ids from '../config/ComponentIds.js'
 import icons from '../config/Icons.js'
 
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   title: 'Command List',
   entries: 15,
   icon: icons.infoList,
@@ -48,3 +49,5 @@ export default {
   noMatchesMessage: `${p.error}Nothing found for ${p.highlight}#{query}${p.error}.`,
   aliasSearch: true // Whether to search for alias on query
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

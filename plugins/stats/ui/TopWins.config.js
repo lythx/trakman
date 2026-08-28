@@ -1,6 +1,8 @@
-import { componentIds as ids, icons } from '../../ui/UI.js'
+import { loadConfig } from "../../../src/ConfigLoader.js"
+import ids from '../../ui/config/ComponentIds.js'
+import icons from '../../ui/config/Icons.js'
 
-export default {
+const defaultConfig = {
   title: 'Top Wins',
   icon: icons.stats,
   gridColumns: [0.8, 4, 3, 3, 0.8, 4, 3, 3],
@@ -40,3 +42,5 @@ export default {
     privilege: 0
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

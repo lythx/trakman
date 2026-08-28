@@ -1,3 +1,4 @@
+import { loadConfig } from "../../../src/ConfigLoader.js"
 import icons from './Icons.js'
 import raceUi from './RaceUi.js'
 import resultUi from './ResultUi.js'
@@ -33,7 +34,7 @@ const p = tm.utils.palette
  * - text2PositionOffset (num) - Position offset of text2, makes the text go lower
  */
 
-export default {
+const defaultConfig = {
   /**
    * RaceUi icons
    */
@@ -81,3 +82,5 @@ export default {
     text2PositionOffset: 1.75
   }]
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

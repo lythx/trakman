@@ -1,7 +1,8 @@
+import { loadConfig } from "../../src/ConfigLoader.js"
 const p = tm.utils.palette
 import icons from '../ui/config/Icons.js'
 
-export default {
+const defaultConfig = {
   noPermission: `${p.error}You have no permission to perform this action.`,
   addVote: {
     voteTexts: {
@@ -139,3 +140,5 @@ export default {
     public: true
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

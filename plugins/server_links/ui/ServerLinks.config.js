@@ -1,6 +1,8 @@
-import { icons, raceConfig as cfg } from '../../ui/UI.js'
+import { loadConfig } from "../../../src/ConfigLoader.js"
+import icons from '../../ui/config/Icons.js'
+import cfg from '../../ui/config/RaceUi.js'
 
-export default {
+const defaultConfig = {
   height: 33,
   width: cfg.width,
   title: 'Linked Servers',
@@ -32,3 +34,5 @@ export default {
   iconWidth: 1.7,
   hidePanel: true
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

@@ -1,4 +1,5 @@
-export default {
+import { loadConfig } from "../../src/ConfigLoader.js"
+const defaultConfig = {
   isEnabled: false, // http server can be used to connect servers running on different computers
   useHttpServer: false,
   httpAddress: '127.0.0.1',
@@ -16,3 +17,5 @@ export default {
   }],
   noDataText: '--'
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

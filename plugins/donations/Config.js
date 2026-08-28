@@ -1,6 +1,7 @@
+import { loadConfig } from "../../src/ConfigLoader.js"
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   paymentFail: `${p.error}Failed to process payment.`,
   paymentSuccess: `${p.highlight}#{nickname}${p.donation} ` + `donated ${p.highlight}#{amount}C${p.donation} to the server.`,
   minimalAmount: 50,
@@ -11,3 +12,5 @@ export default {
     privilege: 0
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

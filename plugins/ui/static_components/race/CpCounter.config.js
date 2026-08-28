@@ -1,9 +1,10 @@
+import { loadConfig } from "../../../../src/ConfigLoader.js"
 import cfg from '../../config/RaceUi.js'
 import icons from '../../config/Icons.js'
 
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   height: 2.17,
   width: cfg.width, // Change this ONLY if you want the widget to be on the side
   useRelative: false,
@@ -41,3 +42,5 @@ export default {
   finishTextDuration: 3000,
   hidePanel: false
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

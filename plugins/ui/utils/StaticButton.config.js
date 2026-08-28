@@ -1,4 +1,5 @@
-export default {
+import { loadConfig } from "../../../src/ConfigLoader.js"
+const defaultConfig = {
   background: '000a',
   yOffsetBig: 2.2,
   yOffset: 2.4,
@@ -10,3 +11,5 @@ export default {
   iconHeight: 1.8,
   topPadding: 0.2
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

@@ -1,6 +1,7 @@
+import { loadConfig } from "../../src/ConfigLoader.js"
 const passCancelPrivilege = 1
 
-export default {
+const defaultConfig = {
   yesKey: 'F5', // keys can be either F5 F6 or F7
   noKey: 'F6',
   keyListenerImportance: 10,
@@ -28,3 +29,5 @@ export default {
     }
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

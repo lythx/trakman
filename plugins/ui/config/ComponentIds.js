@@ -1,4 +1,5 @@
-export default {
+import { loadConfig } from "../../../src/ConfigLoader.js"
+const defaultConfig = {
   PopupWindow: 0,
   rank: 40,
   timerResult: 60,
@@ -86,3 +87,5 @@ export default {
   liveCpsRanking: 550000, // needs 3.1 mil ids
   mapList: 10000000
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

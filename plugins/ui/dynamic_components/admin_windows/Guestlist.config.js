@@ -1,9 +1,10 @@
+import { loadConfig } from "../../../../src/ConfigLoader.js"
 import ids from '../../config/ComponentIds.js'
 import icons from '../../config/Icons.js'
 
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   privilege: tm.config.controller.privileges.addGuest,
   title: ' Guests ',
   icon: icons.guestlist,
@@ -43,3 +44,5 @@ export default {
     privilege: tm.config.controller.privileges.addGuest
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

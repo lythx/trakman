@@ -1,7 +1,8 @@
+import { loadConfig } from "../../../src/ConfigLoader.js"
 import icons from '../config/Icons.js'
 import cfg from '../config/RaceUi.js'
 
-export default {
+const defaultConfig = {
   columnProportions: [1, 2.9, 4.1],
   background: cfg.background,
   headerBackground: '000a',
@@ -40,3 +41,5 @@ export default {
   noRecordEntryText: '-:--.--',
   maxCpCount: 500 // prevents crashes in case theres too many cps to display
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

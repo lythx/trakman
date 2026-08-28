@@ -1,4 +1,5 @@
-export default {
+import { loadConfig } from "../../../src/ConfigLoader.js"
+const defaultConfig = {
   'ALG': 'https://trakman.ptrk.eu/icons/ALG.png',
   'ANG': 'https://trakman.ptrk.eu/icons/ANG.png',
   'ARG': 'https://trakman.ptrk.eu/icons/ARG.png',
@@ -92,3 +93,5 @@ export default {
   'VEN': 'https://trakman.ptrk.eu/icons/VEN.png',
   'VIE': 'https://trakman.ptrk.eu/icons/VIE.png'
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

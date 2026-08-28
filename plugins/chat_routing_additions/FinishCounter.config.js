@@ -1,6 +1,7 @@
+import { loadConfig } from "../../src/ConfigLoader.js"
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   isEnabled: false,
   colours: [{
     amount: 0,
@@ -20,3 +21,5 @@ export default {
   } // Gradient
   ]
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

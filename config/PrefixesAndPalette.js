@@ -1,51 +1,59 @@
 import colours from '../src/data/Colours.js'
+import { loadConfig } from "../src/ConfigLoader.js"
 
-export const prefixes = {
+const defaultConfig = {
+  prefixes: {
   /** Default chat message format when manual chat routing is enabled. This can be overwritten by tm.chat.setMessageStyle() method */
-  manualChatRoutingMessageStyle: `$g[#{name}$z$s$g] `,
+    manualChatRoutingMessageStyle: `$g[#{name}$z$s$g] `,
   /** Characters with which every message sent to individual players will be prefixed (e.g. ChatSendServerMessageToLogin) */
-  serverToPlayer: `${colours.yellow}» `,
+    serverToPlayer: `${colours.yellow}» `,
   /** Characters with which every message sent in public will be prefixed (e.g. ChatSendServerMessage) */
-  serverToAll: `${colours.yellow}»» `
+    serverToAll: `${colours.yellow}»» `
+  },
+
+  /** Controller messages palette object */
+  /** All admin commands */
+  palette: {
+    admin: colours.erin,
+  /** Dedi record messages */
+    dedirecord: colours.darkpastelgreen,
+  /** Dedi misc messages */
+    dedimessage: colours.kellygreen,
+  /** Donation messages */
+    donation: colours.brilliantrose,
+  /** Error messages */
+    error: colours.red,
+  /** General highlighting colour */
+    highlight: colours.white,
+  /** Karma messages */
+    karma: colours.greenyellow,
+  /** Server messages */
+    servermsg: colours.erin,
+  /** Misc messages */
+    message: colours.lightseagreen,
+  /** Rank highlighting colour */
+    rank: colours.icterine,
+  /** Record messages */
+    record: colours.erin,
+  /** Server message prefix colour */
+    server: colours.yellow,
+  /** Voting messages */
+    vote: colours.chartreuse,
+  /** Green */
+    green: 'af4',
+  /** Red */
+    red: 'e22',
+  /** Yellow */
+    yellow: 'fc1',
+  /** Purple */
+    purple: '4af'
+  }
 }
 
-/** Controller messages palette object */
-export const palette = {
-  /** All admin commands */
-  admin: colours.erin,
-  /** Dedi record messages */
-  dedirecord: colours.darkpastelgreen,
-  /** Dedi misc messages */
-  dedimessage: colours.kellygreen,
-  /** Donation messages */
-  donation: colours.brilliantrose,
-  /** Error messages */
-  error: colours.red,
-  /** General highlighting colour */
-  highlight: colours.white,
-  /** Karma messages */
-  karma: colours.greenyellow,
-  /** Server messages */
-  servermsg: colours.erin,
-  /** Misc messages */
-  message: colours.lightseagreen,
-  /** Rank highlighting colour */
-  rank: colours.icterine,
-  /** Record messages */
-  record: colours.erin,
-  /** Server message prefix colour */
-  server: colours.yellow,
-  /** Voting messages */
-  vote: colours.chartreuse,
-  /** Green */
-  green: 'af4',
-  /** Red */
-  red: 'e22',
-  /** Yellow */
-  yellow: 'fc1',
-  /** Purple */
-  purple: '4af'
-}
+const loadedConfig = await loadConfig(defaultConfig, import.meta.url)
+
+export const prefixes = loadedConfig.prefixes
+export const palette = loadedConfig.palette
 
 export default {
   prefixes,

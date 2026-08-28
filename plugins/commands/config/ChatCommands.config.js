@@ -1,7 +1,8 @@
+import { loadConfig } from "../../../src/ConfigLoader.js"
 const p = tm.utils.palette
 const prefix = `$i` // Prefix all "fake" player messages with this (eg. $i, $t, etc)
 
-export default {
+const defaultConfig = {
   defaultValue: `everyone`, // This value will be used for the name if you don't specify anything in e.g. /hi
   hi: {
     text: `$g[#{nickname}$z$s$g] ${prefix}Hello, #{name}$g!`,
@@ -182,3 +183,5 @@ export default {
     help: `Check the amount of coppers the server account currently has.`
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

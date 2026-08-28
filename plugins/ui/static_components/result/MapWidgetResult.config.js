@@ -1,7 +1,8 @@
+import { loadConfig } from "../../../../src/ConfigLoader.js"
 import cfg from '../../config/ResultUi.js'
 import icons from '../../config/Icons.js'
 
-export default {
+const defaultConfig = {
   // Here height is 5 headers with margin
   height: 11.4,
   margin: cfg.margin,
@@ -59,3 +60,5 @@ export default {
     nextTrack: 'Next Map'
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

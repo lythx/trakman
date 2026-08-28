@@ -1,4 +1,5 @@
-export default {
+import { loadConfig } from "../../../src/ConfigLoader.js"
+const defaultConfig = {
   isEnabled: true,
   file: 'test.xml',
   refreshTimeout: 1000,
@@ -15,3 +16,5 @@ export default {
     }
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

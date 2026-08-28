@@ -1,4 +1,5 @@
-export default {
+import { loadConfig } from "../../../src/ConfigLoader.js"
+const defaultConfig = {
   format: '$s',
   textBackground: '8886',
   iconBackground: '8886',
@@ -15,3 +16,5 @@ export default {
   iconVerticalPadding: 0.1,
   centerText: false
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

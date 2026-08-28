@@ -1,4 +1,5 @@
-export default {
+import { loadConfig } from "../../../src/ConfigLoader.js"
+const defaultConfig = {
   reduxModeEnablePlayerAmount: 20,
   reduxModeDisablePlayerAmount: 18,
   margin: 0.15,
@@ -38,3 +39,5 @@ export default {
   stuntsLeftSideOrder: ['ButtonsWidget', 'RankWidget', 'KarmaWidget', 'TMXRanking', 'UltiRanking', 'AdminPanel'],
   stuntsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter']
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

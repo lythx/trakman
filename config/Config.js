@@ -1,4 +1,5 @@
-export default {
+import { loadConfig } from "../src/ConfigLoader.js"
+const defaultConfig = {
   /**
    * Manual chat routing is needed for chat utilities such as custom brackets or finish counter.
    * Enabling it makes the chat a bit slower, as all input has to go through the controller first.
@@ -100,6 +101,13 @@ export default {
   matchStringCacheSize: 10000,
   /** If haystack size exceeds this threshold `matchString()` will skip expensive haystack processing to optimize performance */
   matchStringReduxModeThreshold: 5000,
+  /**
+   * Additional plugin module files to load at startup.
+   * Paths are resolved from the Trakman working directory unless absolute.
+   */
+  externalPlugins: [],
   /** Custom map environments. If a map has an environment that is not in this list, it will be marked as "Stadium" */
   customEnvironments: ["Highlands", "NewSnowCar"]
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

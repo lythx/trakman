@@ -1,9 +1,10 @@
+import { loadConfig } from "../../../../../src/ConfigLoader.js"
 import cfg from '../../../config/RaceUi.js'
 import icons from '../../../config/Icons.js'
 
 const palette = tm.utils.palette
 
-export default {
+const defaultConfig = {
   height: 14.5,
   width: cfg.width,
   margin: cfg.margin,
@@ -283,3 +284,5 @@ export default {
   },
   hidePanel: false
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

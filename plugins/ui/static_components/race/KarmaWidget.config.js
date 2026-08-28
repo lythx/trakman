@@ -1,7 +1,8 @@
+import { loadConfig } from "../../../../src/ConfigLoader.js"
 import cfg from '../../config/RaceUi.js'
 import icons from '../../config/Icons.js'
 
-export default {
+const defaultConfig = {
   height: 8.8,
   width: cfg.width,
   title: 'Karma',
@@ -27,3 +28,5 @@ export default {
     offset: -0.3
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

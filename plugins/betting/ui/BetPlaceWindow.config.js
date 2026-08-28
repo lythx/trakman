@@ -1,9 +1,11 @@
-import { raceConfig, StaticHeader } from '../../ui/UI.js'
+import { loadConfig } from "../../../src/ConfigLoader.js"
+import raceConfig from '../../ui/config/RaceUi.js'
+import StaticHeader from '../../ui/utils/StaticHeader.js'
 
 const p = tm.utils.palette
 
 const width = 10
-export default {
+const defaultConfig = {
   posX: raceConfig.rightPosition - (width + raceConfig.marginBig),
   headerText: `Bet`, // To position the widget next to side ui widgets set these properties and keep staticPos props null
   relativePos: {
@@ -43,3 +45,5 @@ export default {
   topBorder: raceConfig.topBorder, // used for Y positioning
   marginBig: raceConfig.marginBig
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

@@ -1,4 +1,5 @@
-export default {
+import { loadConfig } from "../../../src/ConfigLoader.js"
+const defaultConfig = {
   margin: 0.15,
   marginBig: 0.27,
   format: '$s',
@@ -16,3 +17,5 @@ export default {
     'RoundAveragesRanking', 'AdminPanelResult'],
   otherComponents: ['DonatorsRanking', 'MostRecordsRanking', 'PlaytimeRanking', 'WinnersRanking', 'BannerWidget']
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

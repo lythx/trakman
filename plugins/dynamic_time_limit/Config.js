@@ -1,6 +1,7 @@
+import { loadConfig } from "../../src/ConfigLoader.js"
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   // If false plugin cant be activated
   isEnabled: true,
   // This can be changed using an ingame command
@@ -33,3 +34,5 @@ export default {
     alreadyDisabled: `${p.error}Dynamic time limit is already disabled for the next map.`
   },
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

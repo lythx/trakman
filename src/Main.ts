@@ -13,9 +13,12 @@ import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { RoundsService } from './services/RoundsService.js'
 import { fixRankCoherence } from './FixRankCoherence.js'
+import * as ConfigLoader from './ConfigLoader.js'
 import 'dotenv/config'
 import * as readline from 'node:readline/promises'
 import { stdin as input, stdout as output } from 'node:process'
+import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 import config from '../config/Config.js'
 import './Trakman.js'
 
@@ -48,6 +51,21 @@ await GameService.initialize()
 Logger.trace('Game info fetched')
 // import plugins after initializing database to avoid process exiting with no error in case of query on non-existent table
 await import('../Plugins.js')
+const externalPlugins: unknown[] = Array.isArray(config.externalPlugins) ? config.externalPlugins : []
+for (const pluginPath of externalPlugins) {
+  if (typeof pluginPath !== 'string' || pluginPath.trim() === '') {
+    Logger.warn(`Ignoring invalid external plugin path: ${String(pluginPath)}`)
+    continue
+  }
+  try {
+    const resolvedPath = path.isAbsolute(pluginPath) ? pluginPath : path.resolve(process.cwd(), pluginPath)
+    await import(pathToFileURL(resolvedPath).href)
+    Logger.trace(`Loaded external plugin: ${pluginPath}`)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    Logger.error(`Failed to load external plugin: ${pluginPath}`, message)
+  }
+}
 Logger.trace('Fetching player info...')
 await PlayerService.initialize()
 Logger.trace('Player service instantiated')
@@ -80,6 +98,8 @@ if (cb instanceof Error) {
 Logger.trace('Callbacks enabled')
 await Events.initialize()
 Logger.trace('Controller events enabled')
+const loadedOverrideCount = ConfigLoader.getLoadedConfigOverrideCount()
+Logger.info(`Loaded ${loadedOverrideCount} config override file${loadedOverrideCount === 1 ? '' : 's'}.`)
 Logger.info('Controller started successfully')
 
 let running = true
