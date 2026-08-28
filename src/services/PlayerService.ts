@@ -7,6 +7,8 @@ import { Utils } from "../Utils.js";
 import { Events } from "../Events.js";
 import { RecordService } from "./RecordService.js";
 import { titles } from "../../config/Titles.js";
+import { Database } from '../database/DB.js'
+import config from '../../config/Config.js'
 
 /**
  * This service manages online players on the server and players table in the database
@@ -18,6 +20,8 @@ export class PlayerService {
   private static newLocalsAmount = 0;
   private static ranks: string[];
   private static _totalPlayerCount: number;
+  private static recalcChain: Promise<void> = Promise.resolve()
+  private static lastKnownMapCount: number = 0
 
   /**
    * Fetches ranks, players and creates playerlist
@@ -39,13 +43,26 @@ export class PlayerService {
       ) {
         this.newLocalsAmount++;
       }
-    });
-    Events.addListener(["MapAdded", "MapRemoved"], () => {
-      void this.calculateAveragesAndRanks();
-    });
-    Events.addListener("BeginMap", (): void => {
-      this.newLocalsAmount = 0;
-    });
+    })
+    Events.addListener('MapAdded', (info: tm.MapAddedInfo | tm.MapAddedInfo[]) => {
+      const maps = Array.isArray(info) ? info : [info]
+      const oldCount = this.lastKnownMapCount
+      this.lastKnownMapCount = oldCount + maps.length
+      this.recalcChain = this.recalcChain
+      .then(() => this.recalculateForMapAdded(maps.map(m => m.id), oldCount))
+      .catch(err => Logger.error('Error in map-added recalculation', (err as Error).message))
+    })
+    Events.addListener('MapRemoved', (info: tm.MapRemovedInfo | tm.MapRemovedInfo[]) => {
+      const maps = Array.isArray(info) ? info : [info]
+      const oldCount = this.lastKnownMapCount
+      this.lastKnownMapCount = oldCount - maps.length
+      this.recalcChain = this.recalcChain
+      .then(() => this.recalculateForMapRemoved(maps.map(m => m.id), oldCount))
+      .catch(err => Logger.error('Error in map-removed recalculation', (err as Error).message))
+    })
+    Events.addListener('BeginMap', (): void => {
+      this.newLocalsAmount = 0
+    })
   }
 
   /**
@@ -464,6 +481,290 @@ export class PlayerService {
       e.rank = index === -1 ? undefined : index + 1;
     }
     Events.emit("RanksAndAveragesUpdated", arr);
+  }
+
+  /**
+   * Recalculates averages when maps are added. Queries records for the
+   * added maps since they may have existing records from a previous time
+   * on the server.
+   */
+  private static async recalculateForMapAdded(addedMapUids: string[], oldCount: number): Promise<void> {
+    const limit = RecordService.maxLocalsAmount
+    const addedCount = addedMapUids.length
+    const newCount = oldCount + addedCount
+    const db = new Database()
+    const addedUidSet = new Set(addedMapUids)
+    const allMapIds: {
+      uid: string,
+      id: number
+    }[] = (await db.query(`SELECT id, uid
+                           FROM map_ids`)).rows
+    const addedDbIds = allMapIds.filter(a => addedUidSet.has(a.uid)).map(a => a.id)
+    let addedRecords: {
+      player_id: number,
+      map_id: number
+    }[] = []
+    if (addedDbIds.length > 0) {
+      addedRecords = (await db.query(`SELECT player_id, map_id
+                                      FROM records
+                                      WHERE map_id IN (${addedDbIds.join(',')})
+                                      ORDER BY map_id ASC, time ASC, date ASC;`)).rows
+    }
+    const positionSums = new Map<number, number>()
+    const mapsWithRecords = new Map<number, Set<number>>()
+    for (let i = 0; i < addedRecords.length; i++) {
+      let position = 1
+      for (let k = i - 1; k >= 0; k--) {
+        if (addedRecords[k].map_id !== addedRecords[i].map_id) { break }
+        position++
+      }
+      if (position > limit) { position = limit }
+      const playerId = addedRecords[i].player_id
+      positionSums.set(playerId, (positionSums.get(playerId) ?? 0) + position)
+      if (!mapsWithRecords.has(playerId)) { mapsWithRecords.set(playerId, new Set()) }
+      mapsWithRecords.get(playerId)!.add(addedRecords[i].map_id)
+    }
+    const addedMapDbCount = addedDbIds.length
+    const mapsNotInDb = addedCount - addedMapDbCount
+    const playerRows: {
+      id: number,
+      login: string,
+      average: number
+    }[] = (await db.query(`SELECT id, login, average
+                           FROM players`)).rows
+    const sums: {
+      id: number,
+      login: string,
+      average: number
+    }[] = []
+    for (const p of playerRows) {
+      const recordPositionSum = positionSums.get(p.id) ?? 0
+      const playerMapsWithRecords = mapsWithRecords.get(p.id)?.size ?? 0
+      const playerMapsWithoutRecords = addedMapDbCount - playerMapsWithRecords + mapsNotInDb
+      const addedSum = recordPositionSum + playerMapsWithoutRecords * limit
+      const newAvg = oldCount <= 0 ? addedSum / newCount : (p.average * oldCount + addedSum) / newCount
+      sums.push({
+        id: p.id,
+        login: p.login,
+        average: newAvg
+      })
+    }
+    if (sums.length !== 0) {
+      await db.query(`UPDATE players AS p
+                      SET average = v.average FROM (VALUES ${sums.map(a => `(${a.id}, ${a.average}),`).join('')
+                      .slice(0, -1)}
+                        ) AS v(id
+                        , average)
+                      WHERE v.id = p.id;`)
+    }
+    for (const s of sums) {
+      const onlinePlayer = this.get(s.login)
+      if (onlinePlayer !== undefined) { (onlinePlayer as any).average = s.average }
+    }
+    this.ranks = await this.repo.getRanks()
+    for (const e of this._players) {
+      const index = this.ranks.indexOf(e.login)
+      e.rank = index === -1 ? undefined : (index + 1)
+    }
+    Events.emit('RanksAndAveragesUpdated', sums.map(s => ({
+      login: s.login,
+      average: s.average
+    })))
+  }
+
+  /**
+   * Recalculates averages when maps are removed. Only queries records
+   * for the removed maps instead of the entire records table.
+   */
+  private static async recalculateForMapRemoved(removedMapUids: string[], oldCount: number): Promise<void> {
+    const limit = RecordService.maxLocalsAmount
+    const removedCount = removedMapUids.length
+    const newCount = oldCount - removedCount
+    if (newCount <= 0) {
+      Logger.warn('All maps removed; skipping rank recalculation.')
+      return
+    }
+    const db = new Database()
+    const allMapIds: {
+      uid: string,
+      id: number
+    }[] = (await db.query(`SELECT id, uid
+                           FROM map_ids`)).rows
+    const removedUidSet = new Set(removedMapUids)
+    const removedDbIds = allMapIds.filter(a => removedUidSet.has(a.uid)).map(a => a.id)
+    let removedRecords: {
+      player_id: number,
+      map_id: number
+    }[] = []
+    if (removedDbIds.length > 0) {
+      removedRecords = (await db.query(`SELECT player_id, map_id
+                                        FROM records
+                                        WHERE map_id IN (${removedDbIds.join(',')})
+                                        ORDER BY map_id ASC, time ASC, date ASC;`)).rows
+    }
+    const positionSums = new Map<number, number>()
+    const mapsWithRecords = new Map<number, Set<number>>()
+    for (let i = 0; i < removedRecords.length; i++) {
+      let position = 1
+      for (let k = i - 1; k >= 0; k--) {
+        if (removedRecords[k].map_id !== removedRecords[i].map_id) { break }
+        position++
+      }
+      if (position > limit) { position = limit }
+      const playerId = removedRecords[i].player_id
+      positionSums.set(playerId, (positionSums.get(playerId) ?? 0) + position)
+      if (!mapsWithRecords.has(playerId)) { mapsWithRecords.set(playerId, new Set()) }
+      mapsWithRecords.get(playerId)!.add(removedRecords[i].map_id)
+    }
+    const removedMapDbCount = removedDbIds.length
+    const mapsNotInDb = removedCount - removedMapDbCount
+    const playerRows: {
+      id: number,
+      login: string,
+      average: number
+    }[] = (await db.query(`SELECT id, login, average
+                           FROM players`)).rows
+    const sums: {
+      id: number,
+      login: string,
+      average: number
+    }[] = []
+    for (const p of playerRows) {
+      const recordPositionSum = positionSums.get(p.id) ?? 0
+      const playerMapsWithRecords = mapsWithRecords.get(p.id)?.size ?? 0
+      const playerMapsWithoutRecords = removedMapDbCount - playerMapsWithRecords + mapsNotInDb
+      const removedSum = recordPositionSum + playerMapsWithoutRecords * limit
+      const newAvg = (p.average * oldCount - removedSum) / newCount
+      sums.push({
+        id: p.id,
+        login: p.login,
+        average: newAvg
+      })
+    }
+    if (sums.length !== 0) {
+      await db.query(`UPDATE players AS p
+                      SET average = v.average FROM (VALUES ${sums.map(a => `(${a.id}, ${a.average}),`).join('')
+                      .slice(0, -1)}
+                        ) AS v(id
+                        , average)
+                      WHERE v.id = p.id;`)
+    }
+    for (const s of sums) {
+      const onlinePlayer = this.get(s.login)
+      if (onlinePlayer !== undefined) { (onlinePlayer as any).average = s.average }
+    }
+    this.ranks = await this.repo.getRanks()
+    for (const e of this._players) {
+      const index = this.ranks.indexOf(e.login)
+      e.rank = index === -1 ? undefined : (index + 1)
+    }
+    Events.emit('RanksAndAveragesUpdated', sums.map(s => ({
+      login: s.login,
+      average: s.average
+    })))
+  }
+
+  /**
+   * Performs a full recalculation of all player averages and ranks from scratch.
+   */
+  static async fullRecalculation(): Promise<void> {
+    const db = new Database()
+    Logger.info('Recalculating ranks...')
+    let activeMapUids: string[]
+    if (config.manualMapLoading.enabled) {
+      activeMapUids = MapService.maps.map(m => m.id)
+    } else {
+      const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
+      if (mapList instanceof Error) {
+        Logger.error('Error while getting the map list for rank recalculation', mapList.message)
+        return
+      }
+      activeMapUids = mapList.map((m: any) => m.UId)
+    }
+    if (activeMapUids.length === 0) {
+      Logger.warn('No active maps found; skipping rank recalculation.')
+      return
+    }
+    const activeUidSet = new Set(activeMapUids)
+    const allMapIds: {
+      uid: string,
+      id: number
+    }[] = (await db.query(`SELECT id, uid
+                           FROM map_ids`)).rows
+    const maps = allMapIds.filter(a => activeUidSet.has(a.uid))
+    if (maps.length === 0) {
+      Logger.warn('No active maps found in database; skipping rank recalculation.')
+      return
+    }
+    const mapIds = maps.map(m => m.id)
+    const playerRows: {
+      id: number,
+      login: string
+    }[] = (await db.query(`SELECT id, login
+                           FROM players`)).rows
+    const records: {
+      player_id: number,
+      map_id: number
+    }[] = (await db.query(`SELECT player_id, map_id
+                           FROM records
+                           WHERE map_id IN (${mapIds.join(',')})
+                           ORDER BY map_id ASC, time ASC, date ASC;`)).rows
+    const limit = RecordService.maxLocalsAmount
+    const mapCount = maps.length
+    const sums: {
+      id: number,
+      login: string,
+      average: number
+    }[] = []
+    const indexesMap = new Map<number, number[]>(playerRows.map(a => [a.id, []]))
+    for (let i = 0; i < records.length; i++) {
+      indexesMap.get(records[i].player_id)?.push(i)
+    }
+    for (const player of playerRows) {
+      const indexes = indexesMap.get(player.id) as number[]
+      let sum = 0
+      for (const idx of indexes) {
+        let position = 1
+        for (let k = idx - 1; k >= 0; k--) {
+          if (records[k].map_id !== records[idx].map_id) { break }
+          position++
+        }
+        if (position > limit) { position = limit }
+        sum += position
+      }
+      sum += (mapCount - indexes.length) * limit
+      sums.push({
+        average: sum / mapCount,
+        id: player.id,
+        login: player.login
+      })
+    }
+    if (sums.length !== 0) {
+      await db.query(`UPDATE players AS p
+                      SET average = v.average FROM (VALUES ${sums.map(a => `(${a.id}, ${a.average}),`).join('')
+                      .slice(0, -1)}
+                        ) AS v(id
+                        , average)
+                      WHERE v.id = p.id;`)
+    }
+    for (const s of sums) {
+      const onlinePlayer = this.get(s.login)
+      if (onlinePlayer !== undefined) {
+        (onlinePlayer as any).average = s.average
+      }
+    }
+    this.ranks = await this.repo.getRanks()
+    for (const e of this._players) {
+      const index = this.ranks.indexOf(e.login)
+      e.rank = index === -1 ? undefined : (index + 1)
+    }
+    const updated = sums.map(s => ({
+      login: s.login,
+      average: s.average
+    }))
+    this.lastKnownMapCount = mapCount
+    Events.emit('RanksAndAveragesUpdated', updated)
+    Logger.info('Ranks recalculated successfully')
   }
 
   /**
