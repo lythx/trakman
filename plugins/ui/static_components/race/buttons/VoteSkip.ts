@@ -60,6 +60,7 @@ export class VoteSkip extends UiButton {
   failedVoteTimestamp = 0
   isLastMapReplay = false
   isReplay = false
+  isExtended = false
   isSkip = false
   parentId: number
 
@@ -95,7 +96,15 @@ export class VoteSkip extends UiButton {
   }
 
   private async handleClick(login: string, nickname: string): Promise<void> {
-    if (this.isLastMapReplay || this.isReplay || this.isSkip || tm.getState() === 'result') {
+    if (this.isLastMapReplay || this.isReplay) {
+      tm.sendMessage(msg.disabledReplay, login)
+      return
+    }
+    if (this.isExtended) {
+      tm.sendMessage(msg.disabledExtend, login)
+      return
+    }
+    if (this.isSkip || tm.getState() === 'result') {
       return
     }
     const autopass = tm.players.count === 1
@@ -182,6 +191,7 @@ export class VoteSkip extends UiButton {
     this.failedVoteTimestamp = 0
     this.isSkip = false
     this.isReplay = false
+    this.isExtended = false
     this.emitUpdate()
   }
 
@@ -219,6 +229,8 @@ export class VoteSkip extends UiButton {
     const plus = tm.timer.isDynamic ? 2 : 0
     if (!tm.timer.isDynamic) {
       this.isReplay = true
+    } else {
+      this.isExtended = true
     }
     if (this.isSkip || this.isLastMapReplay) {
       return

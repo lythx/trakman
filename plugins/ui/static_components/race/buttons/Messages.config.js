@@ -19,6 +19,8 @@ export default {
   voteSkip: {
     start: `${p.highlight}#{nickname} ${p.vote}started a vote to ${p.highlight}skip ${p.vote}the ongoing map.`,
     tooLate: `${p.error}It's too late for skip vote.`,
+    disabledReplay: `${p.error}Skip votes are not available on a requeued map.`,
+    disabledExtend: `${p.error}Skip votes are not available after the map time has been extended.`,
     failedRecently: `${p.error}Vote failed recently, wait a bit.`,
     tooManyFailed: `${p.error}Too many votes failed.`,
     alreadyRunning: `${p.error}A vote is already running.`,
