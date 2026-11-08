@@ -1,5 +1,10 @@
 import { centeredText } from '../UI.js'
-import config from './Navbar.config.js'
+import userConfig from './Navbar.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 3.5,
+  margin: 0.15,
+})
 
 /**
  * Util to display horizontal navbar, used by popup windows.

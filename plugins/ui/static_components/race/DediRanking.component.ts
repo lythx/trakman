@@ -3,10 +3,28 @@
  * @since 0.1
  */
 
-import { componentIds, RecordList, StaticComponent, StaticHeader } from '../../UI.js'
+import { componentIds, raceConfig, RecordList, StaticComponent, StaticHeader } from '../../UI.js'
 import { dedimania } from '../../../dedimania/Dedimania.js'
 
-import config from './DediRanking.config.js'
+import userConfig from './DediRanking.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 15,
+  teamsEntries: 15,
+  roundsEntries: 7,
+  cupEntries: 7,
+  lapsEntries: 7,
+  entryHeight: 2.15,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  topCount: 5,
+  teamsTopCount: 5,
+  roundsTopCount: 3,
+  cupTopCount: 3,
+  lapsTopCount: 3,
+  displayNoRecordEntry: true,
+  hidePanel: true,
+})
 
 export default class DediRanking extends StaticComponent {
   private readonly header: StaticHeader

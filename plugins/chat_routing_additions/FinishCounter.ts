@@ -4,8 +4,13 @@
  * @since 1.3
  */
 
-import config from './FinishCounter.config.js'
+import userConfig from './FinishCounter.config.js'
 import { stats } from '../stats/Stats.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  colours: [{ amount: 0, colour: '$fff' }] as { amount: number; colour: string | string[] }[],
+})
 
 if (config.isEnabled) {
   tm.chat.addMessagePrefix(async (info): Promise<string> => {

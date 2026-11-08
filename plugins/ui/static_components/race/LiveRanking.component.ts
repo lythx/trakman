@@ -3,8 +3,22 @@
  * @since 0.1
  */
 
-import { componentIds, RecordList, type RLRecord, StaticComponent, StaticHeader } from '../../UI.js'
-import config from './LiveRanking.config.js'
+import { componentIds, raceConfig, RecordList, type RLRecord, StaticComponent, StaticHeader } from '../../UI.js'
+import userConfig from './LiveRanking.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 6,
+  lapsEntries: 12,
+  stuntsEntries: 8,
+  entryHeight: 2.15,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  topCount: 3,
+  lapsTopCount: 5,
+  stuntsTopCount: 3,
+  displayNoRecordEntry: true,
+  hidePanel: true,
+})
 
 export default class LiveRanking extends StaticComponent {
   private readonly header: StaticHeader

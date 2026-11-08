@@ -3,7 +3,7 @@ import { Events } from '../Events.js'
 import { GameService } from './GameService.js'
 import { Logger } from '../Logger.js'
 import { Client } from '../client/Client.js'
-import config from '../../config/Config.js'
+import config from '../ControllerConfig.js'
 
 export class RoundsService {
   private static teamsRoundPoints?: number

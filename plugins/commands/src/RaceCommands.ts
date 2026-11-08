@@ -1,5 +1,37 @@
-import config from '../config/RaceCommands.config.js'
+import userConfig from '../config/RaceCommands.config.js'
 import { actions } from '../../actions/Actions.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  skip: {
+    public: true,
+    privilege: 1,
+    aliases: ['s', 'skip'],
+  },
+  res: {
+    public: true,
+    privilege: 1,
+    aliases: ['r', 'res', 'restart'],
+  },
+  prev: {
+    public: true,
+    privilege: 1,
+    aliases: ['pt', 'prev', 'previous'],
+  },
+  replay: {
+    privilege: 1,
+    aliases: ['rq', 'requeue', 'replay'],
+  },
+  endround: {
+    public: true,
+    privilege: 1,
+    aliases: ['er', 'endround'],
+  },
+  forceteam: {
+    public: true,
+    privilege: 2,
+    aliases: ['fpt', 'forceteam', 'forceplayerteam'],
+  },
+})
 
 const commands: tm.Command[] = [
   {

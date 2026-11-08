@@ -1,5 +1,13 @@
-import config from './Config.js'
+import userConfig from './Config.js'
 import './ui/Maplist.component.js'
+
+export const config = tm.utils.withDefaults(userConfig, {
+  cacheSize: 10,
+  autojuke: {
+    aliases: ['aj', 'autojuke'],
+    privilege: 0,
+  },
+})
 
 let authorSort: tm.Map[] = []
 let nameSort: tm.Map[] = []

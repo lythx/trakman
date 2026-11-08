@@ -7,9 +7,47 @@ import {
   Grid,
   type GridCellFunction,
   icons,
+  raceConfig,
   StaticHeader,
 } from '../../ui/UI.js'
-import config from './BetPlaceWindow.config.js'
+import userConfig from './BetPlaceWindow.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  posX: raceConfig.rightPosition - (10 + raceConfig.marginBig),
+  relativePos: {
+    side: true,
+    widgetNumber: 3,
+  },
+  staticPos: {
+    posY: null,
+    height: null,
+  },
+  width: 10,
+  options: [50, 100, 200, 500, 1000, 10000],
+  margin: raceConfig.margin,
+  actionIdOffset: 30,
+  timerWidth: 2,
+  countdown: {
+    colourChanges: [10, 3],
+  },
+  betAcceptedText: {
+    textScale: 0.8,
+    yOffset: -0.03,
+  },
+  prizeText: {
+    textScale: 1.1,
+    yOffset: -0.03,
+  },
+  betAmountText: {
+    textScale: 1.3,
+  },
+  countdownText: {
+    specialFont: true,
+    textScale: 0.27,
+  },
+  topBorder: raceConfig.topBorder,
+  marginBig: raceConfig.marginBig,
+})
 
 export default class BetPlaceWindow extends DynamicComponent {
   private readonly header: StaticHeader

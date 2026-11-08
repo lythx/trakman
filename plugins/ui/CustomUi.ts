@@ -1,4 +1,15 @@
-import config from './config/CustomUi.js'
+import userConfig from './config/CustomUi.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  notice: false,
+  challengeInfo: false,
+  netInfo: true,
+  chat: true,
+  checkpointList: false,
+  roundScores: false,
+  scoreTable: true,
+  global: true,
+})
 
 export default class CustomUi {
   constructor() {

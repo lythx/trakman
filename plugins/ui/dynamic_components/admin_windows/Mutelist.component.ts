@@ -14,7 +14,44 @@ import {
   Paginator,
   PopupWindow,
 } from '../../UI.js'
-import config from './Mutelist.config.js'
+import userConfig from './Mutelist.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  privilege: tm.config.controller.privileges.mute,
+  iconWidth: 2,
+  iconHeight: 2,
+  entries: 15,
+  columnProportions: [0.6, 2, 2, 1, 2.6, 2, 1.1],
+  navbar: [
+    {
+      name: 'Playerlist',
+      actionId: componentIds.playerList,
+      privilege: Math.min(...Object.values(tm.config.controller.privileges)),
+    },
+    {
+      name: 'Banlist',
+      actionId: componentIds.banlist,
+      privilege: tm.config.controller.privileges.ban,
+    },
+    {
+      name: 'Blacklist',
+      actionId: componentIds.blacklist,
+      privilege: tm.config.controller.privileges.blacklist,
+    },
+    {
+      name: 'Guestlist',
+      actionId: componentIds.guestlist,
+      privilege: tm.config.controller.privileges.addGuest,
+    },
+  ],
+  grid: {
+    margin: 0.15,
+  },
+  command: {
+    aliases: ['mutel', 'mutelist'],
+    privilege: tm.config.controller.privileges.mute,
+  },
+})
 
 export default class Mutelist extends PopupWindow<number> {
   readonly grid: Grid

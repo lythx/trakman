@@ -8,9 +8,47 @@ import {
   Paginator,
   PopupWindow,
 } from '../../ui/UI.js'
-import pluginConfig from '../Config.js'
+import userPluginConfig from '../Config.js'
 import type { Song } from '../Types.js'
-import config from './SongList.config.js'
+import userConfig from './SongList.config.js'
+
+export const pluginConfig = tm.utils.withDefaults(userPluginConfig, {
+  isEnabled: false,
+  songListPath: './plugins/music/SongList.js',
+  overrideMapMusic: true,
+  historySize: 3,
+  forceQueuePrivilege: 1,
+  publicQueue: true,
+  addCommand: {
+    aliases: ['addsong'],
+    privilege: 1,
+    public: true,
+  },
+  removeCommand: {
+    aliases: ['removesong'],
+    privilege: 1,
+    public: true,
+  },
+  shuffleCommand: {
+    aliases: ['shufflesongs'],
+    privilege: 1,
+    public: true,
+  },
+  openListCommand: {
+    aliases: ['songs', 'songlist'],
+  },
+})
+
+const config = tm.utils.withDefaults(userConfig, {
+  iconWidth: 2,
+  iconHeight: 2,
+  entries: 15,
+  columnProportions: [1, 3, 3, 1.7, 3, 1],
+  navbar: [],
+  grid: {
+    margin: 0.15,
+  },
+})
 
 type SearchTarget = 'name' | 'author'
 

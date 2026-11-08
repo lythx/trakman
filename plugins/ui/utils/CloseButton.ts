@@ -1,4 +1,10 @@
-import config from './CloseButton.config.js'
+import userConfig from './CloseButton.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  buttonWidth: 3,
+  buttonHeight: 3,
+  padding: 0.2,
+})
 
 interface CloseButtonOptions {
   width?: number

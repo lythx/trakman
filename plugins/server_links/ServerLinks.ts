@@ -1,9 +1,21 @@
-import config from './Config.js'
+import userConfig from './Config.js'
 import fs from 'fs/promises'
 import UiComponent from './ui/ServerLinks.component.js'
 import http from 'http'
 import fetch from 'node-fetch'
 import { Logger } from '../../src/Logger'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  useHttpServer: false,
+  httpAddress: '127.0.0.1',
+  httpPort: 7309,
+  refreshTimeout: 10,
+  updateLimit: 30,
+  dataFilePath: './plugins/server_links/temp/data.txt',
+  servers: [] as { name: string; path?: string; url?: string }[],
+  noDataText: '--',
+})
 
 export interface Server {
   name: string

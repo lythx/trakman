@@ -1,4 +1,15 @@
-import config from './Config.js'
+import userConfig from './Config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  messagePrefix: '',
+  defaultFormatting: '$z$s ',
+  chatPrefixEnabled: true,
+  messages: [] as string[],
+  events: [] as string[],
+  sendOnInterval: false,
+  messageInterval: 120,
+})
 
 /**
  * Sends informational messages periodically.

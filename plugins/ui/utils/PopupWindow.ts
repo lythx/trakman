@@ -2,7 +2,17 @@ import { centeredText, componentIds } from '../UI.js'
 import DynamicComponent from './DynamicComponent.js'
 import utilIds from '../config/UtilIds.js'
 import Navbar from './Navbar.js'
-import config from '../config/PopupWindow.js'
+import userConfig from '../config/PopupWindow.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  margin: 0.15,
+  windowHeight: 60,
+  windowWidth: 90,
+  headerHeight: 4,
+  footerHeight: 4,
+  headerPageWidth: 10,
+  textScale: 1,
+})
 
 /**
  * Abstract class for manialink popup windows.

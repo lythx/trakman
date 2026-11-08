@@ -4,7 +4,15 @@
  */
 
 import { componentIds, RecordList, StaticComponent, StaticHeader } from '../../UI.js'
-import config from './NextMapRecords.config.js'
+import userConfig from './NextMapRecords.config.js'
+import cfg from '../../config/ResultUi.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 5,
+  entryHeight: 2.15,
+  width: cfg.width,
+  margin: cfg.margin,
+})
 
 export default class NextMapRecords extends StaticComponent {
   private readonly header: StaticHeader

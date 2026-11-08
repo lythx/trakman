@@ -1,9 +1,55 @@
 import type { ButtonData } from './ButtonData.js'
 import { UiButton } from './UiButton.js'
-import config from './ButtonsWidget.config.js'
+import userConfig from './ButtonsWidget.config.js'
 import { VoteWindow } from '../../../UI.js'
 import messages from './Messages.config.js'
 import { actions } from '../../../../actions/Actions.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  voteSkip: {
+    texts: [
+      {
+        0: ' VOTE ',
+        1: 'TO $E22SKIP',
+        equal: false,
+      },
+      {
+        0: 'SKIP IN',
+        1: '$E22#{seconds} $FFFSECS',
+        equal: true,
+      },
+      {
+        0: '$E22DISABLED',
+        1: 'DUE TO RES',
+        equal: true,
+      },
+      {
+        0: 'MAP IS',
+        1: '$E22SKIPPED',
+        equal: true,
+      },
+      {
+        0: '$E22DISABLED',
+        1: 'DUE TO EXT',
+        equal: true,
+      },
+    ],
+    triesLimit: 3,
+    timeout: 30,
+    time: 30,
+    minimumRemainingTime: 30000,
+    goal: 0.51,
+    width: 1.8,
+    height: 1.8,
+    padding: 0.2,
+    countdown: 5,
+    actionId: 1,
+    command: {
+      aliases: ['s', 'skip'],
+      privilege: 0,
+    },
+  },
+})
 
 const cfg = config.voteSkip
 const msg = messages.voteSkip

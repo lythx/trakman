@@ -3,9 +3,29 @@
  * @since 1.2
  */
 
-import { componentIds, RecordList, type RLImage, StaticComponent, StaticHeader } from '../../UI.js'
+import { componentIds, raceConfig, RecordList, type RLImage, StaticComponent, StaticHeader } from '../../UI.js'
+import icons from '../../config/Icons.js'
 
-import config from './RoundScore.config.js'
+import userConfig from './RoundScore.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  roundsEntries: 12,
+  teamsEntries: 10,
+  cupEntries: 12,
+  entryHeight: 2.15,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  roundsTopCount: 5,
+  teamsTopCount: 5,
+  cupTopCount: 5,
+  cupPositionImages: [icons.trophyClassic, icons.trophySilver, icons.trophyBronze],
+  displayNoRecordEntry: true,
+  markerBackgrounds: {
+    red: tm.utils.palette.red + '6',
+    blue: tm.utils.palette.purple + '6',
+  },
+  hidePanel: true,
+})
 
 export default class RoundScore extends StaticComponent {
   private readonly header: StaticHeader

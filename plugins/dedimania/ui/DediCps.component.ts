@@ -14,7 +14,44 @@ import {
   Paginator,
   PopupWindow,
 } from '../../ui/UI.js'
-import config from './DediCps.config.js'
+import userConfig from './DediCps.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 15,
+  cpsOnFirstPage: 10,
+  navbar: [
+    {
+      name: 'Dedi Sectors',
+      actionId: componentIds.dediSectors,
+    },
+    {
+      name: 'Local Checkpoints',
+      actionId: componentIds.localCps,
+    },
+    {
+      name: 'Local Sectors',
+      actionId: componentIds.localSectors,
+    },
+    {
+      name: 'Live Checkpoints',
+      actionId: componentIds.liveCps,
+    },
+    {
+      name: 'Live Sectors',
+      actionId: componentIds.liveSectors,
+    },
+  ],
+  cpPaginatorMargin: 0.25,
+  startCellWidth: 2,
+  indexCellWidth: 1,
+  grid: {
+    margin: 0.15,
+  },
+  command: {
+    aliases: ['dcp', 'dedicptms', 'dedirecs'],
+    privilege: 0,
+  },
+})
 
 export default class DediCps extends PopupWindow {
   private readonly startCellsOnFirstPage: number = 2

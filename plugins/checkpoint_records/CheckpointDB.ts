@@ -1,4 +1,20 @@
-import config from './Config.js'
+import userConfig from './Config.js'
+
+export const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  useDBClient: true,
+  commands: {
+    deletecp: {
+      aliases: ['delcp', 'deletecp'],
+      privilege: 2,
+      public: true,
+    },
+    deletemycp: {
+      aliases: ['delmycp', 'deletemycp'],
+      privilege: 0,
+    },
+  },
+})
 
 const createQueries = [
   `CREATE TABLE IF NOT EXISTS best_checkpoint_records(

@@ -7,7 +7,35 @@ import { componentIds, Grid, StaticComponent, StaticHeader, type StaticHeaderOpt
 import flags from '../../config/FlagIcons.js'
 import { tmx } from '../../../tmx/Tmx.js'
 import { webservices, type WebservicesInfo } from '../../../webservices/Webservices.js'
-import config from './MapWidgetResult.config.js'
+import userConfig from './MapWidgetResult.config.js'
+import cfg from '../../config/ResultUi.js'
+import icons from '../../config/Icons.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 11.4,
+  margin: cfg.margin,
+  width: cfg.width,
+  mapPadding: 0.3,
+  customTags: [
+    {
+      authors: ['Fwo Niro'],
+      icon: icons.tagRed,
+    },
+    {
+      authors: ['tony89300'],
+      icon: icons.tagPinkCyan,
+    },
+    {
+      names: [/{Kackiest Kacky}*/],
+      icon: icons.tagKacky,
+    },
+    {
+      names: [/\$w\$i\$f70ARC_*/],
+      icon: icons.tagArcade,
+    },
+  ],
+  textScale: 1,
+})
 
 export default class MapWidgetResult extends StaticComponent {
   private readonly rows: number = 5

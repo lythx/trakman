@@ -1,4 +1,20 @@
-import config from './Config.js'
+import userConfig from './Config.js'
+
+export const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  useDBClient: true,
+  commands: {
+    deletesector: {
+      aliases: ['delsec', 'deletesector'],
+      privilege: 2,
+      public: true,
+    },
+    deletemysector: {
+      aliases: ['delmysec', 'deletemysector'],
+      privilege: 0,
+    },
+  },
+})
 
 const createQueries = [
   `CREATE TABLE IF NOT EXISTS best_sector_records(

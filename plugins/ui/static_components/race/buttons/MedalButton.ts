@@ -1,8 +1,18 @@
 import type { ButtonData } from './ButtonData.js'
 import { UiButton } from './UiButton.js'
-import config from './ButtonsWidget.config.js'
-import { horizontallyCenteredText } from '../../../UI.js'
+import userConfig from './ButtonsWidget.config.js'
+import { horizontallyCenteredText, raceConfig } from '../../../UI.js'
 import buttonConfig from '../../../../ui/utils/StaticButton.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  margin: raceConfig.margin,
+  medalButton: {
+    width: 3,
+    height: 3,
+    padding: 0.3,
+    textYOffset: 3.6,
+  },
+})
 
 const cfg = config.medalButton
 

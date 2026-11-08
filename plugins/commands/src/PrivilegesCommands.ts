@@ -1,5 +1,28 @@
-import config from '../config/PrivilegesCommands.config.js'
+import userConfig from '../config/PrivilegesCommands.config.js'
 import { actions } from '../../actions/Actions.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  masteradmin: {
+    public: true,
+    privilege: 4,
+    aliases: ['mad', 'masteradmin', 'addmasteradmin'],
+  },
+  admin: {
+    public: true,
+    privilege: 3,
+    aliases: ['ad', 'admin', 'addadmin'],
+  },
+  operator: {
+    public: true,
+    privilege: 2,
+    aliases: ['op', 'operator', 'addop'],
+  },
+  user: {
+    public: true,
+    privilege: 2,
+    aliases: ['rp', 'user', 'removeprivilege'],
+  },
+})
 
 const commands: tm.Command[] = [
   {

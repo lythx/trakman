@@ -9,7 +9,7 @@ import { ServerConfig } from './ServerConfig.js'
 import { VoteService } from './services/VoteService.js'
 import { Logger } from './Logger.js'
 import { AdministrationService } from './services/AdministrationService.js'
-import config from '../config/Config.js'
+import config from './ControllerConfig.js'
 import { Utils } from './Utils.js'
 import { RoundsService } from './services/RoundsService.js'
 

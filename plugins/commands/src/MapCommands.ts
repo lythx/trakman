@@ -1,6 +1,41 @@
-import config from '../config/MapCommands.config.js'
+import userConfig from '../config/MapCommands.config.js'
 import fetch from 'node-fetch'
 import { actions } from '../../actions/Actions.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  add: {
+    privilege: tm.config.controller.privileges.addMap,
+    aliases: ['add', 'am', 'addmap'],
+  },
+  addlocal: {
+    public: true,
+    privilege: 3,
+    aliases: ['addlocal', 'al'],
+  },
+  addrandom: {
+    public: true,
+    privilege: tm.config.controller.privileges.addMap,
+    aliases: ['ar', 'addr', 'addrandom'],
+  },
+  remove: {
+    privilege: tm.config.controller.privileges.removeMap,
+    aliases: ['et', 'rt', 'erase', 'erasethis'],
+  },
+  addfromurl: {
+    public: true,
+    privilege: tm.config.controller.privileges.addMap,
+    aliases: ['afu', 'addfromurl'],
+  },
+  addallfromdb: {
+    privilege: 4,
+    aliases: ['aadb', 'addallfromdb'],
+  },
+  publicadd: {
+    public: true,
+    privilege: 0,
+    aliases: ['add', 'am', 'addmap'],
+  },
+})
 
 const commands: tm.Command[] = [
   {

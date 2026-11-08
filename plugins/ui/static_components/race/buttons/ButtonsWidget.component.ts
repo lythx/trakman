@@ -1,4 +1,4 @@
-import { componentIds, Grid, type GridCellFunction, staticButton, StaticComponent } from '../../../UI.js'
+import { componentIds, Grid, type GridCellFunction, raceConfig, staticButton, StaticComponent } from '../../../UI.js'
 import { VisitCounter } from './VisitCounter.js'
 import { TimeButton } from './TimeButton.js'
 import { PlayerCounter } from './PlayerCounter.js'
@@ -14,7 +14,30 @@ import { SectorsButton } from './SectorsButton.js'
 import { UiButton } from './UiButton.js'
 import { MedalButton } from './MedalButton.js'
 import { FavouriteButton } from './FavouriteButton.js'
-import config from './ButtonsWidget.config.js'
+import userConfig from './ButtonsWidget.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 14.5,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  rows: 3,
+  columns: 4,
+  order: [
+    'VisitCounter',
+    'PlayerCounter',
+    'VersionButton',
+    'TimeButton',
+    'MapsButton',
+    'StatsButton',
+    'SectorsButton',
+    'CommandListButton',
+    'VoteSkip',
+    'VoteReplay',
+    'PaySkip',
+    'PayReplay',
+  ],
+  hidePanel: false,
+})
 
 export default class ButtonsWidget extends StaticComponent {
   private readonly width: number = config.width

@@ -1,6 +1,6 @@
 import { Logger } from '../Logger.js'
 import { Client } from '../client/Client.js'
-import config from '../../config/Config.js'
+import config from '../ControllerConfig.js'
 import 'dotenv/config'
 import { PrivilegeRepository } from '../database/PrivilegeRepository.js'
 import { BanlistRepository } from '../database/BanlistRepository.js'

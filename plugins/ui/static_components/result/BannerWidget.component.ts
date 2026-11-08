@@ -5,7 +5,25 @@
 
 import { donations } from '../../../donations/Donations.js'
 import { addManialinkListener, centeredText, componentIds, components, StaticComponent } from '../../UI.js'
-import config from './BannerWidget.config.js'
+import userConfig from './BannerWidget.config.js'
+import cfg from '../../config/ResultUi.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 5,
+  entryHeight: 2.15,
+  image: 'https://trakman.ptrk.eu/icons/CrazyTrakman.png',
+  imageLink: tm.config.controller.repo,
+  width: cfg.width,
+  donateAmounts: [50, 100, 200, 500, 1000, 5000],
+  textScale: 0.9,
+  donateText: 'Donate',
+  buttonHeight: 3,
+  margin: cfg.margin,
+  leftBorder: cfg.leftPosition,
+  rightBorder: cfg.rightPosition,
+  topBorder: cfg.topBorder,
+  marginBig: cfg.marginBig,
+})
 
 export default class BannerWidget extends StaticComponent {
   private xml: string = ''

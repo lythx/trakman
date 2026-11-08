@@ -1,6 +1,51 @@
-import RaceUi from '../config/RaceUi.js'
-import ResultUi from '../config/ResultUi.js'
+import userRaceUi from '../config/RaceUi.js'
+import userResultUi from '../config/ResultUi.js'
 import { addKeyListener, components } from '../UI.js'
+
+const RaceUi = tm.utils.withDefaults(userRaceUi, {
+  reduxModeEnablePlayerAmount: 20,
+  reduxModeDisablePlayerAmount: 18,
+  marginBig: 0.27,
+  topBorder: 47.85,
+  rightPosition: 49.13,
+  leftPosition: -63.75,
+  rightSideOrder: ['MapWidget', 'PreviousAndBest', 'TMXRanking', 'TimerWidget', 'LocalRanking', 'LiveRanking',
+    'DonationPanel'],
+  leftSideOrder: ['ButtonsWidget', 'RankWidget', 'KarmaWidget', 'DediRanking', 'AdminPanel'],
+  otherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+  roundsRightSideOrder: ['MapWidget', 'PreviousAndBest', 'TMXRanking', 'TimerWidget', 'RoundScore',
+    'RoundsPointsRanking', 'DonationPanel'],
+  roundsLeftSideOrder: ['ButtonsWidget', 'RankWidget', 'KarmaWidget', 'DediRanking', 'LocalRanking', 'AdminPanel'],
+  roundsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+  cupRightSideOrder: ['MapWidget', 'PreviousAndBest', 'TMXRanking', 'TimerWidget', 'RoundScore', 'RoundsPointsRanking',
+    'DonationPanel'],
+  cupLeftSideOrder: ['ButtonsWidget', 'RankWidget', 'KarmaWidget', 'DediRanking', 'LocalRanking', 'AdminPanel'],
+  cupOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+  teamsRightSideOrder: ['MapWidget', 'PreviousAndBest', 'TMXRanking', 'TimerWidget', 'RoundScore', 'LocalRanking',
+    'TeamScore', 'DonationPanel'],
+  teamsLeftSideOrder: ['ButtonsWidget', 'RankWidget', 'KarmaWidget', 'DediRanking', 'AdminPanel'],
+  teamsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+  lapsRightSideOrder: ['MapWidget', 'PreviousAndBest', 'TMXRanking', 'TimerWidget', 'LiveRanking', 'LocalRanking',
+    'DonationPanel'],
+  lapsLeftSideOrder: ['ButtonsWidget', 'RankWidget', 'KarmaWidget', 'DediRanking', 'LapRanking', 'AdminPanel'],
+  lapsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+  stuntsRightSideOrder: ['MapWidget', 'PreviousAndBest', 'DonationPanel', 'TimerWidget', 'LocalRanking',
+    'LiveRanking'],
+  stuntsLeftSideOrder: ['ButtonsWidget', 'RankWidget', 'KarmaWidget', 'TMXRanking', 'UltiRanking', 'AdminPanel'],
+  stuntsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+})
+
+const ResultUi = tm.utils.withDefaults(userResultUi, {
+  marginBig: 0.27,
+  topBorder: 47.85,
+  rightPosition: 49.13,
+  leftPosition: -63.75,
+  rightSideOrder: ['MapWidgetResult', 'NextMapRecords', 'TimerWidgetResult', 'KarmaRanking', 'VotersRanking',
+    'VisitorsRanking', 'DonationPanelResult'],
+  leftSideOrder: ['AveragesRanking', 'RankWidgetResult', 'KarmaWidgetResult', 'LocalRankingResult', 'DediRankingResult',
+    'RoundAveragesRanking', 'AdminPanelResult'],
+  otherComponents: ['DonatorsRanking', 'MostRecordsRanking', 'PlaytimeRanking', 'WinnersRanking', 'BannerWidget'],
+})
 
 interface PlayerML {
   login: string | string[]

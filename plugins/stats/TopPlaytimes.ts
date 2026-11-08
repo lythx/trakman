@@ -1,4 +1,9 @@
-import config from './Config.js'
+import userConfig from './Config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  playtimesCount: 100000,
+  playtimesUpdateInterval: 1000 * 60 * 10,
+})
 
 let topList: {
   readonly login: string

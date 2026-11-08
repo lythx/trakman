@@ -4,7 +4,13 @@
  * @since 1.3
  */
 
-import config from './CustomBracket.config.js'
+import userConfig from './CustomBracket.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  brackets: [] as { logins: string[]; left: string; right: string }[],
+  importance: 1,
+})
 
 if (config.isEnabled) {
   tm.chat.setMessageStyle(async (info): Promise<string | undefined> => {

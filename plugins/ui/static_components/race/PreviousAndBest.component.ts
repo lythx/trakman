@@ -3,8 +3,14 @@
  * @since 0.1
  */
 
-import { componentIds, StaticComponent } from '../../UI.js'
-import config from './PreviousAndBest.config.js'
+import { componentIds, raceConfig, StaticComponent } from '../../UI.js'
+import userConfig from './PreviousAndBest.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 4.95,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+})
 
 export default class PreviousAndBest extends StaticComponent {
   private xml: string = ''

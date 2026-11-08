@@ -4,8 +4,28 @@
  */
 
 import { centeredText, closeButton, componentIds, Grid, type GridCellFunction, Paginator, PopupWindow } from '../UI.js'
-import config from './Changelog.config.js'
+import userConfig from './Changelog.config.js'
 import fs from 'fs/promises'
+
+const config = tm.utils.withDefaults(userConfig, {
+  navbar: [
+    {
+      name: 'Command List',
+      actionId: componentIds.commandList,
+    },
+  ],
+  textScale: 1.4,
+  marginBig: 1,
+  entries: 2,
+  versionWidth: 6,
+  headerHeight: 3,
+  lineCount: 19,
+  lineCharacterLimit: 60,
+  command: {
+    aliases: ['changes', 'changelog'],
+    privilege: 0,
+  },
+})
 
 export default class Changelog extends PopupWindow<{
   page: number

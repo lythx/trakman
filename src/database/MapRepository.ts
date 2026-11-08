@@ -4,7 +4,7 @@ import { Logger } from '../Logger.js'
 import { Readable } from 'stream'
 import { type CopyStreamQuery } from 'pg-copy-streams'
 import { pipeline } from 'stream/promises'
-import config from '../../config/Config.js'
+import config from '../ControllerConfig.js'
 
 interface TableEntry {
   readonly uid: string

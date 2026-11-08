@@ -4,7 +4,13 @@
  */
 
 import { componentIds, StaticComponent } from '../../UI.js'
-import config from './TimerWidgetResult.config.js'
+import userConfig from './TimerWidgetResult.config.js'
+import cfg from '../../config/ResultUi.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 6.1,
+  width: cfg.width,
+})
 
 export default class TimerWidgetResult extends StaticComponent {
   private xml: string = ''

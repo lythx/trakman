@@ -1,4 +1,8 @@
-import config from './Config.js'
+import userConfig from './Config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  recordsCount: 100000,
+})
 
 let topList: {
   readonly login: string

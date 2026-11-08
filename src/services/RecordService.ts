@@ -6,7 +6,7 @@ import { GameService } from './GameService.js'
 import { Logger } from '../Logger.js'
 import { Utils } from '../Utils.js'
 import { Client } from '../client/Client.js'
-import config from '../../config/Config.js'
+import config from '../ControllerConfig.js'
 import { RoundsService } from './RoundsService.js'
 
 export class RecordService {

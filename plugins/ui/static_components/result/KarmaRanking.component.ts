@@ -4,7 +4,17 @@
  */
 
 import { componentIds, List, StaticComponent, StaticHeader } from '../../UI.js'
-import config from './KarmaRanking.config.js'
+import userConfig from './KarmaRanking.config.js'
+import cfg from '../../config/ResultUi.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 5,
+  entryHeight: 2.15,
+  width: cfg.width,
+  margin: cfg.margin,
+  minimumVotes: 5,
+  columnProportions: [1, 1.9, 5.1],
+})
 
 export default class KarmaRanking extends StaticComponent {
   private readonly list: List

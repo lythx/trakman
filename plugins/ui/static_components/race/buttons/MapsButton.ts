@@ -1,7 +1,20 @@
 import type { ButtonData } from './ButtonData.js'
 import { UiButton } from './UiButton.js'
-import config from './ButtonsWidget.config.js'
+import userConfig from './ButtonsWidget.config.js'
 import { componentIds } from '../../../UI.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  mapsButton: {
+    texts: {
+      0: '#{count}',
+      1: '$AF4MAPS',
+      equal: false,
+    },
+    width: 1.8,
+    height: 1.8,
+    padding: 0.2,
+  },
+})
 
 const cfg = config.mapsButton
 

@@ -1,4 +1,121 @@
-import config from '../config/ServerCommands.config.js'
+import userConfig from '../config/ServerCommands.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  timelimit: {
+    public: true,
+    privilege: 1,
+    aliases: ['tl', 'timelimit'],
+  },
+  pauseTimer: {
+    public: true,
+    privilege: 1,
+    aliases: ['pause', 'stop'],
+  },
+  resumeTimer: {
+    public: true,
+    privilege: 1,
+    aliases: ['resume', 'start', 'unpause'],
+  },
+  enabledynamictimer: {
+    public: true,
+    privilege: 2,
+    aliases: ['edt', 'enabledynamictimer'],
+  },
+  disabledynamictimer: {
+    public: true,
+    privilege: 2,
+    aliases: ['ddt', 'disabledynamictimer'],
+  },
+  setrefpwd: {
+    public: false,
+    privilege: 2,
+    aliases: ['srp', 'setrefpwd', 'setrefereepassword'],
+  },
+  setrefmode: {
+    public: true,
+    privilege: 2,
+    aliases: ['srm', 'setrefmode', 'setrefereemode'],
+  },
+  pay: {
+    public: false,
+    privilege: 3,
+    aliases: ['pay'],
+  },
+  setservername: {
+    public: true,
+    privilege: 3,
+    aliases: ['ssn', 'setservername'],
+  },
+  setcomment: {
+    public: true,
+    privilege: 3,
+    aliases: ['sc', 'setcomment'],
+  },
+  setpassword: {
+    public: false,
+    privilege: 3,
+    aliases: ['sp', 'setpwd', 'setpassword'],
+  },
+  setspecpassword: {
+    public: false,
+    privilege: 3,
+    aliases: ['ssp', 'setspecpwd', 'setspecpassword'],
+  },
+  setmaxplayers: {
+    public: true,
+    privilege: 3,
+    aliases: ['smp', 'setmaxplayers'],
+  },
+  setmaxspecs: {
+    public: true,
+    privilege: 3,
+    aliases: ['sms', 'setmaxspecs'],
+  },
+  sendnotice: {
+    public: false,
+    privilege: 3,
+    aliases: ['sn', 'sendnotice'],
+  },
+  allowmapdownload: {
+    public: true,
+    privilege: 3,
+    aliases: ['amdl', 'allowmapdownload'],
+  },
+  sethideserver: {
+    public: true,
+    privilege: 3,
+    aliases: ['shs', 'sethideserver'],
+  },
+  autosavereplays: {
+    public: true,
+    privilege: 3,
+    aliases: ['asr', 'autosavereplays'],
+  },
+  autosavevalreplays: {
+    public: true,
+    privilege: 3,
+    aliases: ['asvr', 'autosavevalreplays'],
+  },
+  killcontroller: {
+    public: true,
+    privilege: 3,
+    aliases: ['kc', 'killcontroller'],
+  },
+  setbuddynotif: {
+    public: true,
+    privilege: 3,
+    aliases: [`sbn`, `sfln`, `setbuddynotif`, `setbuddynotification`],
+  },
+  shutdown: {
+    public: true,
+    privilege: 3,
+    aliases: ['sd', 'shutdown'],
+  },
+  call: {
+    privilege: 4,
+    aliases: ['call'],
+  },
+})
 
 const pauseTimer = (info: tm.Player) => {
   if (tm.getState() !== 'race') {

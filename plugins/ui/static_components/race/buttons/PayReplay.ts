@@ -1,7 +1,50 @@
 import type { ButtonData } from './ButtonData.js'
 import { UiButton } from './UiButton.js'
-import config from './ButtonsWidget.config.js'
+import userConfig from './ButtonsWidget.config.js'
 import messages from './Messages.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  payReplay: {
+    texts: [
+      {
+        0: 'PAY $AF4#{cost}',
+        1: 'TO $AF4RES',
+        equal: false,
+      },
+      {
+        0: '$AF4RES$z$s LIMIT',
+        1: 'REACHED',
+        equal: true,
+      },
+      {
+        0: 'MAP IS',
+        1: '$AF4REPLAYED',
+        equal: true,
+      },
+      {
+        0: '$E22DISABLED',
+        1: 'DUE TO SKIP',
+        equal: true,
+      },
+      {
+        0: 'PAY $AF4#{cost}',
+        1: 'TO $AF4EXT',
+        equal: false,
+      },
+      {
+        0: '$AF4EXT$z$s LIMIT',
+        1: 'REACHED',
+        equal: true,
+      },
+    ],
+    timeExtension: 1000 * 60 * 5,
+    width: 1.8,
+    height: 1.8,
+    padding: 0.2,
+    costs: [100, 200, 300, 400, 500],
+    actionId: 4,
+  },
+})
 
 const cfg = config.payReplay
 const msg = messages.payReplay

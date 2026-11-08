@@ -1,6 +1,25 @@
-import config from './Config.js'
+import userConfig from './Config.js'
 import { VoteWindow } from '../ui/UI.js'
 import { titles } from '../../config/Titles.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  addVote: { public: true },
+  kick: { public: true, privilege: tm.config.controller.privileges.kick },
+  mute: { public: true, privilege: tm.config.controller.privileges.mute },
+  unmute: { public: true, privilege: tm.config.controller.privileges.mute },
+  forcespec: { public: true, privilege: tm.config.controller.privileges.forceSpectator },
+  forceplay: { public: true, privilege: tm.config.controller.privileges.forceSpectator },
+  ban: { public: true, privilege: tm.config.controller.privileges.ban },
+  unban: { public: true, privilege: tm.config.controller.privileges.ban },
+  blacklist: { public: true, privilege: tm.config.controller.privileges.blacklist },
+  unblacklist: { public: true, privilege: tm.config.controller.privileges.blacklist },
+  addguest: { public: true, privilege: tm.config.controller.privileges.addGuest },
+  rmguest: { public: true, privilege: tm.config.controller.privileges.addGuest },
+  publicAdd: { voteGoal: 0.51, voteTime: 30 },
+  addMap: { public: true },
+  removeMap: { public: true },
+  requeueMap: { public: true },
+})
 
 interface CallerInfo {
   login: string

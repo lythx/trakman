@@ -13,7 +13,53 @@ import {
   Paginator,
   PopupWindow,
 } from '../UI.js'
-import config from './Commandlist.config.js'
+import userConfig from './Commandlist.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 15,
+  navbar: [
+    {
+      name: 'All Commands',
+      actionId: componentIds.commandList,
+      privilege: 1,
+    },
+    {
+      name: 'User Commands',
+      actionId: componentIds.commandList + 100,
+      privilege: 1,
+    },
+    {
+      name: 'Operator Commands',
+      actionId: componentIds.commandList + 200,
+      privilege: 1,
+    },
+    {
+      name: 'Admin Commands',
+      actionId: componentIds.commandList + 300,
+      privilege: 2,
+    },
+    {
+      name: 'Masteradmin Commands',
+      actionId: componentIds.commandList + 400,
+      privilege: 3,
+    },
+    {
+      name: 'Server Owner Commands',
+      actionId: componentIds.commandList + 500,
+      privilege: 4,
+    },
+  ],
+  grid: {
+    margin: 0.15,
+  },
+  slashesForPrivilege: true,
+  columnProportions: [0.2, 1, 2, 2],
+  command: {
+    aliases: ['h', 'help', 'helpall'],
+    privilege: 0,
+  },
+  aliasSearch: true,
+})
 
 interface DisplayParams {
   page: number

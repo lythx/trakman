@@ -14,7 +14,50 @@ import {
   Paginator,
   PopupWindow,
 } from '../../ui/UI.js'
-import config from './TopWins.config.js'
+import userConfig from './TopWins.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  gridColumns: [0.8, 4, 3, 3, 0.8, 4, 3, 3],
+  headers: ['Lp.', 'Nickname', 'Login', 'Wins', 'Lp.', 'Nickname', 'Login', 'Wins'],
+  entries: 30,
+  navbar: [
+    {
+      name: 'Top Donations',
+      actionId: componentIds.topDonations,
+    },
+    {
+      name: 'Top Playtimes',
+      actionId: componentIds.topPlaytimes,
+    },
+    {
+      name: 'Top Ranks',
+      actionId: componentIds.topRanks,
+    },
+    {
+      name: 'Top Records',
+      actionId: componentIds.topRecords,
+    },
+    {
+      name: 'Top Sums',
+      actionId: componentIds.topSums,
+    },
+    {
+      name: 'Top Visits',
+      actionId: componentIds.topVisits,
+    },
+    {
+      name: 'Top Votes',
+      actionId: componentIds.topVotes,
+    },
+  ],
+  grid: {
+    margin: 0.15,
+  },
+  command: {
+    aliases: ['wins', 'topwins', 'winners', 'topwinners'],
+    privilege: 0,
+  },
+})
 
 export default class TopWins extends PopupWindow<number> {
   private readonly paginator: Paginator

@@ -1,5 +1,82 @@
-import config from '../config/AdminCommands.config.js'
+import userConfig from '../config/AdminCommands.config.js'
 import { actions } from '../../actions/Actions.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  kick: {
+    privilege: tm.admin.privileges.kick,
+    aliases: ['k', 'kick'],
+  },
+  mute: {
+    privilege: tm.admin.privileges.mute,
+    aliases: ['m', 'mute'],
+  },
+  unmute: {
+    privilege: tm.admin.privileges.mute,
+    aliases: ['um', 'unmute'],
+  },
+  forcespec: {
+    privilege: tm.admin.privileges.forceSpectator,
+    aliases: ['fs', 'forcespec'],
+  },
+  forceplay: {
+    privilege: tm.admin.privileges.forceSpectator,
+    aliases: ['fp', 'forceplay'],
+  },
+  kickghost: {
+    public: true,
+    privilege: tm.admin.privileges.kick,
+    aliases: ['kg', 'gk', 'kickghost', 'ghostkick'],
+  },
+  ban: {
+    privilege: tm.admin.privileges.ban,
+    aliases: ['b', 'ban'],
+  },
+  unban: {
+    privilege: tm.admin.privileges.ban,
+    aliases: ['ub', 'unban'],
+  },
+  blacklist: {
+    privilege: tm.admin.privileges.blacklist,
+    aliases: ['bl', 'blacklist'],
+  },
+  unblacklist: {
+    privilege: tm.admin.privileges.blacklist,
+    aliases: ['ubl', 'unblacklist'],
+  },
+  addguest: {
+    privilege: tm.admin.privileges.addGuest,
+    aliases: ['ag', 'addguest'],
+  },
+  rmguest: {
+    privilege: tm.admin.privileges.addGuest,
+    aliases: ['rg', 'rmguest', 'removeguest'],
+  },
+  loadmatchsettings: {
+    public: false,
+    privilege: 3,
+    aliases: [`lms`, `loadmatchsettings`],
+  },
+  savematchsettings: {
+    public: false,
+    privilege: 3,
+    aliases: [`svms`, `savematchsettings`],
+  },
+  updatemaps: {
+    public: true,
+    privilege: 3,
+    aliases: ['udm', 'updatemaps'],
+  },
+  recalculateranks: {
+    public: true,
+    privilege: 3,
+    aliases: ['recalculateranks', 'updateranks', 'recrank'],
+  },
+  servermessage: {
+    aliases: ['sm', 'servermessage', 'servermsg'],
+    privilege: 2,
+    public: true,
+  },
+})
 
 const commands: tm.Command[] = [
   {

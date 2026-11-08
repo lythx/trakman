@@ -1,5 +1,15 @@
-import { componentIds, RecordList, StaticComponent, StaticHeader } from '../../ui/UI.js'
-import config from './LiveCpsRanking.config.js'
+import { componentIds, raceConfig, RecordList, StaticComponent, StaticHeader } from '../../ui/UI.js'
+import userConfig from './LiveCpsRanking.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 6,
+  entryHeight: 2.15,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  topCount: 1,
+  displayNoRecordEntry: false,
+  hidePanel: true,
+})
 
 interface PlayerCheckpointData {
   login: string

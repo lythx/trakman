@@ -4,7 +4,13 @@
  */
 
 import { componentIds, StaticComponent } from '../../UI.js'
-import config from './RankWidgetResult.config.js'
+import userConfig from './RankWidgetResult.config.js'
+import cfg from '../../config/ResultUi.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 6.5,
+  width: cfg.width,
+})
 
 export default class RankWidgetResult extends StaticComponent {
   private xml: string = ''

@@ -1,4 +1,4 @@
-import config from './ServerLinks.config.js'
+import userConfig from './ServerLinks.config.js'
 import {
   centeredText,
   componentIds,
@@ -6,11 +6,23 @@ import {
   type GridCellFunction,
   leftAlignedText,
   Paginator,
+  raceConfig,
   StaticComponent,
   StaticHeader,
   type StaticHeaderOptions,
 } from '../../ui/UI.js'
 import type { ServerInfo } from '../ServerLinks.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 33,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  entries: 5,
+  textScale: 0.9,
+  textPadding: 0.15,
+  iconWidth: 1.7,
+  hidePanel: true,
+})
 
 export default class ServerLinks extends StaticComponent {
   private readonly paginator: Paginator

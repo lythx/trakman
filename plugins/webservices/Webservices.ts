@@ -1,6 +1,13 @@
-import config from './Config.js'
+import userConfig from './Config.js'
 import http from 'http'
 import fetch from 'node-fetch'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  altService: true,
+  altServiceURL: 'https://api.ul.unitedascenders.xyz',
+  cacheSize: 30,
+})
 
 const wsLogin: string | undefined = process.env.WEBSERVICES_LOGIN
 const wsPassword: string | undefined = process.env.WEBSERVICES_PASSWORD

@@ -16,7 +16,7 @@ import { fixRankCoherence } from './FixRankCoherence.js'
 import 'dotenv/config'
 import * as readline from 'node:readline/promises'
 import { stdin as input, stdout as output } from 'node:process'
-import config from '../config/Config.js'
+import config from './ControllerConfig.js'
 import './Trakman.js'
 
 await Logger.initialize()

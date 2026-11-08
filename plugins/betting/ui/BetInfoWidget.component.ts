@@ -1,5 +1,17 @@
-import { centeredText, componentIds, components, DynamicComponent, StaticHeader } from '../../ui/UI.js'
-import config from './BetInfoWidget.config.js'
+import { centeredText, componentIds, components, DynamicComponent, raceConfig, StaticHeader } from '../../ui/UI.js'
+import userConfig from './BetInfoWidget.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  posX: raceConfig.rightPosition,
+  side: true,
+  placeAsLastComponent: true,
+  posY: 0,
+  margin: raceConfig.margin,
+  width: raceConfig.width,
+  prizeWidth: 5,
+  topBorder: raceConfig.topBorder,
+  marginBig: raceConfig.marginBig,
+})
 
 export default class BetInfoWidget extends DynamicComponent {
   readonly header: StaticHeader

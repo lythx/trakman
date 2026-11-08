@@ -5,7 +5,19 @@
 
 import { componentIds, List, StaticComponent, StaticHeader } from '../../UI.js'
 import { stats } from '../../../stats/Stats.js'
-import config from './MostRecordsRanking.config.js'
+import userConfig from './MostRecordsRanking.config.js'
+import cfg from '../../config/ResultUi.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 5,
+  entryHeight: 2.15,
+  width: cfg.width,
+  posX: cfg.leftPosition + (cfg.width + cfg.margin) * 2 + cfg.margin,
+  posY: cfg.topBorder,
+  side: false,
+  margin: cfg.margin,
+  columnProportions: [1, 1.9, 5.1],
+})
 
 export default class MostRecordsRanking extends StaticComponent {
   private readonly list: List

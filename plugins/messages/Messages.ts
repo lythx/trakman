@@ -1,6 +1,61 @@
 import { dedimania } from '../dedimania/Dedimania.js'
 import { ultimania } from '../ultimania/Ultimania.js'
-import c from './Config.js'
+import userConfig from './Config.js'
+
+const c = tm.utils.withDefaults(userConfig, {
+  specialWin: 50,
+  startup: {
+    public: true,
+  },
+  changelog: {
+    public: true,
+  },
+  noPb: {
+    public: true,
+  },
+  pb: {
+    public: true,
+  },
+  noRank: {
+    public: true,
+  },
+  rank: {
+    public: true,
+  },
+  welcome: {
+    public: true,
+  },
+  join: {
+    public: true,
+  },
+  win: {
+    public: true,
+  },
+  winPublic: {
+    public: true,
+  },
+  leave: {
+    public: true,
+  },
+  record: {
+    public: true,
+  },
+  lapRecord: {
+    public: true,
+  },
+  dediRecord: {
+    public: true,
+  },
+  ultiRecord: {
+    public: true,
+  },
+  nextJuke: {
+    public: true,
+  },
+  jukeSkipped: {
+    public: true,
+  },
+})
 
 /**
  * Sends server messages on events.

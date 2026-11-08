@@ -13,8 +13,38 @@ import {
   Paginator,
   PopupWindow,
 } from '../../UI.js'
-import config from './Operatorlist.config.js'
+import userConfig from './Operatorlist.config.js'
 import { actions } from '../../../actions/Actions.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  width: 65,
+  iconWidth: 2,
+  iconHeight: 2,
+  entries: 15,
+  columnProportions: [0.35, 1.5, 1.5, 0.5, 0.5],
+  navbar: [
+    {
+      name: 'Playerlist',
+      actionId: componentIds.playerList,
+      privilege: Math.min(...Object.values(tm.config.controller.privileges)),
+    },
+    {
+      name: 'Adminlist',
+      actionId: componentIds.adminlist,
+    },
+    {
+      name: 'Masteradminlist',
+      actionId: componentIds.masteradminlist,
+    },
+  ],
+  grid: {
+    margin: 0.15,
+  },
+  command: {
+    aliases: ['opl', 'oplist', 'operators', 'listops'],
+    privilege: 0,
+  },
+})
 
 export default class Operatorlist extends PopupWindow<{
   page: number

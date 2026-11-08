@@ -1,6 +1,19 @@
 import type { ButtonData } from './ButtonData.js'
 import { UiButton } from './UiButton.js'
-import config from './ButtonsWidget.config.js'
+import userConfig from './ButtonsWidget.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  visitCounter: {
+    texts: {
+      0: '#{count}',
+      1: '$AF4VISITOR#{plural}',
+      equal: false,
+    },
+    width: 2,
+    height: 2,
+    padding: 0.3,
+  },
+})
 
 const cfg = config.visitCounter
 

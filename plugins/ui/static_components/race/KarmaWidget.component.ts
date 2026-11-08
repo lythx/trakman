@@ -9,12 +9,36 @@ import {
   componentIds,
   Grid,
   type GridCellFunction,
+  raceConfig,
   StaticComponent,
   StaticHeader,
 } from '../../UI.js'
 import { maniakarma, type MKMapVotes } from '../../../maniakarma/Maniakarma.js'
-import config from './KarmaWidget.config.js'
+import userConfig from './KarmaWidget.config.js'
+import icons from '../../config/Icons.js'
 import { actions } from '../../../actions/Actions.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 8.8,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  hidePanel: true,
+  icons: [icons.karmaLocal, icons.karmaGlobal, icons.karmaPulse, icons.peopleKarma],
+  colours: ['0F8A', '0D6A', '0B4A', 'BO4A', 'D06A', 'F08A'],
+  mkColours: ['0F0A', '0D0A', '0B0A', 'BOOA', 'D00A', 'F00A'],
+  options: ['+++', '++', '+', '-', '--', '---'],
+  buttonWidth: 1.7,
+  textScale: 0.65,
+  textPadding: 0.1,
+  plus: {
+    scale: 0.6,
+    offset: 0,
+  },
+  minus: {
+    scale: 1,
+    offset: -0.3,
+  },
+})
 
 export default class KarmaWidget extends StaticComponent {
   private readonly header: StaticHeader

@@ -1,5 +1,5 @@
 import { Repository } from './Repository.js'
-import config from '../../config/Config.js'
+import config from '../ControllerConfig.js'
 
 export class MapIdsRepository extends Repository {
   /**

@@ -1,5 +1,21 @@
 import fs from 'node:fs/promises'
-import config from './TestWidget.config.js'
+import userConfig from './TestWidget.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  file: 'test.xml',
+  refreshTimeout: 1000,
+  commands: {
+    displaytest: {
+      aliases: ['displaytest'],
+      privilege: 3,
+    },
+    hidetest: {
+      aliases: ['hidetest'],
+      privilege: 3,
+    },
+  },
+})
 
 export default class TestWindow {
   private intervals: {

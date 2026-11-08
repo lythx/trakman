@@ -14,8 +14,45 @@ import {
   Paginator,
   PopupWindow,
 } from '../../ui/UI.js'
-import config from './TMXWindow.config.js'
+import userConfig from './TMXWindow.config.js'
 import { tmx } from '../../tmx/Tmx.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  navbar: [
+    {
+      name: 'Map List',
+      actionId: componentIds.mapList,
+    },
+    {
+      name: 'Current Map Details',
+      actionId: componentIds.TMXDetailsWindow,
+    },
+  ],
+  itemsPerPage: 3,
+  queueCount: 4,
+  historyCount: 4,
+  localsCount: 5,
+  notLoadedTextscale: 0.5,
+  margin: 0.15,
+  gridRows: [1.2, 6.7, 1.2, 1.2, 4.5, 4.5],
+  info: {
+    columnsProportions: [1.3, 1.3, 1, 1],
+    rows: 4,
+    iconWidth: 2,
+    textscale: 0.6,
+  },
+  authorTimeWidth: 8,
+  iconWidth: 2,
+  textscale: 0.67,
+  screenshotWidth: 15,
+  tmxRecordCount: 3,
+  tmxColumns: [0.7, 2, 3, 3, 0.7],
+  recordTextScale: 0.6,
+  command: {
+    aliases: ['tmxinfo'],
+    privilege: 0,
+  },
+})
 
 class TMXWindow extends PopupWindow<number> {
   private readonly paginator: Paginator

@@ -1,6 +1,31 @@
 import { addKeyListener } from '../ui/utils/KeyListener.js'
 import IDS from '../ui/config/UtilIds.js'
-import config from './Config.js'
+import userConfig from './Config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  yesKey: 'F5',
+  noKey: 'F6',
+  keyListenerImportance: 10,
+  passCancelPrivilege: 1,
+  commands: {
+    yes: {
+      aliases: ['y', 'yes'],
+      privilege: 0,
+    },
+    no: {
+      aliases: ['n', 'no'],
+      privilege: 0,
+    },
+    pass: {
+      aliases: ['pv', 'pass'],
+      privilege: 1,
+    },
+    cancel: {
+      aliases: ['cv', 'can', 'cancel'],
+      privilege: 1,
+    },
+  },
+})
 
 /**
  * Provides utilites for in-game votes.

@@ -3,7 +3,7 @@ import { Client } from '../client/Client.js'
 import { MapRepository } from '../database/MapRepository.js'
 import { Events } from '../Events.js'
 import { Utils } from '../Utils.js'
-import config from '../../config/Config.js'
+import config from '../ControllerConfig.js'
 import { GameService } from './GameService.js'
 import { ManualMapLoading } from './ManualMapLoading.js'
 

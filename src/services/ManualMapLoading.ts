@@ -2,7 +2,7 @@ import fs from 'fs/promises'
 
 import { Logger } from '../Logger.js'
 import { Client } from '../client/Client.js'
-import config from '../../config/Config.js'
+import config from '../ControllerConfig.js'
 import { MapService } from './MapService.js'
 import { GameService } from './GameService.js'
 

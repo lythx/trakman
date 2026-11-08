@@ -1,6 +1,5 @@
-import config from './Config.js'
 import type { NewUltimaniaRecord as NewUltiRecord, UltimaniaRecord as UltiRecord } from './UltimaniaTypes.js'
-import { fetchRecords, sendRecord, updatePlayer } from './UltimaniaClient.js'
+import { config, fetchRecords, sendRecord, updatePlayer } from './UltimaniaClient.js'
 import './ui/UltiRecords.component.js'
 
 let currentUltis: UltiRecord[] = []

@@ -3,9 +3,29 @@
  * @since 0.1
  */
 
-import { componentIds, RecordList, StaticComponent, StaticHeader } from '../../UI.js'
+import { componentIds, raceConfig, RecordList, StaticComponent, StaticHeader } from '../../UI.js'
 
-import config from './LocalRanking.config.js'
+import userConfig from './LocalRanking.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 15,
+  teamsEntries: 7,
+  roundsEntries: 7,
+  cupEntries: 7,
+  lapsEntries: 7,
+  stuntsEntries: 12,
+  entryHeight: 2.15,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  topCount: 5,
+  teamsTopCount: 3,
+  roundsTopCount: 3,
+  cupTopCount: 3,
+  lapsTopCount: 3,
+  stuntsTopCount: 5,
+  displayNoRecordEntry: true,
+  hidePanel: true,
+})
 
 export default class LocalRanking extends StaticComponent {
   private readonly header: StaticHeader

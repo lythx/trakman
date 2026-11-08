@@ -1,4 +1,4 @@
-import config from './Config.js'
+import { config } from './SectorDB.js'
 import { addListener } from './SectorEvents.js'
 import { getMapSectors, getPlayerSectors } from './SectorListeners.js'
 import './ui/SectorRecords.component.js'

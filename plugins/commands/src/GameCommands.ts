@@ -1,4 +1,82 @@
-import config from '../config/GameCommands.config.js'
+import userConfig from '../config/GameCommands.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  setgamemode: {
+    public: true,
+    privilege: 2,
+    aliases: ['sgm', 'setgamemode'],
+  },
+  settimelimit: {
+    public: true,
+    privilege: 3,
+    aliases: ['stl', 'settimelimit'],
+  },
+  setchattime: {
+    public: true,
+    privilege: 3,
+    aliases: ['sct', 'setchattime'],
+  },
+  setwarmup: {
+    public: true,
+    privilege: 2,
+    aliases: ['swu', 'setwarmup'],
+  },
+  setlapsamount: {
+    public: true,
+    privilege: 2,
+    aliases: ['sla', 'setlapsamount'],
+  },
+  setroundslapsamount: {
+    public: true,
+    privilege: 2,
+    aliases: ['srla', 'setroundslapsamount'],
+  },
+  setroundspointlimit: {
+    public: true,
+    privilege: 2,
+    aliases: ['srpl', 'setroundspointlimit'],
+  },
+  setteamspointlimit: {
+    public: true,
+    privilege: 2,
+    aliases: ['stpl', 'setteamspointlimit'],
+  },
+  setteamsmaxpoints: {
+    public: true,
+    privilege: 2,
+    aliases: ['stmp', 'setteamsmaxpoints'],
+  },
+  setcuppointlimit: {
+    public: true,
+    privilege: 2,
+    aliases: ['scpl', 'setcuppointlimit'],
+  },
+  setcuproundspermap: {
+    public: true,
+    privilege: 2,
+    aliases: ['scrpm', 'setcuproundspermap'],
+  },
+  setcupwarmuprounds: {
+    public: true,
+    privilege: 2,
+    aliases: ['scwr', 'setcupwarmuprounds'],
+  },
+  setcupwinnersamount: {
+    public: true,
+    privilege: 2,
+    aliases: ['scwa', 'setcupwinnersamount'],
+  },
+  forceshowopp: {
+    public: true,
+    privilege: 3,
+    aliases: ['fso', 'forceshowopp', 'forceshowopponents'],
+  },
+  disablerespawn: {
+    public: true,
+    privilege: 3,
+    aliases: ['drp', 'disablerespawn'],
+  },
+})
 
 const commands: tm.Command[] = [
   {

@@ -3,11 +3,34 @@
  * @since 0.1
  */
 
-import { componentIds, Grid, StaticComponent, StaticHeader, type StaticHeaderOptions } from '../../UI.js'
+import { componentIds, Grid, raceConfig, StaticComponent, StaticHeader, type StaticHeaderOptions } from '../../UI.js'
 import flags from '../../config/FlagIcons.js'
+import icons from '../../config/Icons.js'
 import { tmx } from '../../../tmx/Tmx.js'
 import { webservices } from '../../../webservices/Webservices.js'
-import config from './MapWidget.config.js'
+import userConfig from './MapWidget.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 9.13,
+  margin: raceConfig.margin,
+  width: raceConfig.width,
+  mapPadding: 0.3,
+  customTags: [] as typeof userConfig.customTags,
+  icons: {
+    header: icons.ongoingMap,
+    tags: {
+      normal: icons.tag,
+      nadeo: icons.tagGreen,
+      classic: icons.tagYellow,
+    },
+    author: icons.personBuilder,
+    authorTime: icons.clockAuthor,
+    buildDate: icons.tools,
+    goldScore: icons.clockAuthor,
+    authorScore: icons.clockAuthor,
+  },
+  textScale: 1,
+})
 
 export default class MapWidget extends StaticComponent {
   private readonly rows: number = 4

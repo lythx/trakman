@@ -1,6 +1,13 @@
 import http, { ClientRequest } from 'http'
-import config from './Config.js'
+import userConfig from './Config.js'
 import 'dotenv/config'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  manialiveHash: '6f116833b419fe7cb9c912fdaefb774845f60e79',
+  manialiveVersion: 239,
+  manialiveUrl: 'ws.trackmania.com',
+})
 
 let isConnected: boolean = false
 const password = process.env.FREEZONE_PASSWORD

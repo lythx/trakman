@@ -14,7 +14,46 @@ import {
   Paginator,
   PopupWindow,
 } from '../../UI.js'
-import config from './Playerlist.config.js'
+import userConfig from './Playerlist.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  kickPrivilege: tm.admin.privileges.kick,
+  forceSpecPrivilege: tm.admin.privileges.forceSpectator,
+  privilege: 1,
+  iconWidth: 2,
+  iconHeight: 2,
+  entries: 15,
+  columnProportions: [1.5, 3, 3, 2, 2, 2, 2, 2, 2, 2],
+  navbar: [
+    {
+      name: 'Banlist',
+      actionId: componentIds.banlist,
+      privilege: tm.config.controller.privileges.ban,
+    },
+    {
+      name: 'Blacklist',
+      actionId: componentIds.blacklist,
+      privilege: tm.config.controller.privileges.blacklist,
+    },
+    {
+      name: 'Mutelist',
+      actionId: componentIds.mutelist,
+      privilege: tm.config.controller.privileges.mute,
+    },
+    {
+      name: 'Guestlist',
+      actionId: componentIds.guestlist,
+      privilege: tm.config.controller.privileges.addGuest,
+    },
+  ],
+  grid: {
+    margin: 0.15,
+  },
+  command: {
+    aliases: ['players', 'playerl', 'playerlist'],
+    privilege: 1,
+  },
+})
 
 export default class PlayerList extends PopupWindow<{
   page: number

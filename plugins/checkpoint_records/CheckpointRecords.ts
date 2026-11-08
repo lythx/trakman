@@ -1,4 +1,4 @@
-import config from './Config.js'
+import { config } from './CheckpointDB.js'
 import { addListener } from './CheckpointEvents.js'
 import { getMapCheckpoints, getPlayerCheckpoints } from './CheckpointListeners.js'
 import './ui/CheckpointRecords.component.js'

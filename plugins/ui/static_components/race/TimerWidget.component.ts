@@ -3,8 +3,38 @@
  * @since 0.1
  */
 
-import { addManialinkListener, centeredText, componentIds, StaticComponent, StaticHeader } from '../../UI.js'
-import config from './TimerWidget.config.js'
+import { addManialinkListener, centeredText, componentIds, raceConfig, StaticComponent, StaticHeader } from '../../UI.js'
+import icons from '../../config/Icons.js'
+import userConfig from './TimerWidget.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 6.45,
+  stuntsDynamicMarginTop: 5.5,
+  stuntsHeight: 6.45 + 5.5,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  timerActionsPrivilege: 1,
+  buttonWidth: 1.8,
+  buttonOrder: ['pause', 'add', 'subtract'],
+  textYOffset: -0.3,
+  icons: {
+    pause: icons.pause,
+    resume: icons.play,
+    add: icons.plus,
+    subtract: icons.minus,
+  },
+  iconsHover: {
+    pause: icons.pauseGreen,
+    resume: icons.playGreen,
+    add: icons.plusGreen,
+    subtract: icons.minusGreen,
+  },
+  timeColours: ['FFF', tm.utils.palette.yellow, tm.utils.palette.red],
+  colourChangeThresholds: [180, 60],
+  iconPadding: 0.3,
+  timeAddedOnClick: 5 * 60 * 1000,
+  timeSubtractedOnClick: 5 * 60 * 1000,
+})
 
 export default class TimerWidget extends StaticComponent {
   private readonly header: StaticHeader

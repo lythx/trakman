@@ -9,12 +9,31 @@ import {
   Grid,
   leftAlignedText,
   Paginator,
+  raceConfig,
   rightAlignedText,
   StaticComponent,
   StaticHeader,
   type StaticHeaderOptions,
 } from '../../UI.js'
-import config from './BestCps.config.js'
+import userConfig from './BestCps.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entryHeight: 2.16,
+  entries: 6,
+  width: raceConfig.width,
+  horizontalModeWidth: raceConfig.rightPosition - raceConfig.leftPosition - raceConfig.width * 2 - raceConfig.margin * 4,
+  posX: raceConfig.leftPosition + raceConfig.marginBig + raceConfig.width,
+  horizontalModePosX: raceConfig.leftPosition + raceConfig.width + raceConfig.margin,
+  posY: raceConfig.topBorder,
+  side: false,
+  margin: raceConfig.margin,
+  columnProportions: [1, 2.8, 4],
+  textScale: 0.87,
+  textPadding: 0.2,
+  horizontal: false,
+  horizontalMaxRows: 5,
+  hidePanel: true,
+})
 
 export default class BestCps extends StaticComponent {
   private readonly bestCps: {

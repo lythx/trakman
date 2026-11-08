@@ -6,7 +6,20 @@ import { Logger } from '../Logger.js'
 import { Utils } from '../Utils.js'
 import { Events } from '../Events.js'
 import { RecordService } from './RecordService.js'
-import { titles } from '../../config/Titles.js'
+import { titles as userTitles } from '../../config/Titles.js'
+import { withDefaults } from '../ConfigDefaults.js'
+
+const titles = withDefaults(userTitles, {
+  logins: {},
+  countries: {},
+  privileges: {
+    0: 'Player',
+    1: 'Operator',
+    2: 'Admin',
+    3: 'Masteradmin',
+    4: 'Server Owner',
+  },
+})
 
 /**
  * This service manages online players on the server and players table in the database

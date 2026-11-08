@@ -1,7 +1,6 @@
 import type { BestSectors, PlayerSectors } from './SectorTypes.js'
-import { allSecsDB, bestSecsDB } from './SectorDB.js'
+import { allSecsDB, bestSecsDB, config } from './SectorDB.js'
 import { addListener, emitEvent } from './SectorEvents.js'
-import config from './Config.js'
 
 let currentBestSecs: BestSectors
 let currentMapDBId: number

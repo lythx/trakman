@@ -13,7 +13,20 @@ import {
   Paginator,
   PopupWindow,
 } from '../UI.js'
-import config from './Chatlog.config.js'
+import userConfig from './Chatlog.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 16,
+  columnProportions: [2, 3, 2.5, 7],
+  navbar: [],
+  grid: {
+    margin: 0.15,
+  },
+  command: {
+    aliases: ['chatlog', 'cl'],
+    privilege: 0,
+  },
+})
 
 export default class ChatLog extends PopupWindow<{
   page: number

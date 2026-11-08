@@ -1,7 +1,7 @@
 import { Database } from './database/DB.js'
 import { Logger } from './Logger.js'
 import { Client } from './client/Client.js'
-import config from '../config/Config.js'
+import config from './ControllerConfig.js'
 import fs from 'fs/promises'
 
 const db = new Database()

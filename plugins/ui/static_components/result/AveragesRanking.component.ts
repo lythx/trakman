@@ -5,7 +5,18 @@
 
 import { componentIds, List, StaticComponent, StaticHeader } from '../../UI.js'
 import { stats } from '../../../stats/Stats.js'
-import config from './AveragesRanking.config.js'
+import userConfig from './AveragesRanking.config.js'
+import cfg from '../../config/ResultUi.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 5,
+  entryHeight: 2.15,
+  width: cfg.width,
+  margin: cfg.margin,
+  columnProportions: [1, 1.9, 5.1],
+  topCount: 5,
+  displayNoRecordEntry: true,
+})
 
 export default class AveragesRanking extends StaticComponent {
   private readonly list: List

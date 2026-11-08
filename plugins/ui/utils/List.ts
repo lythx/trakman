@@ -1,6 +1,11 @@
 import { Grid, type GridCellFunction, type GridCellObject } from './Grid.js'
 import { centeredText, leftAlignedText } from './TextUtils.js'
-import config from './List.config.js'
+import userConfig from './List.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  textScale: 0.85,
+  margin: 0.15,
+})
 
 /**
  * Util to display list data in manialinks. Displays 3 columns of data from which one is index

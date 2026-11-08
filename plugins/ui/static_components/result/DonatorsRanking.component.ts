@@ -5,7 +5,19 @@
 
 import { componentIds, List, StaticComponent, StaticHeader } from '../../UI.js'
 import { stats } from '../../../stats/Stats.js'
-import config from './DonatorsRanking.config.js'
+import userConfig from './DonatorsRanking.config.js'
+import cfg from '../../config/ResultUi.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 5,
+  entryHeight: 2.15,
+  width: cfg.width,
+  posX: cfg.rightPosition - (cfg.marginBig + cfg.width) * 2,
+  posY: cfg.topBorder,
+  side: true,
+  margin: cfg.margin,
+  columnProportions: [1, 1.9, 5.1],
+})
 
 export default class DonatorsRanking extends StaticComponent {
   private readonly list: List

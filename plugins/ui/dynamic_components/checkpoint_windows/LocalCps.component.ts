@@ -13,7 +13,69 @@ import {
   Paginator,
   PopupWindow,
 } from '../../UI.js'
-import config from './LocalCps.config.js'
+import userConfig from './LocalCps.config.js'
+
+const p = tm.utils.palette
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 15,
+  cpsOnFirstPage: 8,
+  cpColours: {
+    best: `${p.green}F`,
+    worst: `${p.red}F`,
+    equal: `${p.yellow}F`,
+  },
+  navbar: [
+    {
+      name: 'Local Sectors',
+      actionId: componentIds.localSectors,
+    },
+    {
+      name: 'Dedi Checkpoints',
+      actionId: componentIds.dediCps,
+    },
+    {
+      name: 'Dedi Sectors',
+      actionId: componentIds.dediSectors,
+    },
+    {
+      name: 'Live Checkpoints',
+      actionId: componentIds.liveCps,
+    },
+    {
+      name: 'Live Sectors',
+      actionId: componentIds.liveSectors,
+    },
+  ],
+  stuntsNavbar: [
+    {
+      name: 'Local Sectors',
+      actionId: componentIds.localSectors,
+    },
+    {
+      name: 'Ulti Records',
+      actionId: componentIds.ultiRecords,
+    },
+    {
+      name: 'Live Checkpoints',
+      actionId: componentIds.liveCps,
+    },
+    {
+      name: 'Live Sectors',
+      actionId: componentIds.liveSectors,
+    },
+  ],
+  cpPaginatorMargin: 0.25,
+  startCellWidth: 2,
+  indexCellWidth: 1,
+  grid: {
+    margin: 0.15,
+  },
+  command: {
+    aliases: ['cp', 'cptms', 'recs'],
+    privilege: 0,
+  },
+})
 
 export default class LocalCps extends PopupWindow {
   private readonly startCellsOnFirstPage: number = 3

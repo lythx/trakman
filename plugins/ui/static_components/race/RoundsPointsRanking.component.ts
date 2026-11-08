@@ -3,8 +3,25 @@
  * @since 0.1
  */
 
-import { componentIds, RecordList, type RLImage, StaticComponent, StaticHeader } from '../../UI.js'
-import config from './RoundsPointsRanking.config.js'
+import { componentIds, raceConfig, RecordList, type RLImage, StaticComponent, StaticHeader } from '../../UI.js'
+import icons from '../../config/Icons.js'
+import userConfig from './RoundsPointsRanking.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 8,
+  cupEntries: 8,
+  entryHeight: 2.15,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  topCount: 5,
+  cupTopCount: 5,
+  columnProportions: [1, 1.5, 5.5],
+  displayNoRecordEntry: true,
+  cupPositionImages: [icons.trophyClassic, icons.trophySilver, icons.trophyBronze],
+  cupImageVerticalPadding: 0.1,
+  cupImageHorizontalPadding: 0.3,
+  hidePanel: true,
+})
 
 export default class RoundsPointsRanking extends StaticComponent {
   private readonly header: StaticHeader

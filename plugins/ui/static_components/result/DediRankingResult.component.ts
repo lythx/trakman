@@ -5,7 +5,17 @@
 
 import { componentIds, RecordList, StaticComponent, StaticHeader } from '../../UI.js'
 import { dedimania } from '../../../dedimania/Dedimania.js'
-import config from './DediRankingResult.config.js'
+import userConfig from './DediRankingResult.config.js'
+import cfg from '../../config/ResultUi.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 5,
+  entryHeight: 2.15,
+  width: cfg.width,
+  margin: cfg.margin,
+  topCount: 5,
+  displayNoRecordEntry: true,
+})
 
 export default class DediRankingResult extends StaticComponent {
   private readonly header: StaticHeader

@@ -14,7 +14,27 @@ import {
   PopupWindow,
 } from '../UI.js'
 import { actions } from '../../actions/Actions.js'
-import config from './TMXSearchWindow.config.js'
+import userConfig from './TMXSearchWindow.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  addPrivilege: tm.config.controller.privileges.addMap,
+  textScale: 1,
+  padding: 0.1,
+  rows: 5,
+  columns: 5,
+  grid: {
+    margin: 0.15,
+  },
+  navbar: [],
+  iconWidth: 2,
+  timeWidth: 4.5,
+  awardsWidth: 2,
+  authorSearchSeparator: '$a',
+  command: {
+    aliases: ['xlist', 'searchtmx', 'searchmap'],
+    privilege: 0,
+  },
+})
 
 export default class TMXSearchWindow extends PopupWindow<{
   page: number

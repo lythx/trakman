@@ -1,6 +1,27 @@
 import BetPlaceWindow from './ui/BetPlaceWindow.component.js'
 import BetInfoWidget from './ui/BetInfoWidget.component.js'
-import config from './Config.js'
+import userConfig from './Config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  isActive: false,
+  betTimeSeconds: 30,
+  minimumAmount: 50,
+  activatePrivilege: 3,
+  bet: {
+    aliases: ['bet'],
+    public: true,
+    privilege: 0,
+  },
+  activate: {
+    aliases: ['ebet', 'enablebets'],
+    public: true,
+  },
+  deactivate: {
+    aliases: ['dbet', 'disablebets'],
+    public: true,
+  },
+})
 
 const betLogins: string[] = []
 let prize: number | undefined

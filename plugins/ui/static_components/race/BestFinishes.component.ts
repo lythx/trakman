@@ -3,8 +3,33 @@
  * @since 0.1
  */
 
-import { centeredText, componentIds, Grid, leftAlignedText, StaticComponent, StaticHeader } from '../../UI.js'
-import config from './BestFinishes.config.js'
+import {
+  centeredText,
+  componentIds,
+  Grid,
+  leftAlignedText,
+  raceConfig,
+  StaticComponent,
+  StaticHeader,
+} from '../../UI.js'
+import userConfig from './BestFinishes.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entryHeight: 2.16,
+  entries: 7,
+  width: raceConfig.width,
+  horizontalModeWidth: raceConfig.rightPosition - raceConfig.leftPosition - raceConfig.width * 2 - raceConfig.margin * 3,
+  posX: raceConfig.rightPosition - (raceConfig.marginBig + raceConfig.width),
+  horizontalModePosX: raceConfig.leftPosition + raceConfig.width * 2 + raceConfig.margin * 2,
+  posY: raceConfig.topBorder,
+  side: true,
+  margin: raceConfig.margin,
+  columnProportions: [1, 2.8, 4],
+  textScale: 0.87,
+  textPadding: 0.2,
+  horizontal: false,
+  hidePanel: true,
+})
 
 export default class BestFinishes extends StaticComponent {
   private readonly bestFinishes: {

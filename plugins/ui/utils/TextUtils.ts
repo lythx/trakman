@@ -1,4 +1,10 @@
-import config from './TextUtils.config.js'
+import userConfig from './TextUtils.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  textScale: 0.7,
+  padding: 0.2,
+  yOffset: -0.1,
+})
 
 interface UITextOptions {
   textScale?: number

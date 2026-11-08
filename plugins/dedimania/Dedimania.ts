@@ -1,8 +1,18 @@
 import { DedimaniaClient } from './DedimaniaClient.js'
-import config from './Config.js'
+import userConfig from './Config.js'
 import type { DediLeaderboard, DediRecord, NewDediRecord } from './DedimaniaTypes.js'
 import './ui/DediCps.component.js'
 import './ui/DediSectors.component.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  dediCount: 30,
+  syncName: true,
+  port: 8002,
+  host: 'dedimania.net',
+  reconnectTimeout: 120,
+  updateInterval: 240,
+})
 
 let currentDedis: DediRecord[] = []
 let newDedis: DediRecord[] = []

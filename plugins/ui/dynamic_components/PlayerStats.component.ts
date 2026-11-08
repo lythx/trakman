@@ -14,7 +14,43 @@ import {
 } from '../UI.js'
 import { titles } from '../../../config/Titles.js'
 import { stats } from '../../stats/Stats.js'
-import config from './PlayerStats.config.js'
+import userConfig from './PlayerStats.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  width: 60,
+  navbar: [
+    {
+      name: `All Stats`,
+      actionId: componentIds.topRanks,
+    },
+  ],
+  grid: {
+    margin: 0.15,
+  },
+  sumsColours: ['FD0', 'CCC', 'C73', 'FFF'],
+  columnProportions: [2, 2],
+  cells: [
+    ` Player Login `,
+    ` Player Nickname `,
+    ` Player Nation `,
+    ` Player Privilege `,
+    ` Server Rank `,
+    ` Server Average `,
+    ` Total Playtime `,
+    ` Total Records `,
+    ` Total Map Votes `,
+    ` Top Sums `,
+    ` Visits Amount `,
+    ` Donations Amount `,
+    ` Wins Amount `,
+    ` Account Type `,
+    ` Last Seen `,
+  ],
+  command: {
+    aliases: ['ps', 'stats', 'playerstats', 'pls'],
+    privilege: 0,
+  },
+})
 
 export default class PlayerStatsWindow extends PopupWindow {
   private readonly grid: Grid

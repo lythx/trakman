@@ -1,7 +1,7 @@
 import fetch from 'node-fetch'
 import { Logger } from './Logger.js'
 import { MapService } from './services/MapService.js'
-import config from '../config/Config.js'
+import config from './ControllerConfig.js'
 
 type TMXPrefix = 'tmnforever' | 'united' | 'nations' | 'original' | 'sunrise'
 

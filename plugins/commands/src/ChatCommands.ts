@@ -1,4 +1,126 @@
-import config from '../config/ChatCommands.config.js'
+import userConfig from '../config/ChatCommands.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  hi: {
+    public: true,
+    privilege: 0,
+    aliases: ['hi', 'hey', 'hello'],
+  },
+  greet: {
+    public: true,
+    privilege: 0,
+    aliases: ['greet'],
+  },
+  bye: {
+    public: true,
+    privilege: 0,
+    aliases: ['bb', 'bye'],
+  },
+  thx: {
+    public: true,
+    privilege: 0,
+    aliases: ['ty', 'tx', 'thx', 'thanks'],
+  },
+  gg: {
+    public: true,
+    privilege: 0,
+    aliases: ['gg', 'goodgame'],
+  },
+  bg: {
+    public: true,
+    privilege: 0,
+    aliases: ['bg', 'badgame'],
+  },
+  n1: {
+    public: true,
+    privilege: 0,
+    aliases: ['n1', 'nice1', 'niceone'],
+  },
+  gr: {
+    public: true,
+    privilege: 0,
+    aliases: ['gr', 'goodrace'],
+  },
+  bgm: {
+    public: true,
+    privilege: 0,
+    aliases: ['bgm'],
+  },
+  brb: {
+    public: true,
+    privilege: 0,
+    aliases: ['brb'],
+  },
+  afk: {
+    public: true,
+    privilege: 0,
+    aliases: ['afk', 'imstupid'],
+  },
+  me: {
+    public: true,
+    privilege: 0,
+    aliases: ['me', 'mfw'],
+  },
+  lol: {
+    public: true,
+    privilege: 0,
+    aliases: ['lol'],
+  },
+  lool: {
+    public: true,
+    privilege: 0,
+    aliases: ['lool'],
+  },
+  loool: {
+    public: true,
+    privilege: 0,
+    aliases: ['loool'],
+  },
+  time: {
+    privilege: 0,
+    aliases: ['time'],
+  },
+  bootme: {
+    public: true,
+    privilege: 0,
+    aliases: ['bm', 'bootme', 'dienow'],
+  },
+  rq: {
+    public: true,
+    privilege: 0,
+    aliases: ['rq', 'ragequit'],
+  },
+  pm: {
+    privilege: 0,
+    aliases: ['pm', 'dm'],
+  },
+  playtime: {
+    privilege: 0,
+    aliases: ['pt', 'playtime'],
+  },
+  laston: {
+    privilege: 0,
+    aliases: ['lo', 'laston'],
+  },
+  sessiontime: {
+    privilege: 0,
+    aliases: ['st', 'session', 'sessiontime'],
+  },
+  man: {
+    public: false,
+    privilege: 0,
+    aliases: ['man'],
+  },
+  admin: {
+    privilege: 0,
+    aliases: ['admin', 'a'],
+  },
+  coppers: {
+    public: false,
+    privilege: 3,
+    aliases: ['ccs', 'coppers', 'checkcoppers'],
+  },
+})
 
 const commands: tm.Command[] = [
   {

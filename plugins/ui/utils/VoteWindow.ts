@@ -2,7 +2,30 @@ import IDS from '../config/UtilIds.js'
 import { centeredText, rightAlignedText } from './TextUtils.js'
 import { Vote } from '../../vote/Vote.js'
 import { addManialinkListener, removeManialinkListener, StaticHeader, type StaticHeaderOptions } from '../UI.js'
-import config from './VoteWindow.config.js'
+import userConfig from './VoteWindow.config.js'
+import cfg from '../config/RaceUi.js'
+import header from './StaticHeaderRace.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  width: 25,
+  height: 10,
+  margin: cfg.margin,
+  posX: cfg.leftPosition + cfg.marginBig + cfg.width,
+  posY: cfg.topBorder - (14.5 + cfg.marginBig),
+  headerHeight: header.height,
+  buttonHeight: 2.5,
+  buttonWidth: 2.5,
+  headerTextXOffset: 0.2,
+  textScale: 0.7,
+  bigTextScale: 1,
+  counterTextScale: 0.4,
+  timerColourChanges: [20, 5],
+  adminButtons: {
+    height: 3,
+    width: 6,
+    textScale: 1.2,
+  },
+})
 
 /**
  * Util to manage votes and render vote manialink window

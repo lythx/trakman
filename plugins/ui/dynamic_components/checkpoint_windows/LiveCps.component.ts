@@ -13,7 +13,69 @@ import {
   Paginator,
   PopupWindow,
 } from '../../UI.js'
-import config from './LiveCps.config.js'
+import userConfig from './LiveCps.config.js'
+
+const p = tm.utils.palette
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 15,
+  cpsOnFirstPage: 10,
+  cpColours: {
+    best: `${p.green}F`,
+    worst: `${p.red}F`,
+    equal: `${p.yellow}F`,
+  },
+  navbar: [
+    {
+      name: 'Live Sectors',
+      actionId: componentIds.liveSectors,
+    },
+    {
+      name: 'Dedi Checkpoints',
+      actionId: componentIds.dediCps,
+    },
+    {
+      name: 'Dedi Sectors',
+      actionId: componentIds.dediSectors,
+    },
+    {
+      name: 'Local Checkpoints',
+      actionId: componentIds.localCps,
+    },
+    {
+      name: 'Local Sectors',
+      actionId: componentIds.localSectors,
+    },
+  ],
+  stuntsNavbar: [
+    {
+      name: 'Live Sectors',
+      actionId: componentIds.liveSectors,
+    },
+    {
+      name: 'Ulti Records',
+      actionId: componentIds.ultiRecords,
+    },
+    {
+      name: 'Local Checkpoints',
+      actionId: componentIds.localCps,
+    },
+    {
+      name: 'Local Sectors',
+      actionId: componentIds.localSectors,
+    },
+  ],
+  cpPaginatorMargin: 0.25,
+  startCellWidth: 2,
+  indexCellWidth: 1,
+  grid: {
+    margin: 0.15,
+  },
+  command: {
+    aliases: ['lcp', 'livecptms', 'liverecs'],
+    privilege: 0,
+  },
+})
 
 export default class LiveCps extends PopupWindow {
   private readonly startCellsOnFirstPage: number = 2

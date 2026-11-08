@@ -1,5 +1,9 @@
 import { actions } from '../../actions/Actions.js'
-import config from '../config/KarmaCommands.config.js'
+import userConfig from '../config/KarmaCommands.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  aliases: ['+++', '++', '+', '-', '--', '---'],
+})
 
 const options = {
   '+++': 3,

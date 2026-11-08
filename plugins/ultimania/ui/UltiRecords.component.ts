@@ -13,7 +13,37 @@ import {
   Paginator,
   PopupWindow,
 } from '../../ui/UI.js'
-import config from './UltiRecords.config.js'
+import userConfig from './UltiRecords.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 15,
+  navbar: [
+    {
+      name: 'Local Checkpoints',
+      actionId: componentIds.localCps,
+    },
+    {
+      name: 'Local Sectors',
+      actionId: componentIds.localSectors,
+    },
+    {
+      name: 'Live Checkpoints',
+      actionId: componentIds.liveCps,
+    },
+    {
+      name: 'Live Sectors',
+      actionId: componentIds.liveSectors,
+    },
+  ],
+  columnProportions: [0.5, 2, 2, 2, 1],
+  grid: {
+    margin: 0.15,
+  },
+  command: {
+    aliases: ['urc', 'ultirecs'],
+    privilege: 0,
+  },
+})
 
 export default class UltiRecords extends PopupWindow {
   private readonly entries: number = config.entries

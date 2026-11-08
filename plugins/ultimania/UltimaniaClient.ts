@@ -1,6 +1,12 @@
 import fetch from 'node-fetch'
 import type { UltimaniaRecord } from './UltimaniaTypes'
-import config from './Config.js'
+import userConfig from './Config.js'
+
+export const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  syncName: true,
+  host: 'http://ultimania5.askuri.de/api/v5',
+})
 
 async function fetchRecords(mapId: string): Promise<UltimaniaRecord[] | Error> {
   const res = await fetch(`${config.host}/maps/${mapId}/records`).catch((err: Error) => err)

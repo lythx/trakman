@@ -1,4 +1,8 @@
-import config from './Config.js'
+import userConfig from './Config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  minimalAmount: 50,
+})
 
 interface DonationInfo {
   readonly login: string

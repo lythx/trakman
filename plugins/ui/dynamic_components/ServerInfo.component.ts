@@ -12,10 +12,55 @@ import {
   type GridCellObject,
   PopupWindow,
 } from '../UI.js'
-import config from './ServerInfo.config.js'
+import userConfig from './ServerInfo.config.js'
 import { arch, cpus, freemem, loadavg, platform, totalmem } from 'node:os'
 import { memoryUsage, uptime, version } from 'node:process'
 import 'dotenv/config'
+
+const config = tm.utils.withDefaults(userConfig, {
+  navbar: [
+    {
+      name: `Changelog`,
+      actionId: componentIds.changelog,
+    },
+  ],
+  grid: {
+    margin: 0.15,
+  },
+  columnProportions: [2, 2, 2, 2],
+  serverCells: [
+    ` Dedicated Server Uptime `,
+    ` Dedicated Server Version `,
+    ` Dedicated Server Build `,
+    ` Server Name `,
+    ` Server Login `,
+    ` Server Zone `,
+    ` Server Rights `,
+    ` Server Max Players `,
+    ` Server Max Spectators `,
+    ` Server Max Records `,
+    ` Server Map Count `,
+    ` Server Visitor Count`,
+  ],
+  hostCells: [
+    ` System Uptime `,
+    ` System Architecture `,
+    ` System CPU `,
+    ` System CPU Load `,
+    ` System Free RAM `,
+    ` System Kernel `,
+    ` Trakman Version `,
+    ` Trakman Uptime `,
+    ` NodeJS Version `,
+    ` NodeJS RAM Usage `,
+    ` PostgreSQL Version `,
+    ` PostgreSQL DB Size `,
+  ],
+  command: {
+    aliases: ['server', 'serverinfo', 'sinfo', 'si'],
+    privilege: 0,
+  },
+})
 
 export default class ServerInfoWindow extends PopupWindow {
   private readonly grid: Grid

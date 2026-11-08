@@ -1,7 +1,6 @@
 import type { BestCheckpoints, PlayerCheckpoints } from './CheckpointTypes.js'
-import { allCpsDB, bestCpsDB } from './CheckpointDB.js'
+import { allCpsDB, bestCpsDB, config } from './CheckpointDB.js'
 import { emitEvent } from './CheckpointEvents.js'
-import config from './Config.js'
 
 let currentBestCps: BestCheckpoints = []
 let currentMapDBId: number

@@ -1,4 +1,9 @@
-import config from './Config.js'
+import userConfig from './Config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  waitTime: 5,
+})
 
 /**
  * Skips the lengthy endscreen by forcing everyone into specmode

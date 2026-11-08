@@ -5,7 +5,8 @@ import { Events } from './Events.js'
 import { PlayerService } from './services/PlayerService.js'
 import colours from './data/Colours.js'
 import { palette } from '../config/PrefixesAndPalette.js'
-import config from '../config/Config.js'
+import config from './ControllerConfig.js'
+import { withDefaults } from './ConfigDefaults.js'
 import { Logger } from './Logger.js'
 import uFuzzy from '@leeoniya/ufuzzy'
 
@@ -611,6 +612,15 @@ export const Utils = {
   strVar,
 
   /**
+   * Fills in missing settings of a (possibly outdated) config object with hard-coded defaults.
+   * Nested objects are merged recursively, arrays and primitives present in the config are kept as-is.
+   * @param config Config object (e.g. imported from a `.js` config file)
+   * @param defaults Defaults for the settings that must be present
+   * @returns Config object with the defaults applied
+   */
+  withDefaults,
+
+  /**
    * List of colours in Trackmania format (prefixed with $ and in 3 digit hex).
    */
   get colours() {
@@ -655,6 +665,9 @@ function strVar(
     [name: string]: any
   }
 ): string {
+  if (str === undefined) {
+    return ''
+  }
   if (Array.isArray(vars)) {
     for (const e of vars) {
       if (typeof e === 'string') {

@@ -3,10 +3,19 @@
  * @since 0.1
  */
 
-import { componentIds, RecordList, StaticComponent, StaticHeader } from '../../UI.js'
-
+import { componentIds, raceConfig, RecordList, StaticComponent, StaticHeader } from '../../UI.js'
 import { tmx } from '../../../tmx/Tmx.js'
-import config from './TMXRanking.config.js'
+import userConfig from './TMXRanking.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 3,
+  entryHeight: 2.15,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  topCount: 3,
+  displayNoRecordEntry: false,
+  hidePanel: true,
+})
 
 export default class TMXRanking extends StaticComponent {
   private recordList!: RecordList

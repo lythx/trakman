@@ -1,4 +1,17 @@
-import config from '../config/RecordsCommands.config.js'
+import userConfig from '../config/RecordsCommands.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  delrec: {
+    public: true,
+    privilege: 2,
+    aliases: ['dr', 'delrec', 'deleterecord'],
+  },
+  prunerecs: {
+    public: true,
+    privilege: 3,
+    aliases: ['pr', 'prunerecs', 'prunerecords'],
+  },
+})
 
 const commands: tm.Command[] = [
   {

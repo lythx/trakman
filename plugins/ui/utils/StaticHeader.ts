@@ -1,6 +1,36 @@
 import { centeredText, leftAlignedText, rightAlignedText } from './TextUtils.js'
-import raceConfig from './StaticHeaderRace.config.js'
-import resultConfig from './StaticHeaderResult.config.js'
+import userRaceConfig from './StaticHeaderRace.config.js'
+import userResultConfig from './StaticHeaderResult.config.js'
+
+const raceConfig = tm.utils.withDefaults(userRaceConfig, {
+  textScale: 1,
+  squareWidth: 1.7,
+  rectangleWidth: 12.8,
+  height: 2.17,
+  margin: 0.15,
+  verticalPadding: 0.3,
+  horizontalPadding: 0.5,
+  iconWidth: 1.55,
+  iconHeight: 2,
+  iconHorizontalPadding: 0.075,
+  iconVerticalPadding: 0.1,
+  centerText: false,
+})
+
+const resultConfig = tm.utils.withDefaults(userResultConfig, {
+  textScale: 1,
+  squareWidth: 1.7,
+  rectangleWidth: 12.8,
+  height: 2.17,
+  margin: 0.15,
+  verticalPadding: 0.3,
+  horizontalPadding: 0.5,
+  iconWidth: 1.55,
+  iconHeight: 2,
+  iconHorizontalPadding: 0.075,
+  iconVerticalPadding: 0.1,
+  centerText: false,
+})
 
 export interface StaticHeaderOptions {
   /** Header height */

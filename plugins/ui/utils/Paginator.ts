@@ -1,5 +1,12 @@
-import config from './Paginator.config.js'
+import userConfig from './Paginator.config.js'
 import IDS from '../config/UtilIds.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  buttonWidth: 3,
+  buttonHeight: 3,
+  margin: 0.4,
+  padding: 0.2,
+})
 
 const ID = IDS.Paginator
 

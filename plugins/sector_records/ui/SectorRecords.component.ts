@@ -14,7 +14,59 @@ import {
   PopupWindow,
 } from '../../ui//UI.js'
 import { sectorRecords } from '../../sector_records/SectorRecords.js'
-import config from './SectorRecords.config.js'
+import userConfig from './SectorRecords.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 13,
+  columnProportions: [0.7, 2, 2, 2, 1, 1.5],
+  navbar: [
+    {
+      name: 'Checkpoint Records',
+      actionId: componentIds.checkpointRecords,
+    },
+    {
+      name: 'Dedi Checkpoints',
+      actionId: componentIds.dediCps,
+    },
+    {
+      name: 'Dedi Sectors',
+      actionId: componentIds.dediSectors,
+    },
+    {
+      name: 'Local Checkpoints',
+      actionId: componentIds.localCps,
+    },
+    {
+      name: 'Local Sectors',
+      actionId: componentIds.localSectors,
+    },
+  ],
+  stuntsNavbar: [
+    {
+      name: 'Checkpoint Records',
+      actionId: componentIds.checkpointRecords,
+    },
+    {
+      name: 'Ulti Records',
+      actionId: componentIds.ultiRecords,
+    },
+    {
+      name: 'Local Checkpoints',
+      actionId: componentIds.localCps,
+    },
+    {
+      name: 'Local Sectors',
+      actionId: componentIds.localSectors,
+    },
+  ],
+  grid: {
+    margin: 0.15,
+  },
+  command: {
+    aliases: ['sr', 'secrecs'],
+    privilege: 0,
+  },
+})
 
 class SectorRecords extends PopupWindow {
   private readonly grid: Grid

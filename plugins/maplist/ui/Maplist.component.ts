@@ -15,7 +15,53 @@ import {
 } from '../../ui/UI.js'
 import { actions } from '../../actions/Actions.js'
 import { maplist } from '../Maplist.js'
-import config from './Maplist.config.js'
+import userConfig from './Maplist.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  textScale: 1,
+  padding: 0.1,
+  removePrivilege: tm.config.controller.privileges.removeMap,
+  multijukePrivilege: 1,
+  multijukeMaxMaps: 5,
+  unlimitedJukePrivilege: 2,
+  rows: 5,
+  columns: 5,
+  grid: {
+    margin: 0.15,
+  },
+  navbar: [
+    {
+      name: 'Map Info',
+      actionId: componentIds.TMXWindow,
+    },
+  ],
+  iconWidth: 2,
+  queueWidth: 5.2,
+  queueNumberWidth: 2.9,
+  timeWidth: 5,
+  positionWidth: 3.1,
+  public: true,
+  authorSearchSeparator: '$a',
+  pageSearchSeparator: '$p',
+  commands: {
+    list: {
+      aliases: ['l', 'ml', 'list'],
+      privilege: 0,
+    },
+    best: {
+      aliases: ['best'],
+      privilege: 0,
+    },
+    worst: {
+      aliases: ['worst'],
+      privilege: 0,
+    },
+    jukebox: {
+      aliases: ['jb', 'jukebox'],
+      privilege: 0,
+    },
+  },
+})
 
 export default class MapList extends PopupWindow<{
   page: number

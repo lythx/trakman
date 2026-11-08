@@ -3,10 +3,28 @@
  * @since 1.5.0
  */
 
-import { componentIds, RecordList, StaticComponent, StaticHeader } from '../../UI.js'
+import { componentIds, raceConfig, RecordList, StaticComponent, StaticHeader } from '../../UI.js'
 import { ultimania } from '../../../ultimania/Ultimania.js'
+import userConfig from './UltiRanking.config.js'
 
-import config from './UltiRanking.config.js'
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 12,
+  teamsEntries: 15,
+  roundsEntries: 7,
+  cupEntries: 7,
+  lapsEntries: 7,
+  entryHeight: 2.15,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  topCount: 5,
+  teamsTopCount: 5,
+  roundsTopCount: 3,
+  cupTopCount: 3,
+  lapsTopCount: 3,
+  displayNoRecordEntry: true,
+  hidePanel: true,
+  maxRecordCount: 5000,
+})
 
 export default class UltiRanking extends StaticComponent {
   private readonly header: StaticHeader

@@ -1,7 +1,7 @@
 import { Events } from '../Events.js'
 import { Client } from '../client/Client.js'
 import { Logger } from '../Logger.js'
-import config from '../../config/Config.js'
+import config from '../ControllerConfig.js'
 
 export class GameService {
   private static _config: tm.GameInfo

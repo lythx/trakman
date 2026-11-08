@@ -1,6 +1,40 @@
 import IDS from '../config/UtilIds.js'
-import raceConfig from './RecordListRace.config.js'
-import resultConfig from './RecordListResult.config.js'
+import userRaceConfig from './RecordListRace.config.js'
+import userResultConfig from './RecordListResult.config.js'
+
+const raceConfig = tm.utils.withDefaults(userRaceConfig, {
+  columnProportions: [1, 2.9, 4.1],
+  textScale: 0.85,
+  padding: 0.2,
+  markerWidth: 1.7,
+  columnGap: 0.15,
+  rowGap: 0.15,
+  iconVerticalPadding: 0.15,
+  iconHorizontalPadding: 0.15,
+  info: {
+    iconWidth: 1.7,
+    columns: 5,
+    columnWidth: 3,
+  },
+  maxCpCount: 500,
+})
+
+const resultConfig = tm.utils.withDefaults(userResultConfig, {
+  columnProportions: [1, 2.9, 4.1],
+  textScale: 0.85,
+  padding: 0.2,
+  markerWidth: 1.7,
+  columnGap: 0.15,
+  rowGap: 0.15,
+  iconVerticalPadding: 0.15,
+  iconHorizontalPadding: 0.15,
+  info: {
+    iconWidth: 1.7,
+    columns: 5,
+    columnWidth: 3,
+  },
+  maxCpCount: 500,
+})
 
 /**
  * Record list image object

@@ -14,7 +14,44 @@ import {
   Paginator,
   PopupWindow,
 } from '../../UI.js'
-import config from './Guestlist.config.js'
+import userConfig from './Guestlist.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  privilege: tm.config.controller.privileges.addGuest,
+  iconWidth: 2,
+  iconHeight: 2,
+  entries: 15,
+  columnProportions: [0.8, 2, 2, 2, 2, 1],
+  navbar: [
+    {
+      name: 'Playerlist',
+      actionId: componentIds.playerList,
+      privilege: Math.min(...Object.values(tm.config.controller.privileges)),
+    },
+    {
+      name: 'Banlist',
+      actionId: componentIds.banlist,
+      privilege: tm.config.controller.privileges.ban,
+    },
+    {
+      name: 'Blacklist',
+      actionId: componentIds.blacklist,
+      privilege: tm.config.controller.privileges.blacklist,
+    },
+    {
+      name: 'Mutelist',
+      actionId: componentIds.mutelist,
+      privilege: tm.config.controller.privileges.mute,
+    },
+  ],
+  grid: {
+    margin: 0.15,
+  },
+  command: {
+    aliases: ['guestl', 'guestlist'],
+    privilege: tm.config.controller.privileges.addGuest,
+  },
+})
 
 export default class Guestlist extends PopupWindow<number> {
   readonly grid: Grid

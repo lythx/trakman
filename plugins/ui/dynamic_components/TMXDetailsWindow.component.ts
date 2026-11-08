@@ -13,8 +13,39 @@ import {
   leftAlignedText,
   PopupWindow,
 } from '../../ui/UI.js'
-import config from './TMXDetailsWindow.config.js'
+import userConfig from './TMXDetailsWindow.config.js'
 import { tmx } from '../../tmx/Tmx.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  margin: 0.15,
+  windowHeight: 40,
+  columnProportions: [1, 1, 1],
+  rowProportions: [1],
+  grid: {
+    margin: 0.15,
+  },
+  navbar: [
+    {
+      name: 'Map Info',
+      actionId: componentIds.TMXWindow,
+    },
+  ],
+  tmxRecordsProportions: [0.7, 2, 3, 3, 0.7],
+  tmxRecordsAmount: 10,
+  recordTextScale: 0.6,
+  screenshotPadding: 1,
+  notLoadedTextscale: 0.5,
+  description: {
+    padding: 1,
+    textSize: 1,
+    textLength: 550,
+    lineLength: 40,
+  },
+  command: {
+    aliases: ['td', 'tmxdetails'],
+    privilege: 0,
+  },
+})
 
 export default class TMXDetailsWindow extends PopupWindow {
   private readonly grid: Grid

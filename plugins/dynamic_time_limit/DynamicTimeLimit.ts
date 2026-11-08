@@ -1,6 +1,24 @@
-import config from './Config.js'
+import userConfig from './Config.js'
 import 'dotenv/config'
 import type { DynamicTimeLimitMode } from './Types.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  isActive: false,
+  defaultMode: 'author',
+  defaultMultiplier: 10,
+  sendTimeLimitMessage: true,
+  enableCommand: {
+    privilege: 3,
+    aliases: ['edtl', 'enabledynamictimelimit'],
+    public: true,
+  },
+  disableCommand: {
+    privilege: 3,
+    aliases: ['ddtl', 'disabledynamictimelimit'],
+    public: true,
+  },
+})
 
 let isActive = config.isActive && config.isEnabled
 let dynamicTimeLimitMode: DynamicTimeLimitMode = config.defaultMode as DynamicTimeLimitMode

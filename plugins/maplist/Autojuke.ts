@@ -4,8 +4,7 @@
  * @since 0.4
  */
 
-import { maplist } from './Maplist.js'
-import config from './Config.js'
+import { config, maplist } from './Maplist.js'
 
 const chooseAndAddMap = (
   maps: tm.Map[],

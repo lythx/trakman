@@ -4,8 +4,16 @@
  */
 
 import { donations } from '../../../donations/Donations.js'
-import { centeredText, componentIds, StaticComponent, StaticHeader } from '../../UI.js'
-import config from './DonationPanel.config.js'
+import { centeredText, componentIds, raceConfig, StaticComponent, StaticHeader } from '../../UI.js'
+import userConfig from './DonationPanel.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 4.49,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  hidePanel: true,
+  amounts: [50, 100, 200, 500, 1000, 5000],
+})
 
 export default class DonationPanel extends StaticComponent {
   private readonly header: StaticHeader

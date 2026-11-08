@@ -2,8 +2,32 @@
  * @author lythx
  * @since 1.2
  */
-import { centeredText, componentIds, Grid, type GridCellFunction, StaticComponent, StaticHeader } from '../../UI.js'
-import config from './TeamScore.config.js'
+import {
+  centeredText,
+  componentIds,
+  Grid,
+  type GridCellFunction,
+  raceConfig,
+  StaticComponent,
+  StaticHeader,
+} from '../../UI.js'
+import userConfig from './TeamScore.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 5.5,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  text: {
+    specialFont: true,
+    textScale: 0.5,
+  },
+  colours: {
+    left: tm.utils.palette.purple + '8',
+    middle: raceConfig.background,
+    right: tm.utils.palette.red + '8',
+  },
+  hidePanel: true,
+})
 
 export default class TeamScore extends StaticComponent {
   private readonly header: StaticHeader

@@ -3,9 +3,51 @@
  * @since 0.4
  */
 
-import { centeredText, componentIds, StaticComponent, StaticHeader, type StaticHeaderOptions } from '../../UI.js'
-import config from './CpCounter.config.js'
+import {
+  centeredText,
+  componentIds,
+  icons,
+  raceConfig,
+  StaticComponent,
+  StaticHeader,
+  type StaticHeaderOptions,
+} from '../../UI.js'
+import userConfig from './CpCounter.config.js'
 import { dedimania, type DediRecord } from '../../../dedimania/Dedimania.js'
+
+const p = tm.utils.palette
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 2.17,
+  width: raceConfig.width,
+  useRelative: false,
+  posX: 12,
+  posY: -37,
+  margin: raceConfig.margin,
+  side: true,
+  times: true,
+  rectangleWidth: 7.7,
+  noCpsWidth: raceConfig.width - raceConfig.margin - 1.7,
+  colours: {
+    default: 'CCC',
+    cpsCollected: p.green,
+    worse: p.red,
+    better: p.purple,
+    equal: p.yellow,
+    finish: p.green,
+  },
+  lap: {
+    iconBottom: icons.lap,
+    iconTop: icons.clockLap,
+    lapText: 'Lap',
+    lapTextWidth: 2.7,
+    lapCounterWidth: 3.2,
+    checkpointText: 'CP',
+    checkpointTextWidth: 2,
+  },
+  finishTextDuration: 3000,
+  hidePanel: false,
+})
 
 interface CheckpointData {
   index: number

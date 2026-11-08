@@ -1,4 +1,27 @@
-import config from '../config/JukeboxCommands.config.js'
+import userConfig from '../config/JukeboxCommands.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  dropjukebox: {
+    public: true,
+    privilege: 1,
+    aliases: ['dq', 'djb', 'dropqueue', 'dropjukebox'],
+  },
+  clearjukebox: {
+    public: true,
+    privilege: 1,
+    aliases: ['cq', 'cjb', 'clearqueue', 'clearjukebox'],
+  },
+  shuffle: {
+    public: true,
+    privilege: 2,
+    aliases: ['shuf', 'shuffle'],
+  },
+  clearhistory: {
+    public: true,
+    privilege: 2,
+    aliases: ['ch', 'clearhistory'],
+  },
+})
 
 const commands: tm.Command[] = [
   {

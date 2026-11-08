@@ -1,6 +1,17 @@
-import { componentIds, leftAlignedText, StaticComponent, StaticHeader } from '../../ui/UI.js'
+import { componentIds, leftAlignedText, raceConfig, StaticComponent, StaticHeader } from '../../ui/UI.js'
 import type { Song } from '../Types.js'
-import config from './MusicWidget.config.js'
+import userConfig from './MusicWidget.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 7,
+  margin: raceConfig.margin,
+  width: raceConfig.width,
+  side: true,
+  textScale: 0.9,
+  textPadding: 0.15,
+  iconWidth: 1.7,
+  hidePanel: true,
+})
 
 export default class MusicWidget extends StaticComponent {
   private song: Song | undefined

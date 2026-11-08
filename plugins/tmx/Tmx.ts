@@ -1,6 +1,12 @@
-import config from './Config.js'
+import userConfig from './Config.js'
 import type { TMXMapChangedInfo } from './TmxTypes.js'
 import './ui/TMXWindow.component.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  queueCount: 4,
+  historyCount: 4,
+})
 
 // fill with empty strings at start to avoid undefined error on startup
 const history: (tm.TMXMap | string)[] = []

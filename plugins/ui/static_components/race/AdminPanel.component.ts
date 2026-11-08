@@ -8,11 +8,48 @@ import {
   componentIds,
   Grid,
   type GridCellFunction,
+  icons,
+  raceConfig,
   StaticComponent,
   StaticHeader,
 } from '../../UI.js'
-import config from './AdminPanel.config.js'
+import userConfig from './AdminPanel.config.js'
 import { actions } from '../../../actions/Actions.js'
+
+const p = tm.utils.palette
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 5,
+  width: raceConfig.width,
+  privilege: 1,
+  margin: raceConfig.margin,
+  public: true,
+  hidePanel: true,
+  icons: {
+    players: icons.playerList,
+    restart: icons.restart,
+    previous: icons.pageLeft,
+    requeue: icons.requeue,
+    skip: icons.pageRight,
+    endRound: icons.pageLast,
+    jukebox: icons.mapList,
+  },
+  iconsHover: {
+    players: icons.playerListHover,
+    restart: icons.restartHover,
+    previous: icons.pageLeftHover,
+    requeue: icons.requeueHover,
+    skip: icons.pageRightHover,
+    endRound: icons.pageLastHover,
+    jukebox: icons.mapListHover,
+  },
+  messages: {
+    skip: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has skipped the ongoing map.`,
+    previous: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has requeued the previous map.`,
+    restart: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has restarted the ongoing map.`,
+    endRound: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has forced the ongoing round to end.`,
+  },
+})
 
 export default class AdminPanel extends StaticComponent {
   private readonly header: StaticHeader

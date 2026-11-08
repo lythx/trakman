@@ -4,7 +4,23 @@
  */
 
 import { closeButton, componentIds, PopupWindow } from '../UI.js'
-import config from './WarnWindow.config.js'
+import userConfig from './WarnWindow.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  width: 60,
+  height: 40,
+  padding: 2.5,
+  textSize: 2.7,
+  warn: {
+    aliases: ['warn'],
+    privilege: 1,
+    public: true,
+  },
+  wall: {
+    aliases: ['wall', 'adminmsg', 'mta'],
+    privilege: 2,
+  },
+})
 
 interface DisplayParams {
   message?: string

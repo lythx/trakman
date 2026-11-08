@@ -1,8 +1,13 @@
 import fetch from 'node-fetch'
 import xml2js from 'xml2js'
 import type { MKMapVotes, MKVote } from './ManiakarmaTypes.js'
-import config from './Config.js'
+import userConfig from './Config.js'
 import countries from './Countries.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  reconnectTimeout: 300,
+})
 
 let authCode: string
 let isConnected = false

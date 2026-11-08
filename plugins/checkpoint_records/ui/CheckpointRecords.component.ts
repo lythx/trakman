@@ -13,8 +13,60 @@ import {
   Paginator,
   PopupWindow,
 } from '../../ui/UI.js'
-import { checkpointRecords } from '../../checkpoint_records/CheckpointRecords.js'
-import config from './CheckpointRecords.config.js'
+import { checkpointRecords } from '../CheckpointRecords.js'
+import userConfig from './CheckpointRecords.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 14,
+  columnProportions: [0.7, 2, 2, 2, 1, 1.5],
+  navbar: [
+    {
+      name: 'Sector Records',
+      actionId: componentIds.sectorRecords,
+    },
+    {
+      name: 'Dedi Checkpoints',
+      actionId: componentIds.dediCps,
+    },
+    {
+      name: 'Dedi Sectors',
+      actionId: componentIds.dediSectors,
+    },
+    {
+      name: 'Local Checkpoints',
+      actionId: componentIds.localCps,
+    },
+    {
+      name: 'Local Sectors',
+      actionId: componentIds.localSectors,
+    },
+  ],
+  stuntsNavbar: [
+    {
+      name: 'Sector Records',
+      actionId: componentIds.sectorRecords,
+    },
+    {
+      name: 'Ulti Records',
+      actionId: componentIds.ultiRecords,
+    },
+    {
+      name: 'Local Checkpoints',
+      actionId: componentIds.localCps,
+    },
+    {
+      name: 'Local Sectors',
+      actionId: componentIds.localSectors,
+    },
+  ],
+  grid: {
+    margin: 0.15,
+  },
+  command: {
+    aliases: ['cpr', 'cprecs'],
+    privilege: 0,
+  },
+})
 
 class CheckpointRecords extends PopupWindow {
   private readonly grid: Grid

@@ -1,7 +1,6 @@
-import config from './Config.js'
 import songList from './SongList.js'
 import type { Caller, QueueChangedCallback, Song, SongAddedCallback, SongRemovedCallback } from './Types.js'
-import SongList from './ui/SongList.component.js'
+import SongList, { pluginConfig as config } from './ui/SongList.component.js'
 import MusicWidget from './ui/MusicWidget.component.js'
 import fs from 'fs/promises'
 

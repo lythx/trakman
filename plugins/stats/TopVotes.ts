@@ -1,4 +1,8 @@
-import config from './Config.js'
+import userConfig from './Config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  votesCount: 100000,
+})
 
 let onlineList: {
   readonly login: string

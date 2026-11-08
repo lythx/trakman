@@ -5,7 +5,16 @@
 
 import { componentIds, List, StaticComponent, StaticHeader } from '../../UI.js'
 import { stats } from '../../../stats/Stats.js'
-import config from './VotersRanking.config.js'
+import userConfig from './VotersRanking.config.js'
+import cfg from '../../config/ResultUi.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 5,
+  entryHeight: 2.15,
+  width: cfg.width,
+  margin: cfg.margin,
+  columnProportions: [1, 1.9, 5.1],
+})
 
 export default class VotersRanking extends StaticComponent {
   private readonly header: StaticHeader
