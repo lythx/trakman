@@ -140,7 +140,7 @@ class SectorRecords extends PopupWindow {
         const noTimeText = tm.getGameMode() === 'Stunts' ? config.stuntsNoTimeText : config.noTimeText
         return centeredText(noTimeText, w, h)
       }
-      const sum = sectors.map(a => a?.sector ?? 0).reduce((acc, cur) => acc += cur)
+      const sum = sectors.map(a => a?.sector ?? 0).reduce((acc, cur) => acc + cur)
       return centeredText(tm.utils.getTimeString(sum), w, h)
     }
 
@@ -158,9 +158,9 @@ class SectorRecords extends PopupWindow {
         worseSign = '-'
       }
       let differenceString = ''
-      const sum = secs.map(a => a === null ? 0 : a).reduce((acc, cur) => acc += cur)
+      const sum = secs.map(a => a === null ? 0 : a).reduce((acc, cur) => acc + cur)
       if (!sectors.some(a => a === null)) {
-        const bestSum = sectors.map(a => a?.sector ?? 0).reduce((acc, cur) => acc += cur)
+        const bestSum = sectors.map(a => a?.sector ?? 0).reduce((acc, cur) => acc + cur)
         const difference = bestSum - sum
         if (difference > 0) {
           differenceString = `($${config.colours.better}${betterSign}${tm.utils.getTimeString(difference)}$FFF)`

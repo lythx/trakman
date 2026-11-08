@@ -42,7 +42,7 @@ export class VoteRepository extends Repository {
     }
     try { // TODO Rarely service calls this method while the same entry exists therefore causing controller to crash
       await this.query(query, ...values)
-    } catch(err) {
+    } catch {
       Logger.debug(`Error while adding votes`, JSON.stringify(votes, null, 2))
     }
   }

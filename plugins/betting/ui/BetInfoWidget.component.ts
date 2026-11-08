@@ -27,7 +27,7 @@ export default class BetInfoWidget extends DynamicComponent {
     }
     const side = config.side === true ? 'right' : 'left'
     const data = components.staticHeights[tm.getGameMode()]
-    this.posY = config.topBorder - data[side].reduce((acc, cur) => acc += cur.getHeight() + config.marginBig, 0)
+    this.posY = config.topBorder - data[side].reduce((acc, cur) => acc + cur.getHeight() + config.marginBig, 0)
   }
 
   displayToPlayer(login: string): void {

@@ -14,7 +14,7 @@ import { Utils } from "./Utils.js";
 import { RoundsService } from "./services/RoundsService.js";
 
 let isRestart: boolean = false;
-let timeouts = new Array(260).fill(0); // playerId's range from 0 to ~250
+const timeouts = new Array(260).fill(0); // playerId's range from 0 to ~250
 
 export class Listeners {
   private static readonly listeners: tm.Listener[] = [
@@ -126,7 +126,7 @@ export class Listeners {
           return;
         }
         const cpsPerLap = MapService.current.checkpointsPerLap;
-        let div = player.currentCheckpoints.length / cpsPerLap;
+        const div = player.currentCheckpoints.length / cpsPerLap;
         const startIndex = cpsPerLap * Math.floor(div);
         const lapCheckpointIndex = checkpointIndex - startIndex;
         const lapCheckpointTime = timeOrScore - (player.currentCheckpoints[startIndex - 1]?.time ?? 0);

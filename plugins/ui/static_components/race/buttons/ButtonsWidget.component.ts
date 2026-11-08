@@ -42,7 +42,7 @@ export default class ButtonsWidget extends StaticComponent {
     // Use per-player dedicated server calls only if necessary to improve performance
     if (perPlayerButtonExists) {
       UiButton.onUpdate(() => {
-        let calls = []
+        const calls = []
         if (this.isDisplayed) {
           for (const player of tm.players.list) {
             calls.push({

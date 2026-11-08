@@ -93,7 +93,7 @@ let failedHealthChecks = 0
 
 setInterval(async () => {
   Logger.debug('Checking if the dedicated server is alive...')
-  let status = await Client.call('GetStatus')
+  const status = await Client.call('GetStatus')
   if (status instanceof Error) {
     failedHealthChecks++
     Logger.warn('Server did not respond to healthcheck')

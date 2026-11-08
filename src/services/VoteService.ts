@@ -173,7 +173,7 @@ export abstract class VoteService {
       '3': 100
     }
     const count = votes.length
-    const sum = votes.map(a => values[a.vote.toString() as keyof typeof values]).reduce((acc, cur) => acc += cur, 0)
+    const sum = votes.map(a => values[a.vote.toString() as keyof typeof values]).reduce((acc, cur) => acc + cur, 0)
     return count === 0 ? 0 : sum / count
   }
 

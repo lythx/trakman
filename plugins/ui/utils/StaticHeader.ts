@@ -81,7 +81,7 @@ export default class StaticHeader {
       (cfg as any)[k] = v
     }
     if (side) {
-      let label: string = ''
+      let label: string
       if (cfg.centerText) {
         label = centeredText(text, cfg.rectangleWidth, cfg.height, {
           textScale: cfg.textScale,
@@ -103,7 +103,7 @@ export default class StaticHeader {
           ${label}
          `
     } else {
-      let label: string = ''
+      let label: string
       if (cfg.centerText) {
         label = centeredText(text, cfg.rectangleWidth, cfg.height, {
           textScale: cfg.textScale,

@@ -48,7 +48,7 @@ export class Grid {
     this.height = height
     this.margin = options?.margin ?? 0
     const columnSum: number = columnProportions.reduce((acc, cur): number => acc + cur, 0)
-    const rowSum: number = rowProportions.reduce((acc, cur): number => acc += cur, 0)
+    const rowSum: number = rowProportions.reduce((acc, cur): number => acc + cur, 0)
     this.columnWidths = columnProportions.map(a => (a / columnSum) * (this.width - this.margin))
     this.rowHeights = rowProportions.map(a => (a / rowSum) * (this.height - this.margin))
     this.columns = columnProportions.length
@@ -65,7 +65,7 @@ export class Grid {
    */
   constructXml(objectsOrFunctions: (GridCellFunction | GridCellObject)[]): string {
     let xml: string = ``
-    let map: boolean[][] = Array.from(new Array(this.columns), () => new Array(this.rows).fill(false))
+    const map: boolean[][] = Array.from(new Array(this.columns), () => new Array(this.rows).fill(false))
     let indexOffset: number = 0
     for (let i: number = 0; i < this.rows; i++) {
       for (let j: number = 0; j < this.columns; j++) {
@@ -88,9 +88,9 @@ export class Grid {
           callback = obj
         }
         const posY: number = -this.rowHeights.filter((val, index): boolean => index < i)
-        .reduce((acc, cur): number => acc += cur, 0) - this.margin
+        .reduce((acc, cur): number => acc + cur, 0) - this.margin
         const posX: number = this.columnWidths.filter((val, index): boolean => index < j)
-        .reduce((acc, cur): number => acc += cur, 0) + this.margin
+        .reduce((acc, cur): number => acc + cur, 0) + this.margin
         let h: number = -this.margin
         for (let k: number = i; k < i + rowspan; k++) {
           h += this.rowHeights[k]

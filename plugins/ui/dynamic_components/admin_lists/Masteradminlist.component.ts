@@ -90,12 +90,9 @@ export default class Masteradminlist extends PopupWindow<{
       centeredText('$' + config.selfColour + masteradminlist[i + index].login, w, h) :
       centeredText(masteradminlist[i + index].login, w, h)
     const promoteButton: GridCellFunction = (i, j, w, h) => {
-      let actionStr = ` action="${this.openId + i + 1000 + index}"`
-      let cover = ''
-      actionStr = ''
-      cover = `<quad posn="0 0 4" sizen="${w} ${h}" bgcolor="${config.disabledColour}"/>`
+      const cover: string = `<quad posn="0 0 4" sizen="${w} ${h}" bgcolor="${config.disabledColour}"/>`
       return `${cover}<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.promoteIcon}"
-    imagefocus="${config.promoteIconHover}" halign="center" valign="center"${actionStr}/> `
+    imagefocus="${config.promoteIconHover}" halign="center" valign="center" /> `
     }
     const demoteButton: GridCellFunction = (i, j, w, h) => {
       let actionStr = ` action="${this.openId + i + 2000 + index}"`

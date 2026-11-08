@@ -34,7 +34,7 @@ export default class BetPlaceWindow extends DynamicComponent {
     const data = components.staticHeights[tm.getGameMode()]
     this.height = config.staticPos.height ?? data[side][config.relativePos.widgetNumber]?.getHeight() ?? 0
     this.posY = config.staticPos.posY ?? (config.topBorder - data[side].slice(0, config.relativePos.widgetNumber)
-    .reduce((acc, cur) => acc += cur.getHeight() + config.marginBig, 0))
+    .reduce((acc, cur) => acc + cur.getHeight() + config.marginBig, 0))
   }
 
   displayToPlayer(login: string, params: {

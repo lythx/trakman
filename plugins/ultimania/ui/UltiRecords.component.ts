@@ -71,12 +71,10 @@ export default class UltiRecords extends PopupWindow {
       return centeredText(tm.utils.getTimeString(records[i + playerIndex].score), w, h)
     }
 
-    let grid: Grid
-    let headers: GridCellFunction[] = []
-    headers = [(i, j, w, h) => centeredText(' Lp. ', w, h), (i, j, w, h) => centeredText(' Nickname ', w, h),
+    const headers: GridCellFunction[] = [(i, j, w, h) => centeredText(' Lp. ', w, h), (i, j, w, h) => centeredText(' Nickname ', w, h),
       (i, j, w, h) => centeredText(' Login ', w, h), (i, j, w, h) => centeredText(' Date ', w, h),
       (i, j, w, h) => centeredText(' Score ', w, h)]
-    grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
+    const grid: Grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(this.entries + 1).fill(1), config.grid)
     const arr = [...headers]
     for (let i = 0; i < entriesToDisplay; i++) {

@@ -190,8 +190,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
         }
       }
     }
-    let indices: number[]
-    indices = tm.utils.matchString(query, commands.map(a => a.help ?? ''))
+    const indices: number[] = tm.utils.matchString(query, commands.map(a => a.help ?? ''))
     const list: tm.Command[] = [...indices.map(a => commands[a]), ...matchedAliases].filter(
       (a, i, arr) => arr.indexOf(a) === i)
     if (list.length === 0) {

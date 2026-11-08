@@ -450,8 +450,8 @@ export default class MapList extends PopupWindow<{
     actionId: number,
     deleteId: number
   } {
-    let actionId = -1
-    let deleteId = -1
+    let actionId
+    let deleteId
     const mapActionId: number = this.mapActionIds.indexOf(mapId)
     if (mapActionId !== -1) {
       actionId = mapActionId + this.openId + this.mapAddId

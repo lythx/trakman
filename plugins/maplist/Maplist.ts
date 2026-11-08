@@ -10,7 +10,7 @@ let worstAtSort: tm.Map[] = []
 let newestSort: tm.Map[] = []
 let oldestSort: tm.Map[] = []
 const jukebox: tm.Map[] = []
-let cache: {
+const cache: {
   type: 'best' | 'worst' | 'name' | 'author' | 'nofin' | 'norank' | 'noauthor' | 'newest' | 'oldest',
   query: string,
   list: tm.Map[]
@@ -66,7 +66,7 @@ async function removeMap(map: tm.MapRemovedInfo): Promise<void> {
   for (const e of updateListeners) { e('remove', map) }
 }
 
-function addOrRemove(map: tm.MapAddedInfo | tm.MapAddedInfo[], fun: Function): void {
+function addOrRemove(map: tm.MapAddedInfo | tm.MapAddedInfo[], fun: (m: tm.MapAddedInfo | tm.MapRemovedInfo) => Promise<void>): void {
   if (!Array.isArray(map)) {
     void fun(map)
     return

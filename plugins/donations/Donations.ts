@@ -79,7 +79,7 @@ async function getFromDB(logins: string | string[]): Promise<DonationInfo | unde
     return {
       login: logins,
       nickname: res[0].nickname,
-      sum: res.reduce((acc, cur) => acc += cur.amount, 0),
+      sum: res.reduce((acc, cur) => acc + cur.amount, 0),
       history: res.map(a => ({
         amount: a.amount,
         date: a.date
@@ -103,7 +103,7 @@ async function getFromDB(logins: string | string[]): Promise<DonationInfo | unde
     ret.push({
       login,
       nickname: arr[0]?.nickname,
-      sum: arr.reduce((acc, cur) => acc += cur.amount, 0),
+      sum: arr.reduce((acc, cur) => acc + cur.amount, 0),
       history: arr.map(a => ({
         amount: a.amount,
         date: a.date

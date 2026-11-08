@@ -59,7 +59,7 @@ export class RecordService {
       const ranks = this._playerRanks.filter(a => a.mapId === MapService.current.id)
       const rec = ranks.find(a => a.login === info.login)
       if (rec !== undefined) {
-        rec.rank === info.position
+        rec.rank = info.position
       } else {
         this._playerRanks.push({
           login: info.login,

@@ -3,6 +3,7 @@ import fs from 'fs/promises'
 import UiComponent from './ui/ServerLinks.component.js'
 import http from 'http'
 import fetch from 'node-fetch'
+import { Logger } from '../../src/Logger'
 
 export interface Server {
   name: string
@@ -67,7 +68,9 @@ async function updateDataFile() {
   }
   try {
     await fs.writeFile(config.dataFilePath, JSON.stringify(serverData))
-  } catch { }
+  } catch (err) {
+    tm.log.error(`Could not write server data file`, err)
+  }
 }
 
 async function refreshOtherServersData() {

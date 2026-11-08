@@ -185,7 +185,7 @@ export default class BestCps extends StaticComponent {
 
   private constructText(login: string, page: number): string {
     if (this.bestCps.length === 0) { return '' }
-    if (this.reduxModeEnabled) { login === '' }
+    if (this.reduxModeEnabled) { return '' }
     // bestCps[i] can be undefined if someone was driving while controller was off (first indexes dont exist) so im just returning empty cells
     const cpIndex: number = config.entries * (page - 1)
 

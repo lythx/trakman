@@ -30,7 +30,7 @@ try {
       process.exit()
     }
     await doUpdate(fromPath, newHashes, oldHashes)
-  } catch(e) {
+  } catch {
     console.log('.hashes.json file does not exist.')
     await doUpdate(fromPath, newHashes)
   }
@@ -49,7 +49,7 @@ async function hashFile(path) {
     hash.write(f)
     hash.end()
     return hash.read()
-  } catch(e) {
+  } catch {
     console.log('Cannot read file ' + path)
     return ''
   }

@@ -172,7 +172,7 @@ export default class RecordList {
         `Expected 3 numbers in column proportions array in recordlist, received ${options.columnProportions}`)
     }
     const columnProportions: number[] = options?.columnProportions ?? this.config.columnProportions
-    const proportionsSum: number = columnProportions.reduce((acc, cur): number => acc += cur, 0)
+    const proportionsSum: number = columnProportions.reduce((acc, cur): number => acc + cur, 0)
     this.columnWidths = columnProportions.map(a => (a / proportionsSum) * (width + this.columnGap))
     this.noRecordEntry = noRecordEntry
     this.getColoursFromPb = options?.getColoursFromPb ?? false

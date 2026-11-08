@@ -97,7 +97,7 @@ export default class DediCps extends PopupWindow {
     const emptyCell = (): string => ''
 
     let grid: Grid
-    let headers: GridCellFunction[] = []
+    let headers: GridCellFunction[]
     if (params.cpPage === 1) {
       headers = [(i, j, w, h) => centeredText(' Lp. ', w, h), (i, j, w, h) => centeredText(' Nickname ', w, h),
         (i, j, w, h) => centeredText(' Login ', w, h), ...new Array(cpsToDisplay).fill(

@@ -160,7 +160,7 @@ export default class TimerWidget extends StaticComponent {
 
   private constructXml(isDynamic: boolean): string {
     const headerHeight: number = this.header.options.height
-    let headerXml = isDynamic ? this.getButtonsXml() : this.header.constructXml(config.title, config.icon, this.side)
+    const headerXml = isDynamic ? this.getButtonsXml() : this.header.constructXml(config.title, config.icon, this.side)
     let timeXml = ''
     let bottomH = config.height - (headerHeight + config.margin)
     const isStunts = tm.getGameMode() === 'Stunts'
@@ -193,7 +193,7 @@ export default class TimerWidget extends StaticComponent {
         })
       }
     }
-    let stuntsMargin = (isStunts && isDynamic) ? config.stuntsDynamicMarginTop : 0
+    const stuntsMargin = (isStunts && isDynamic) ? config.stuntsDynamicMarginTop : 0
     if (isStunts && !isDynamic) {
       return `
     <manialink id="${this.id}">

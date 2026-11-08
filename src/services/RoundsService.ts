@@ -238,7 +238,7 @@ export class RoundsService {
           roundTimes[this.finishedRounds - 1] = -1
         }
       }
-      let ranking: any[] | Error = []
+      let ranking: any[] | Error
       let attempts = 0
       // this is stupid but sometimes the server just doesn't respond for no reason
       do {

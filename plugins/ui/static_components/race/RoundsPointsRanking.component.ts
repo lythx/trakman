@@ -62,8 +62,8 @@ export default class RoundsPointsRanking extends StaticComponent {
   }
 
   private getRecordList(): void {
-    let height = this.getHeight()
-    let entries = this.getEntries()
+    const height = this.getHeight()
+    const entries = this.getEntries()
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width,
       height - (this.header.options.height + config.margin), entries, this.side, this.getTopCount(),

@@ -47,8 +47,8 @@ export default class LapRanking extends StaticComponent {
   }
 
   private getRecordList() {
-    let entries = config.entries
-    let height = this.getHeight()
+    const entries = config.entries
+    const height = this.getHeight()
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width,
       height - (this.header.options.height + config.margin), entries, this.side, config.topCount,

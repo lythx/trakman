@@ -107,13 +107,12 @@ export const Utils = {
     }
     const textSplit: string[] = text.split('')
     let gradient: string = ''
-    let [startRGB, endRGB] = [this.getRGB(startColour), this.getRGB(endColour)]
-    let colours: string[] = []
+    const [startRGB, endRGB] = [this.getRGB(startColour), this.getRGB(endColour)]
+    const colours: string[] = []
     let alpha: number = 0.0
     for (let i = 0; i !== length; i++) {
-      let cc: Array<number> = []
       alpha += (1.0 / length)
-      cc = [startRGB[0] * alpha + (1 - alpha) * endRGB[0], startRGB[1] * alpha + (1 - alpha) * endRGB[1],
+      const cc: Array<number> = [startRGB[0] * alpha + (1 - alpha) * endRGB[0], startRGB[1] * alpha + (1 - alpha) * endRGB[1],
       startRGB[2] * alpha + (1 - alpha) * endRGB[2]]
       colours.push(this.getHex(cc, false))
     }
@@ -143,7 +142,7 @@ export const Utils = {
    * @returns Hex colour string
    */
   getHex(rgb: Array<number>, getFull: boolean = true): string {
-    let hex: string = (1 << 24 | rgb[0] << 16 | rgb[1] << 8 | rgb[2]).toString(16).slice(1)
+    const hex: string = (1 << 24 | rgb[0] << 16 | rgb[1] << 8 | rgb[2]).toString(16).slice(1)
     return getFull ? hex : hex[0] + hex[2] + hex[4] // idk maybe this can be done better
   },
 
@@ -186,7 +185,7 @@ export const Utils = {
     country: string,
     countryCode: string
   } {
-    let split = region.split('|')
+    const split = region.split('|')
     if (region.startsWith('World')) {
       split.shift()
     }
@@ -414,7 +413,7 @@ export const Utils = {
     let res: string
     try {
       res = decodeURIComponent(str)
-    } catch (e) {
+    } catch {
       // try to cut off the last percent sign and try again
       // this failure happens so little I do not care about speed that much
       // it looks much better usually

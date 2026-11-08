@@ -156,28 +156,31 @@ export abstract class ChatService {
           continue
         }
         switch(param.type) {
-          case 'int':
+          case 'int': {
             if (!Number.isInteger(Number(params[i]))) {
               this.sendErrorMessage(Utils.strVar(messages.notInt, { name: param.name }), info.login)
               return
             }
             parsedParams.push(Number(params[i]))
             break
-          case 'double':
+          }
+          case 'double': {
             if (isNaN(Number(params[i]))) {
               this.sendErrorMessage(Utils.strVar(messages.notDouble, { name: param.name }), info.login)
               return
             }
             parsedParams.push(Number(params[i]))
             break
-          case 'boolean':
+          }
+          case 'boolean': {
             if (![...config.truthyParams, ...config.falsyParams].includes(params[i].toLowerCase())) {
               this.sendErrorMessage(Utils.strVar(messages.notBoolean, { name: param.name }), info.login)
               return
             }
             parsedParams.push(config.truthyParams.includes(params[i].toLowerCase()))
             break
-          case 'time':
+          }
+          case 'time': {
             const timeOrError = Utils.parseTimeString(params[i])
             if (timeOrError instanceof RangeError) {
               this.sendErrorMessage(Utils.strVar(messages.timeTooBig, { name: param.name }), info.login)
@@ -188,6 +191,7 @@ export abstract class ChatService {
             }
             parsedParams.push(timeOrError)
             break
+          }
           case 'player': {
             let player = PlayerService.get(params[i])
             if (player === undefined) {
@@ -212,7 +216,7 @@ export abstract class ChatService {
             parsedParams.push(player)
             break
           }
-          case 'multiword':
+          case 'multiword': {
             const split: string[] = input.split(' ')
             let n: number = 0
             while (true) {
@@ -226,6 +230,7 @@ export abstract class ChatService {
               }
             }
             break
+          }
           default:
             parsedParams.push(params[i])
         }

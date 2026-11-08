@@ -130,10 +130,9 @@ export default class LiveCpsRanking extends StaticComponent {
       currentCp: a.currentCp,
       finished: a.finished
     }))
-    let content: string
     this.title = config.title
     // actual cp times could be added but i dont think recordlist can handle the refresh in that case
-    content = this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, records
+    const content: string = this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, records
     .map(a => ({
       name: a.nickname,
       time: a.time,
@@ -173,14 +172,12 @@ export default class LiveCpsRanking extends StaticComponent {
   private getRecordList(): void {
     const entries = this.getEntries()
     const height = this.getHeight()
-    let dontParseTime = false
-    let noRecordEntryText: string | undefined
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width,
       height - (this.header.options.height + config.margin), entries, this.side, this.getTopCount(),
       tm.records.maxLocalsAmount, config.displayNoRecordEntry, {
-        dontParseTime,
-        noRecordEntryText
+        dontParseTime: false,
+        noRecordEntryText: undefined
       })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       if (this.reduxModeEnabled) { return }

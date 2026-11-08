@@ -152,7 +152,7 @@ export default class SongList extends PopupWindow<DisplayParams> {
   }
 
   private getSearchResult(query: string, target: SearchTarget) {
-    let indices: number[] = tm.utils.matchString(query, this.songs.map(a => a[target]))
+    const indices: number[] = tm.utils.matchString(query, this.songs.map(a => a[target]))
     return indices.map(a => this.songs[a])
   }
 

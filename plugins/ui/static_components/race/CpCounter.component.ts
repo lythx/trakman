@@ -310,9 +310,9 @@ export default class CpCounter extends StaticComponent {
     if (lapsAmount === data?.index) {
       lapColour = config.colours.cpsCollected
     }
-    let lapTextW: number = config.lap.lapTextWidth
-    let lapCounter: string = `$${lapColour}${data?.index ?? 1}/${lapsAmount}`
-    let lapCounterXml: string = `
+    const lapTextW: number = config.lap.lapTextWidth
+    const lapCounter: string = `$${lapColour}${data?.index ?? 1}/${lapsAmount}`
+    const lapCounterXml: string = `
     <frame posn="${h.squareWidth + h.margin * 2 + lapTextW} 0 3">
       <quad posn="0 0 3" sizen="${lapCounterW} ${h.height}" bgcolor="${h.textBackground}"/>
       ${centeredText(lapCounter, lapCounterW, h.height, h)}
@@ -323,10 +323,10 @@ export default class CpCounter extends StaticComponent {
       cpColour = config.colours.cpsCollected
     }
     const cpX = h.squareWidth + h.margin * 2 + lapTextW + lapCounterW + config.margin
-    let cpTextW: number = config.lap.checkpointTextWidth
+    const cpTextW: number = config.lap.checkpointTextWidth
     const cpCounterW: number = config.width - (cpX + cpTextW)
-    let cpCounter: string = `$${cpColour}${data?.cpIndex ?? 0}/${cpAmount}`
-    let cpCounterXml: string = `
+    const cpCounter: string = `$${cpColour}${data?.cpIndex ?? 0}/${cpAmount}`
+    const cpCounterXml: string = `
     <frame posn="${config.margin + cpTextW} 0 3">
       <quad posn="0 0 3" sizen="${cpCounterW} ${h.height}" bgcolor="${h.textBackground}"/>
       ${centeredText(cpCounter, cpCounterW, h.height, h)}

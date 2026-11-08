@@ -187,7 +187,7 @@ export default class Paginator {
         return this._pageCount
       case this.parentId + ID.jumpBackwards:
         page -= 10
-        if (page < 1) { return page = 1 }
+        if (page < 1) { return 1 }
         return page
       case this.parentId + ID.jumpForwards: {
         const lastPage: number = this._pageCount
