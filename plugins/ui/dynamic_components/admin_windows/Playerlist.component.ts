@@ -4,14 +4,22 @@
  */
 
 import { actions } from '../../../actions/Actions.js'
-import { addManialinkListener, centeredText, closeButton, componentIds, Grid, type GridCellFunction, Paginator, PopupWindow } from '../../UI.js'
+import {
+  addManialinkListener,
+  centeredText,
+  closeButton,
+  componentIds,
+  Grid,
+  type GridCellFunction,
+  Paginator,
+  PopupWindow,
+} from '../../UI.js'
 import config from './Playerlist.config.js'
 
 export default class PlayerList extends PopupWindow<{
-  page: number,
+  page: number
   privilege: number
 }> {
-
   readonly grid: Grid
   readonly paginator: Paginator
   readonly actions = {
@@ -20,45 +28,67 @@ export default class PlayerList extends PopupWindow<{
     mute: 3000,
     addGuest: 4000,
     blacklist: 5000,
-    ban: 6000
+    ban: 6000,
   }
 
   constructor() {
     super(componentIds.playerList, config.icon, config.title, config.navbar)
-    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
-      new Array(config.entries).fill(1), config.grid)
-    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
-      Math.ceil(tm.players.count / config.entries))
+    this.grid = new Grid(
+      this.contentWidth,
+      this.contentHeight,
+      config.columnProportions,
+      new Array(config.entries).fill(1),
+      config.grid
+    )
+    this.paginator = new Paginator(
+      this.openId,
+      this.contentWidth,
+      this.footerHeight,
+      Math.ceil(tm.players.count / config.entries)
+    )
     this.paginator.onPageChange = (login, page, info) => {
-      this.displayToPlayer(login, {
-        page,
-        privilege: info.privilege
-      }, `${page}/${this.paginator.pageCount}`, info.privilege)
+      this.displayToPlayer(
+        login,
+        {
+          page,
+          privilege: info.privilege,
+        },
+        `${page}/${this.paginator.pageCount}`,
+        info.privilege
+      )
     }
-    tm.addListener(['PlayerLeave', 'PlayerJoin', 'PlayerInfoChanged', 'Mute', 'Unmute', 'AddGuest', 'RemoveGuest'],
+    tm.addListener(
+      ['PlayerLeave', 'PlayerJoin', 'PlayerInfoChanged', 'Mute', 'Unmute', 'AddGuest', 'RemoveGuest'],
       () => {
         this.paginator.setPageCount(Math.ceil(tm.players.count / config.entries))
         this.reRender()
-      })
+      }
+    )
     tm.addListener('PrivilegeChanged', (info) => {
-      if (info.newPrivilege < config.privilege) { this.hideToPlayer(info.login) }
+      if (info.newPrivilege < config.privilege) {
+        this.hideToPlayer(info.login)
+      }
       this.reRender()
     })
     tm.commands.add({
       aliases: config.command.aliases,
       help: config.command.help,
       callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
-      privilege: config.command.privilege
+      privilege: config.command.privilege,
     })
     tm.addListener('PlayerDataUpdated', () => this.reRender())
     addManialinkListener(this.openId + this.actions.kick, 1000, (info, offset) => {
       const target = tm.players.list[offset]
-      if (target === undefined) { return }
+      if (target === undefined) {
+        return
+      }
       actions.kick(info, target)
     })
     addManialinkListener(this.openId + this.actions.forceSpec, 1000, (info, offset) => {
       const target = tm.players.list[offset]
-      if (target === undefined) { return }
+      if (target === undefined) {
+        return
+      }
       if (target.isSpectator) {
         actions.forcePlay(info, target)
       } else {
@@ -67,7 +97,9 @@ export default class PlayerList extends PopupWindow<{
     })
     addManialinkListener(this.openId + this.actions.mute, 1000, (info, offset) => {
       const target = tm.players.list[offset]
-      if (target === undefined) { return }
+      if (target === undefined) {
+        return
+      }
       if (tm.admin.getMute(target.login) === undefined) {
         actions.mute(info, target)
       } else {
@@ -76,7 +108,9 @@ export default class PlayerList extends PopupWindow<{
     })
     addManialinkListener(this.openId + this.actions.addGuest, 1000, (info, offset) => {
       const target = tm.players.list[offset]
-      if (target === undefined) { return }
+      if (target === undefined) {
+        return
+      }
       if (tm.admin.getGuest(target.login) === undefined) {
         actions.addGuest(info, target)
       } else {
@@ -85,22 +119,31 @@ export default class PlayerList extends PopupWindow<{
     })
     addManialinkListener(this.openId + this.actions.blacklist, 1000, (info, offset) => {
       const target = tm.players.list[offset]
-      if (target === undefined) { return }
+      if (target === undefined) {
+        return
+      }
       actions.blacklist(info, target)
     })
     addManialinkListener(this.openId + this.actions.ban, 1000, (info, offset) => {
       const target = tm.players.list[offset]
-      if (target === undefined) { return }
+      if (target === undefined) {
+        return
+      }
       actions.ban(info, target)
     })
   }
 
   protected onOpen(info: tm.ManialinkClickInfo): void {
     const page = this.paginator.getPageByLogin(info.login)
-    this.displayToPlayer(info.login, {
-      page,
-      privilege: info.privilege
-    }, `${page}/${this.paginator.pageCount}`, info.privilege)
+    this.displayToPlayer(
+      info.login,
+      {
+        page,
+        privilege: info.privilege,
+      },
+      `${page}/${this.paginator.pageCount}`,
+      info.privilege
+    )
   }
 
   private reRender(): void {
@@ -108,29 +151,43 @@ export default class PlayerList extends PopupWindow<{
     for (const player of players) {
       const page = this.paginator.getPageByLogin(player.login)
       const privilege = tm.players.get(player.login)?.privilege ?? 0
-      this.displayToPlayer(player.login, {
-        page,
+      this.displayToPlayer(
+        player.login,
+        {
+          page,
+          privilege,
+        },
+        `${page}/${this.paginator.pageCount} `,
         privilege
-      }, `${page}/${this.paginator.pageCount} `, privilege)
+      )
     }
   }
 
-  protected constructContent(login: string, params: {
-    page: number,
-    privilege: number
-  }): string {
+  protected constructContent(
+    login: string,
+    params: {
+      page: number
+      privilege: number
+    }
+  ): string {
     const page = params.page
     const privilege = params.privilege
     const index = (page - 1) * config.entries - 1
     const players = tm.players.list
     const mutelist = tm.admin.mutelist
     const guestlist = tm.admin.guestlist
-    const headers: GridCellFunction[] = [(i, j, w, h) => centeredText(' Index ', w, h),
-      (i, j, w, h) => centeredText(' Nickname ', w, h), (i, j, w, h) => centeredText(' Login ', w, h),
-      (i, j, w, h) => centeredText(' Privilege ', w, h), (i, j, w, h) => centeredText(' Kick ', w, h),
-      (i, j, w, h) => centeredText(' Mute ', w, h), (i, j, w, h) => centeredText(' Blacklist ', w, h),
-      (i, j, w, h) => centeredText(' Ban ', w, h), (i, j, w, h) => centeredText(' Guest ', w, h),
-      (i, j, w, h) => centeredText(' Forcespec ', w, h)]
+    const headers: GridCellFunction[] = [
+      (i, j, w, h) => centeredText(' Index ', w, h),
+      (i, j, w, h) => centeredText(' Nickname ', w, h),
+      (i, j, w, h) => centeredText(' Login ', w, h),
+      (i, j, w, h) => centeredText(' Privilege ', w, h),
+      (i, j, w, h) => centeredText(' Kick ', w, h),
+      (i, j, w, h) => centeredText(' Mute ', w, h),
+      (i, j, w, h) => centeredText(' Blacklist ', w, h),
+      (i, j, w, h) => centeredText(' Ban ', w, h),
+      (i, j, w, h) => centeredText(' Guest ', w, h),
+      (i, j, w, h) => centeredText(' Forcespec ', w, h),
+    ]
     const indexCell: GridCellFunction = (i, j, w, h) => {
       return centeredText((i + index + 1).toString(), w, h)
     }
@@ -139,14 +196,20 @@ export default class PlayerList extends PopupWindow<{
     }
     const loginCell: GridCellFunction = (i, j, w, h) => {
       let colour = ''
-      if (players[i + index].login === login) { colour = '$' + config.selfColour }
+      if (players[i + index].login === login) {
+        colour = '$' + config.selfColour
+      }
       return centeredText(colour + players[i + index].login, w, h)
     }
     const privilegeCell: GridCellFunction = (i, j, w, h) => {
       const privilege = players[i + index].privilege
       return centeredText(
-        '$' + config.privilegeColours[privilege as keyof typeof config.privilegeColours] + players[i + index].privilege.toString(),
-        w, h)
+        '$' +
+          config.privilegeColours[privilege as keyof typeof config.privilegeColours] +
+          players[i + index].privilege.toString(),
+        w,
+        h
+      )
     }
     const kickCell: GridCellFunction = (i, j, w, h) => {
       let actionStr = ` action="${this.openId + i + this.actions.kick + index}"`
@@ -167,7 +230,7 @@ export default class PlayerList extends PopupWindow<{
       }
       let icon = config.icons.mute
       let hoverIcon = config.hoverIcons.mute
-      if (mutelist.some(a => a.login === players[i + index].login)) {
+      if (mutelist.some((a) => a.login === players[i + index].login)) {
         icon = config.icons.unmute
         hoverIcon = config.hoverIcons.unmute
       }
@@ -177,7 +240,10 @@ export default class PlayerList extends PopupWindow<{
     const blacklistCell: GridCellFunction = (i, j, w, h) => {
       let actionStr = ` action="${this.openId + i + this.actions.blacklist + index}"`
       let cover = ''
-      if (params.privilege < tm.config.controller.privileges.blacklist || params.privilege <= players[i + index].privilege) {
+      if (
+        params.privilege < tm.config.controller.privileges.blacklist ||
+        params.privilege <= players[i + index].privilege
+      ) {
         actionStr = ''
         cover = `<quad posn="0 0 4" sizen="${w} ${h}" bgcolor="${config.disabledColour}"/>`
       }
@@ -203,7 +269,7 @@ export default class PlayerList extends PopupWindow<{
       }
       let icon = config.icons.addGuest
       let hoverIcon = config.hoverIcons.addGuest
-      if (guestlist.some(a => a.login === players[i + index].login)) {
+      if (guestlist.some((a) => a.login === players[i + index].login)) {
         icon = config.icons.removeGuest
         hoverIcon = config.hoverIcons.removeGuest
       }
@@ -229,8 +295,18 @@ export default class PlayerList extends PopupWindow<{
     const rows = Math.min(config.entries, players.length - (index + 1))
     const arr = headers
     for (let i = 0; i < rows; i++) {
-      arr.push(indexCell, nicknameCell, loginCell, privilegeCell, kickCell, muteCell, blacklistCell, banCell, guestCell,
-        forcespecCell)
+      arr.push(
+        indexCell,
+        nicknameCell,
+        loginCell,
+        privilegeCell,
+        kickCell,
+        muteCell,
+        blacklistCell,
+        banCell,
+        guestCell,
+        forcespecCell
+      )
     }
     return this.grid.constructXml(arr)
   }

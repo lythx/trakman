@@ -13,7 +13,7 @@ if (process.argv.length < 3) {
     await fs.writeFile('.hashes.json', hashes, { encoding: 'utf-8' })
     console.log('Hashes written.')
     process.exit()
-  } catch(e) {
+  } catch (e) {
     console.log('Failed to write hashes to file.')
     console.log(e)
     process.exit(1)
@@ -34,9 +34,9 @@ try {
     console.log('.hashes.json file does not exist.')
     await doUpdate(fromPath, newHashes)
   }
-} catch(e) {
+} catch (e) {
   console.log('Failed to update Trakman.')
-  console.log('Usage: node Update.js <new version\'s hashes.json>')
+  console.log("Usage: node Update.js <new version's hashes.json>")
   console.log(e)
   process.exit(1)
 }
@@ -57,25 +57,35 @@ async function hashFile(path) {
 
 async function generateHashes() {
   console.log('Generating hashes for current files...')
-  const entries = (await fs.readdir('./src', {
-    recursive: true,
-    withFileTypes: true
-  }))
-  .concat(await fs.readdir('./plugins', {
-    recursive: true,
-    withFileTypes: true
-  }))
-  .concat(await fs.readdir('./config', {
-    recursive: true,
-    withFileTypes: true
-  }))
+  const entries = (
+    await fs.readdir('./src', {
+      recursive: true,
+      withFileTypes: true,
+    })
+  )
+    .concat(
+      await fs.readdir('./plugins', {
+        recursive: true,
+        withFileTypes: true,
+      })
+    )
+    .concat(
+      await fs.readdir('./config', {
+        recursive: true,
+        withFileTypes: true,
+      })
+    )
 
   const res = new Map(
-    await Promise.all(entries.filter(a => a.isFile() && (a.name.endsWith('.js') || a.name.endsWith('.ts')))
-    .map(async (a) => {
-      const p = path.join(a.parentPath, a.name)
-      return [p, await hashFile(p)]
-    })))
+    await Promise.all(
+      entries
+        .filter((a) => a.isFile() && (a.name.endsWith('.js') || a.name.endsWith('.ts')))
+        .map(async (a) => {
+          const p = path.join(a.parentPath, a.name)
+          return [p, await hashFile(p)]
+        })
+    )
+  )
   for (const name of ['Plugins.ts', 'package.json', 'tsconfig.json', 'CHANGELOG.md', 'Update.js']) {
     res.set(name, await hashFile(name))
   }
@@ -121,7 +131,7 @@ async function doUpdate(fromPath, newHashes, oldHashes = null) {
         await fs.copyFile(fullFromPath, file)
       }
       // otherwise the file is already what it needs to be, no need to update it
-    } catch(e) {
+    } catch (e) {
       console.log('Could not copy file ' + file)
       console.log(e)
       errorOccurred = true
@@ -131,7 +141,7 @@ async function doUpdate(fromPath, newHashes, oldHashes = null) {
   // copy new hashes so you only have to update once
   try {
     await fs.copyFile(process.argv[2], '.hashes.json')
-  } catch(e) {
+  } catch (e) {
     console.log('Failed to copy new hashes.')
     console.log(e)
     process.exit(1)
@@ -141,14 +151,15 @@ async function doUpdate(fromPath, newHashes, oldHashes = null) {
     process.exit(1)
   }
 
-  let log = `Update log to version ${JSON.parse(
-    await fs.readFile(path.join(fromPath, 'package.json'), { encoding: 'utf-8' }))['version']}\n\n`
+  let log = `Update log to version ${
+    JSON.parse(await fs.readFile(path.join(fromPath, 'package.json'), { encoding: 'utf-8' }))['version']
+  }\n\n`
   if (conflicts.length > 0) {
     console.log('!!! Update conflicts, make sure to fix them by comparing your files to files ending in .new !!!')
     console.log('If you do not fix these conflicts, the controller might fail to start or crash.')
     console.log('Affected files: ')
     log += 'Update did not succeed because of conflicts. Please merge the following files manually:\n'
-    conflicts.forEach(name => {
+    conflicts.forEach((name) => {
       console.log(name)
       log += name + '\n'
     })
@@ -159,7 +170,7 @@ async function doUpdate(fromPath, newHashes, oldHashes = null) {
 
   try {
     await fs.writeFile('update.log', log, { encoding: 'utf-8' })
-  } catch(e) {
+  } catch (e) {
     console.log('Failed to write update log.')
     console.log(e)
   }

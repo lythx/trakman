@@ -6,14 +6,13 @@ import { Client } from '../client/Client.js'
 import config from '../../config/Config.js'
 
 export class RoundsService {
-
   private static teamsRoundPoints?: number
   private static _teamScores: {
-    blue: number;
+    blue: number
     red: number
   } = {
     blue: 0,
-    red: 0
+    red: 0,
   }
   private static _roundsPointSystem: number[] = []
   private static _roundsPointsLimit: number
@@ -28,16 +27,20 @@ export class RoundsService {
   private static roundFinishCount = 0
 
   static async initialize(): Promise<void> {
-    await Client.call('system.multicall', [{
-      method: 'SetCupRoundsPerChallenge',
-      params: [{ int: 0 }]
-    }, {
-      method: 'SetUseNewRulesTeam',
-      params: [{ boolean: true }]
-    }, {
-      method: 'SetUseNewRulesRound',
-      params: [{ boolean: false }]
-    }])
+    await Client.call('system.multicall', [
+      {
+        method: 'SetCupRoundsPerChallenge',
+        params: [{ int: 0 }],
+      },
+      {
+        method: 'SetUseNewRulesTeam',
+        params: [{ boolean: true }],
+      },
+      {
+        method: 'SetUseNewRulesRound',
+        params: [{ boolean: false }],
+      },
+    ])
     const status = await this.updateRoundsSettings()
     if (status instanceof Error) {
       await Logger.fatal(status.message)
@@ -58,7 +61,7 @@ export class RoundsService {
       Logger.warn(`Failed to get current ranking: ${ranking.message}`)
     } else {
       for (const e of ranking) {
-        const player = playerList.find(a => e.Login === a.login)
+        const player = playerList.find((a) => e.Login === a.login)
         if (player !== undefined) {
           player.roundsPoints = e.Score
           this._ranking.push(player)
@@ -66,7 +69,7 @@ export class RoundsService {
       }
     }
     for (const e of playerList) {
-      if (!this._ranking.some(a => a.login === e.login)) {
+      if (!this._ranking.some((a) => a.login === e.login)) {
         this._ranking.push(e)
       }
     }
@@ -86,43 +89,58 @@ export class RoundsService {
         Logger.error(`Call to get team score failed`, res.message)
         return
       }
-      this._teamScores.blue = res.find(a => a.NickName === '$00FBlue Team')?.Score ?? 0
-      this._teamScores.red = res.find(a => a.NickName === '$F00Red Team')?.Score ?? 0
+      this._teamScores.blue = res.find((a) => a.NickName === '$00FBlue Team')?.Score ?? 0
+      this._teamScores.red = res.find((a) => a.NickName === '$F00Red Team')?.Score ?? 0
     }
   }
 
   static async updateRoundsSettings(): Promise<true | Error> {
-    const settings = await Client.call('system.multicall',
-      [{ method: 'GetRoundCustomPoints' }, { method: 'GetRoundPointsLimit' }, { method: 'GetTeamPointsLimit' },
-        { method: 'GetCupPointsLimit' }, { method: 'GetCupNbWinners' }])
+    const settings = await Client.call('system.multicall', [
+      { method: 'GetRoundCustomPoints' },
+      { method: 'GetRoundPointsLimit' },
+      { method: 'GetTeamPointsLimit' },
+      { method: 'GetCupPointsLimit' },
+      { method: 'GetCupNbWinners' },
+    ])
     if (settings instanceof Error) {
       return new Error(`Failed to fetch round settings, server responded with error: ${settings.message}`)
     }
-    const err = settings.find(a => a instanceof Error) as Error
+    const err = settings.find((a) => a instanceof Error) as Error
     if (err !== undefined) {
       return new Error(`Failed to fetch round settings, server responded with error: ${err.message}`)
     }
-    const [roundPointSystem, roundPointsLimit, teamPointsLimit, cupPointsLimit, cupMaxWinnersCount] = (settings as {
-      method: string;
-      params: any;
-    }[]).map(a => a.params)
+    const [roundPointSystem, roundPointsLimit, teamPointsLimit, cupPointsLimit, cupMaxWinnersCount] = (
+      settings as {
+        method: string
+        params: any
+      }[]
+    ).map((a) => a.params)
     this._roundsPointSystem = roundPointSystem
     this._roundsPointSystem = roundPointSystem
     this._roundsPointsLimit = roundPointsLimit.CurrentValue
     this._teamsPointsLimit = teamPointsLimit.CurrentValue
     this._cupPointsLimit = cupPointsLimit.CurrentValue
     this._cupMaxWinnersCount = cupMaxWinnersCount.CurrentValue
-    if (this._roundsPointSystem.length === 0 || !(this._roundsPointSystem.length === config.roundsModePointSystem.length && this._roundsPointSystem.every(
-      (v, i) => v === config.roundsModePointSystem[i]))) {
+    if (
+      this._roundsPointSystem.length === 0 ||
+      !(
+        this._roundsPointSystem.length === config.roundsModePointSystem.length &&
+        this._roundsPointSystem.every((v, i) => v === config.roundsModePointSystem[i])
+      )
+    ) {
       this._roundsPointSystem = config.roundsModePointSystem
-      Client.callNoRes(`SetRoundCustomPoints`,
-        [{ array: this._roundsPointSystem.map(a => ({ int: a })) }, { boolean: true }])
+      Client.callNoRes(`SetRoundCustomPoints`, [
+        { array: this._roundsPointSystem.map((a) => ({ int: a })) },
+        { boolean: true },
+      ])
     }
     return true
   }
 
   static registerRoundRecord(record: tm.FinishInfo, player: tm.Player) {
-    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts' || GameService.gameMode === 'Laps') { return }
+    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts' || GameService.gameMode === 'Laps') {
+      return
+    }
     if (this.noRoundFinishes) {
       this.noRoundFinishes = false
       this.finishedRounds++
@@ -132,8 +150,10 @@ export class RoundsService {
   }
 
   static registerRoundPoints(player: tm.Player): number {
-    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts' || GameService.gameMode === 'Laps') { return 0 }
-    const index = this._ranking.findIndex(a => a.login === player.login)
+    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts' || GameService.gameMode === 'Laps') {
+      return 0
+    }
+    const index = this._ranking.findIndex((a) => a.login === player.login)
     if (index === -1) {
       Logger.error(`Player object not present in RoundsService ranking when adding points`)
       return 0
@@ -141,7 +161,7 @@ export class RoundsService {
     let points = 0
     if (GameService.gameMode === 'Teams') {
       if (this.teamsRoundPoints === undefined) {
-        this.teamsRoundPoints = PlayerService.players.filter(a => !a.isPureSpectator).length
+        this.teamsRoundPoints = PlayerService.players.filter((a) => !a.isPureSpectator).length
       }
       points = this.teamsRoundPoints - this.roundFinishCount
     } else if (GameService.gameMode === 'Rounds' || GameService.gameMode === 'Cup') {
@@ -170,18 +190,20 @@ export class RoundsService {
   }
 
   static registerPlayer(player: tm.Player) {
-    const index = this._ranking.findIndex(a => a.login === player.login)
+    const index = this._ranking.findIndex((a) => a.login === player.login)
     if (index === -1) {
       this._ranking.push(player)
       return
     }
     player.roundTimes = this._ranking[index].roundTimes
     for (let i = 0; i < this.finishedRounds; i++) {
-      if (player.roundTimes[i] === undefined) { player.roundTimes[i] = -1 }
+      if (player.roundTimes[i] === undefined) {
+        player.roundTimes[i] = -1
+      }
     }
     player.roundsPoints = this._ranking[index].roundsPoints
     player.isCupFinalist = this._ranking[index].isCupFinalist
-    const winIndex = this._cupWinners.findIndex(a => a.login === player.login)
+    const winIndex = this._cupWinners.findIndex((a) => a.login === player.login)
     if (winIndex !== -1) {
       player.cupPosition = winIndex + 1
     }
@@ -192,7 +214,7 @@ export class RoundsService {
     this.teamsRoundPoints = undefined
     this._teamScores = {
       blue: 0,
-      red: 0
+      red: 0,
     }
     this.finishedRounds = 0
     if (!config.resetCupScoreOnSkipAndRestart) {
@@ -226,8 +248,8 @@ export class RoundsService {
         Logger.error(`Call to get team score failed`, res.message)
         return
       }
-      this._teamScores.blue = res.find(a => a.NickName === '$00FBlue Team')?.Score ?? 0
-      this._teamScores.red = res.find(a => a.NickName === '$F00Red Team')?.Score ?? 0
+      this._teamScores.blue = res.find((a) => a.NickName === '$00FBlue Team')?.Score ?? 0
+      this._teamScores.red = res.find((a) => a.NickName === '$F00Red Team')?.Score ?? 0
     }
     if (GameService.gameMode === 'Rounds' || GameService.gameMode === 'Cup') {
       // This method modifies the player objects so it needs to ignore the readonly constraint
@@ -257,25 +279,39 @@ export class RoundsService {
         }
       } while (ranking instanceof Error)
       for (const e of ranking) {
-        const obj = this._ranking.find(a => a.login === e.Login)
-        if (obj === undefined) { continue }
+        const obj = this._ranking.find((a) => a.login === e.Login)
+        if (obj === undefined) {
+          continue
+        }
         if (obj.roundsPoints !== e.Score) {
-          if (GameService.gameMode === 'Cup' && (obj.roundsPoints === this._cupPointsLimit || this._cupWinners.some(
-            a => a.login === e.Login))) { continue }
-          Logger.debug(`${GameService.gameMode} points mismatch in RoundsService`, JSON.stringify(obj),
-            JSON.stringify(e))
+          if (
+            GameService.gameMode === 'Cup' &&
+            (obj.roundsPoints === this._cupPointsLimit || this._cupWinners.some((a) => a.login === e.Login))
+          ) {
+            continue
+          }
+          Logger.debug(
+            `${GameService.gameMode} points mismatch in RoundsService`,
+            JSON.stringify(obj),
+            JSON.stringify(e)
+          )
           const player = PlayerService.get(obj.login) as tm.Player
           obj.roundsPoints = e.Score
-          if (player !== undefined) { player.roundsPoints = e.Score }
+          if (player !== undefined) {
+            player.roundsPoints = e.Score
+          }
         }
       }
     }
   }
 
   private static fixRankingPosition(index: number) {
-    if (this._ranking[index] === undefined) { return }
+    if (this._ranking[index] === undefined) {
+      return
+    }
     const obj = this._ranking.splice(index, 1)[0]
-    for (let i = this._cupWinners.length; i < index; i++) { // Preserve cup winner order
+    for (let i = this._cupWinners.length; i < index; i++) {
+      // Preserve cup winner order
       if (obj.roundsPoints > this._ranking[i].roundsPoints) {
         this._ranking.splice(i, 0, obj)
         return
@@ -299,9 +335,9 @@ export class RoundsService {
   static getRoundRecord(logins: string[]): tm.FinishInfo[]
   static getRoundRecord(logins: string | string[]): tm.FinishInfo | undefined | tm.FinishInfo[] {
     if (typeof logins === 'string') {
-      return this._roundRecords.find(a => a.login === logins)
+      return this._roundRecords.find((a) => a.login === logins)
     }
-    return this._roundRecords.filter(a => logins.includes(a.login))
+    return this._roundRecords.filter((a) => logins.includes(a.login))
   }
 
   /**
@@ -373,5 +409,4 @@ export class RoundsService {
   static get cupWinners(): Readonly<tm.Player>[] {
     return [...this._cupWinners]
   }
-
 }

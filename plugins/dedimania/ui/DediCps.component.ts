@@ -3,18 +3,27 @@
  * @since 0.1
  */
 
-import { dedimania } from "../../dedimania/Dedimania.js"
-import { centeredText, closeButton, componentIds, getCpTypes, Grid, type GridCellFunction, Paginator, PopupWindow } from '../../ui/UI.js'
+import { dedimania } from '../../dedimania/Dedimania.js'
+import {
+  centeredText,
+  closeButton,
+  componentIds,
+  getCpTypes,
+  Grid,
+  type GridCellFunction,
+  Paginator,
+  PopupWindow,
+} from '../../ui/UI.js'
 import config from './DediCps.config.js'
 
 export default class DediCps extends PopupWindow {
-
   private readonly startCellsOnFirstPage: number = 2
   private readonly startCellsOnNextPages: number = 1
   private readonly startCellWidth: number = config.startCellWidth
   private readonly indexCellWidth: number = config.indexCellWidth
   private readonly cpsOnFirstPage: number = config.cpsOnFirstPage
-  private readonly cpsOnNextPages: number = this.cpsOnFirstPage + (this.startCellsOnFirstPage - this.startCellsOnNextPages) * this.startCellWidth
+  private readonly cpsOnNextPages: number =
+    this.cpsOnFirstPage + (this.startCellsOnFirstPage - this.startCellsOnNextPages) * this.startCellWidth
   private readonly entries: number = config.entries
   private readonly paginator: Paginator
   private readonly cpPaginator: Paginator
@@ -24,10 +33,20 @@ export default class DediCps extends PopupWindow {
   constructor() {
     super(componentIds.dediCps, config.icon, config.title, config.navbar)
     const records = dedimania.records
-    this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight,
-      Math.ceil(records.length / this.entries))
-    this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1,
-      true)
+    this.paginator = new Paginator(
+      this.openId,
+      this.windowWidth,
+      this.footerHeight,
+      Math.ceil(records.length / this.entries)
+    )
+    this.cpPaginator = new Paginator(
+      this.openId + 10,
+      this.windowWidth,
+      this.footerHeight,
+      this.calculateCpPages(),
+      1,
+      true
+    )
     this.paginator.onPageChange = (login: string): void => {
       this.getPagesAndOpen(login)
     }
@@ -47,7 +66,7 @@ export default class DediCps extends PopupWindow {
       aliases: config.command.aliases,
       help: config.command.help,
       callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
-      privilege: config.command.privilege
+      privilege: config.command.privilege,
     })
     tm.addListener('PlayerDataUpdated', () => this.reRender())
   }
@@ -56,14 +75,17 @@ export default class DediCps extends PopupWindow {
     this.getPagesAndOpen(info.login)
   }
 
-  protected constructContent(login: string, params: {
-    page: number,
-    cpPage: number
-  }): string {
+  protected constructContent(
+    login: string,
+    params: {
+      page: number
+      cpPage: number
+    }
+  ): string {
     const records = dedimania.records
     const [cpIndex, cpsToDisplay] = this.getCpIndexAndAmount(params.cpPage)
     const playerIndex: number = (params.page - 1) * this.entries - 1
-    const cpTypes = getCpTypes(records.map(a => a.checkpoints))
+    const cpTypes = getCpTypes(records.map((a) => a.checkpoints))
     const entriesToDisplay = records.length - (playerIndex + 1)
 
     const indexCell: GridCellFunction = (i, j, w, h) => centeredText((i + playerIndex + 1).toString(), w, h)
@@ -74,7 +96,8 @@ export default class DediCps extends PopupWindow {
 
     const loginCell = (i: number, j: number, w: number, h: number): string => {
       const ret: string = centeredText(records[i + playerIndex].login, w, h)
-      if (login === records[i + playerIndex].login) { // Add colour for yourself
+      if (login === records[i + playerIndex].login) {
+        // Add colour for yourself
         return `<format textcolor="${this.selfColour}"/>` + ret
       }
       return ret
@@ -85,8 +108,10 @@ export default class DediCps extends PopupWindow {
       const record = records[i + playerIndex]
       const cpType = cpTypes[i + playerIndex][j + cpIndex - startCells]
       const colour: string = cpType === undefined ? 'FFFF' : (this.cpColours as any)[cpType]
-      const cp = record.checkpoints[(j - startCells) + cpIndex]
-      return cp === undefined ? '' : `<format textcolor="${colour}"/>
+      const cp = record.checkpoints[j - startCells + cpIndex]
+      return cp === undefined
+        ? ''
+        : `<format textcolor="${colour}"/>
         ${centeredText(tm.utils.getTimeString(cp), w, h)}`
     }
 
@@ -99,45 +124,86 @@ export default class DediCps extends PopupWindow {
     let grid: Grid
     let headers: GridCellFunction[]
     if (params.cpPage === 1) {
-      headers = [(i, j, w, h) => centeredText(' Lp. ', w, h), (i, j, w, h) => centeredText(' Nickname ', w, h),
-        (i, j, w, h) => centeredText(' Login ', w, h), ...new Array(cpsToDisplay).fill(
-          (i: number, j: number, w: number, h: number): string => centeredText(
-            (j - this.startCellsOnFirstPage).toString(), w, h)), (i, j, w, h) => centeredText(' Finish ', w, h),
+      headers = [
+        (i, j, w, h) => centeredText(' Lp. ', w, h),
+        (i, j, w, h) => centeredText(' Nickname ', w, h),
+        (i, j, w, h) => centeredText(' Login ', w, h),
+        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string =>
+          centeredText((j - this.startCellsOnFirstPage).toString(), w, h)
+        ),
+        (i, j, w, h) => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill(
-          (i: number, j: number, w: number, h: number): string => '')]
-      grid = new Grid(this.contentWidth, this.contentHeight,
-        [this.indexCellWidth, ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth),
-          ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
+          (i: number, j: number, w: number, h: number): string => ''
+        ),
+      ]
+      grid = new Grid(
+        this.contentWidth,
+        this.contentHeight,
+        [
+          this.indexCellWidth,
+          ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth),
+          ...new Array(this.cpsOnFirstPage + 1).fill(1),
+        ],
+        new Array(this.entries + 1).fill(1),
+        config.grid
+      )
     } else {
-      headers = [(i, j, w, h) => centeredText(' Lp. ', w, h),
+      headers = [
+        (i, j, w, h) => centeredText(' Lp. ', w, h),
         (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
-        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(
-          (j + cpIndex - (this.startCellsOnNextPages)).toString(), w, h)),
+        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string =>
+          centeredText((j + cpIndex - this.startCellsOnNextPages).toString(), w, h)
+        ),
         (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnNextPages - cpsToDisplay).fill(
-          (i: number, j: number, w: number, h: number): string => '')]
-      grid = new Grid(this.contentWidth, this.contentHeight,
-        [this.indexCellWidth, ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth),
-          ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
+          (i: number, j: number, w: number, h: number): string => ''
+        ),
+      ]
+      grid = new Grid(
+        this.contentWidth,
+        this.contentHeight,
+        [
+          this.indexCellWidth,
+          ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth),
+          ...new Array(this.cpsOnNextPages + 1).fill(1),
+        ],
+        new Array(this.entries + 1).fill(1),
+        config.grid
+      )
     }
     const arr = [...headers]
     for (let i = 0; i < entriesToDisplay; i++) {
       if (params.cpPage === 1) {
-        arr.push(indexCell, nickNameCell, loginCell, ...new Array(cpsToDisplay).fill(cell), finishCell,
-          ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill(emptyCell))
+        arr.push(
+          indexCell,
+          nickNameCell,
+          loginCell,
+          ...new Array(cpsToDisplay).fill(cell),
+          finishCell,
+          ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill(emptyCell)
+        )
       } else {
-        arr.push(indexCell, nickNameCell, ...new Array(cpsToDisplay).fill(cell), finishCell,
-          ...new Array(this.cpsOnNextPages - cpsToDisplay).fill(emptyCell))
+        arr.push(
+          indexCell,
+          nickNameCell,
+          ...new Array(cpsToDisplay).fill(cell),
+          finishCell,
+          ...new Array(this.cpsOnNextPages - cpsToDisplay).fill(emptyCell)
+        )
       }
     }
     return grid.constructXml(arr)
   }
 
-  protected constructFooter(login: string, params: {
-    page: number,
-    cpPage: number
-  }): string {
-    const w = (this.cpPaginator.buttonW + this.cpPaginator.margin) * this.cpPaginator.buttonCount + config.cpPaginatorMargin
+  protected constructFooter(
+    login: string,
+    params: {
+      page: number
+      cpPage: number
+    }
+  ): string {
+    const w =
+      (this.cpPaginator.buttonW + this.cpPaginator.margin) * this.cpPaginator.buttonCount + config.cpPaginatorMargin
     return `${closeButton(this.closeId, this.windowWidth, this.headerHeight - this.margin)}
     ${this.paginator.constructXml(params.page)}
     <frame posn="${this.windowWidth / 2 - w} 0 3">
@@ -146,8 +212,9 @@ export default class DediCps extends PopupWindow {
   }
 
   private getCpIndexAndAmount(cpPage: number): [number, number] {
-    const cpAmount = dedimania.isUploadingLaps ? tm.maps.current.checkpointsPerLap - 1 :
-      tm.maps.current.checkpointsAmount - 1
+    const cpAmount = dedimania.isUploadingLaps
+      ? tm.maps.current.checkpointsPerLap - 1
+      : tm.maps.current.checkpointsAmount - 1
     let cpsToDisplay: number = Math.min(cpAmount, this.cpsOnFirstPage)
     let cpIndex = 0
     if (cpPage > 1) {
@@ -164,10 +231,14 @@ export default class DediCps extends PopupWindow {
     const page = this.paginator.getPageByLogin(login)
     const cpPage = this.cpPaginator.getPageByLogin(login)
     const pageCount: number = this.paginator.pageCount
-    this.displayToPlayer(login, {
-      page,
-      cpPage
-    }, `${page}/${Math.max(1, pageCount)}`)
+    this.displayToPlayer(
+      login,
+      {
+        page,
+        cpPage,
+      },
+      `${page}/${Math.max(1, pageCount)}`
+    )
   }
 
   private reRender(): void {
@@ -179,8 +250,9 @@ export default class DediCps extends PopupWindow {
 
   private calculateCpPages(): number {
     let cpPages = 1
-    const cpAmount = dedimania.isUploadingLaps ? tm.maps.current.checkpointsPerLap - 1 :
-      tm.maps.current.checkpointsAmount - 1
+    const cpAmount = dedimania.isUploadingLaps
+      ? tm.maps.current.checkpointsPerLap - 1
+      : tm.maps.current.checkpointsAmount - 1
     for (let i = 1; i < cpAmount; i++) {
       if (cpPages === 1 && i >= this.cpsOnFirstPage) {
         cpPages++
@@ -190,7 +262,6 @@ export default class DediCps extends PopupWindow {
     }
     return cpPages
   }
-
 }
 
 tm.addListener('Startup', () => {

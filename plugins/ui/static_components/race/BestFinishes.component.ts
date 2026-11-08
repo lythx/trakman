@@ -7,10 +7,9 @@ import { centeredText, componentIds, Grid, leftAlignedText, StaticComponent, Sta
 import config from './BestFinishes.config.js'
 
 export default class BestFinishes extends StaticComponent {
-
   private readonly bestFinishes: {
-    login: string,
-    time: number,
+    login: string
+    time: number
     nickname: string
   }[] = []
   private readonly header: StaticHeader
@@ -25,27 +24,40 @@ export default class BestFinishes extends StaticComponent {
     this.headerBg = this.header.options.textBackground
     this.headerHeight = this.header.options.height
     if (config.horizontal) {
-      this.grid = new Grid(config.horizontalModeWidth, config.entryHeight,
-        new Array(config.entries).fill(config.columnProportions).flat(), [1], { margin: config.margin })
+      this.grid = new Grid(
+        config.horizontalModeWidth,
+        config.entryHeight,
+        new Array(config.entries).fill(config.columnProportions).flat(),
+        [1],
+        { margin: config.margin }
+      )
     } else {
-      const contentHeight = ((config.entryHeight + config.margin * 2) * config.entries) - (this.headerHeight + config.margin)
-      this.grid = new Grid(config.width + config.margin * 2, contentHeight, config.columnProportions,
-        new Array(config.entries).fill(1), { margin: config.margin })
+      const contentHeight =
+        (config.entryHeight + config.margin * 2) * config.entries - (this.headerHeight + config.margin)
+      this.grid = new Grid(
+        config.width + config.margin * 2,
+        contentHeight,
+        config.columnProportions,
+        new Array(config.entries).fill(1),
+        { margin: config.margin }
+      )
     }
     this.renderOnEvent('PlayerFinish', (info: tm.FinishInfo) => {
       const isStunts = tm.getGameMode() === 'Stunts'
       let index: number
       if (isStunts) {
-        index = this.bestFinishes.findIndex(a => a.time < info.time)
+        index = this.bestFinishes.findIndex((a) => a.time < info.time)
       } else {
-        index = this.bestFinishes.findIndex(a => a.time > info.time)
+        index = this.bestFinishes.findIndex((a) => a.time > info.time)
       }
-      if (index === -1) { index = this.bestFinishes.length }
+      if (index === -1) {
+        index = this.bestFinishes.length
+      }
       if (index < config.entries) {
         this.bestFinishes.splice(index, 0, {
           login: info.login,
           time: info.time,
-          nickname: info.nickname
+          nickname: info.nickname,
         })
         this.bestFinishes.length = Math.min(config.entries, this.bestFinishes.length)
         this.newestFinish = index
@@ -54,8 +66,10 @@ export default class BestFinishes extends StaticComponent {
     })
     this.renderOnEvent('PlayerDataUpdated', (info) => {
       for (const e of this.bestFinishes) {
-        const newNickname: string | undefined = info.find(a => a.login === e.login)?.nickname
-        if (newNickname !== undefined) { e.nickname = newNickname }
+        const newNickname: string | undefined = info.find((a) => a.login === e.login)?.nickname
+        if (newNickname !== undefined) {
+          e.nickname = newNickname
+        }
       }
       return this.display()
     })
@@ -77,8 +91,12 @@ export default class BestFinishes extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
-    if (this.reduxModeEnabled) { return this.displayToPlayer('')?.xml }
+    if (!this.isDisplayed) {
+      return
+    }
+    if (this.reduxModeEnabled) {
+      return this.displayToPlayer('')?.xml
+    }
     const arr = []
     for (const e of tm.players.list) {
       arr.push(this.displayToPlayer(e.login))
@@ -87,7 +105,9 @@ export default class BestFinishes extends StaticComponent {
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
@@ -100,7 +120,7 @@ export default class BestFinishes extends StaticComponent {
       ${this.constructGrid(login)}
     </frame>
     </manialink>`,
-        login
+        login,
       }
     }
     return {
@@ -110,22 +130,26 @@ export default class BestFinishes extends StaticComponent {
       <format textsize="1"/>
       ${this.constructHeader()}
     </frame>
-    <frame posn="${config.posX - config.margin} ${config.posY - (this.headerHeight)} 1">
+    <frame posn="${config.posX - config.margin} ${config.posY - this.headerHeight} 1">
       <format textsize="1"/>
       ${this.constructGrid(login)}
     </frame>
     </manialink>`,
-      login
+      login,
     }
   }
 
   private constructHeader(): string {
-    if (this.bestFinishes.length === 0) { return '' }
+    if (this.bestFinishes.length === 0) {
+      return ''
+    }
     return this.header.constructXml(config.title, config.icon, config.side)
   }
 
   private constructGrid(login: string): string {
-    if (this.reduxModeEnabled) { login = '' }
+    if (this.reduxModeEnabled) {
+      login = ''
+    }
     const indexCell = (i: number, j: number, w: number, h: number): string => {
       let index
       if (config.horizontal) {
@@ -134,33 +158,46 @@ export default class BestFinishes extends StaticComponent {
         index = i + 1
       }
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${this.headerBg}"/>`
-      return this.bestFinishes[i] === undefined ? '' : bg + (centeredText((index).toString(), w, h, {
-        textScale: config.textScale,
-        padding: config.textPadding
-      }))
+      return this.bestFinishes[i] === undefined
+        ? ''
+        : bg +
+            centeredText(index.toString(), w, h, {
+              textScale: config.textScale,
+              padding: config.textPadding,
+            })
     }
 
     const timeCell = (i: number, j: number, w: number, h: number): string => {
       const index = config.horizontal ? (j - 1) / 3 : i
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${config.background}"/>`
       const fin = this.bestFinishes[index]
-      if (fin === undefined) { return '' }
+      if (fin === undefined) {
+        return ''
+      }
       let format: string = fin.login === login ? `<format textcolor="${config.selfColour}"/>` : ''
-      if (index === this.newestFinish) { format = `<format textcolor="${config.newestColour}"/>` }
-      return bg + format + centeredText(tm.utils.getTimeString(fin.time), w, h, {
-        textScale: config.textScale,
-        padding: config.textPadding
-      })
+      if (index === this.newestFinish) {
+        format = `<format textcolor="${config.newestColour}"/>`
+      }
+      return (
+        bg +
+        format +
+        centeredText(tm.utils.getTimeString(fin.time), w, h, {
+          textScale: config.textScale,
+          padding: config.textPadding,
+        })
+      )
     }
 
     const nicknameCell = (i: number, j: number, w: number, h: number): string => {
       const index = config.horizontal ? (j - 2) / 3 : i
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${config.background}"/>`
-      return this.bestFinishes[index] === undefined ? '' :
-        bg + (leftAlignedText(tm.utils.safeString(tm.utils.strip(this.bestFinishes[index].nickname, false)), w, h, {
-          textScale: config.textScale,
-          padding: config.textPadding
-        }))
+      return this.bestFinishes[index] === undefined
+        ? ''
+        : bg +
+            leftAlignedText(tm.utils.safeString(tm.utils.strip(this.bestFinishes[index].nickname, false)), w, h, {
+              textScale: config.textScale,
+              padding: config.textPadding,
+            })
     }
 
     const arr: ((i: number, j: number, w: number, h: number) => string)[] = []
@@ -169,5 +206,4 @@ export default class BestFinishes extends StaticComponent {
     }
     return this.grid.constructXml(arr)
   }
-
 }

@@ -7,7 +7,6 @@ import { addManialinkListener, centeredText, componentIds, StaticComponent, Stat
 import config from './TimerWidget.config.js'
 
 export default class TimerWidget extends StaticComponent {
-
   private readonly header: StaticHeader
   private dynamicTimerInterval: NodeJS.Timeout | undefined
   private noButtonXml: string = ''
@@ -51,14 +50,16 @@ export default class TimerWidget extends StaticComponent {
       return this.display()
     })
     addManialinkListener(this.pauseButtonId, (info) => {
-      if (info.privilege < config.timerActionsPrivilege) { return }
+      if (info.privilege < config.timerActionsPrivilege) {
+        return
+      }
       if (!tm.timer.isDynamic) {
         tm.sendMessage(config.notDynamic, info.login)
         return
       }
       const strObject = {
         title: info.title,
-        adminName: tm.utils.strip(info.nickname)
+        adminName: tm.utils.strip(info.nickname),
       }
       if (tm.timer.isPaused) {
         tm.sendMessage(tm.utils.strVar(config.resume, strObject))
@@ -69,7 +70,9 @@ export default class TimerWidget extends StaticComponent {
       }
     })
     addManialinkListener(this.addButtonid, (info) => {
-      if (info.privilege < config.timerActionsPrivilege) { return }
+      if (info.privilege < config.timerActionsPrivilege) {
+        return
+      }
       if (!tm.timer.isDynamic) {
         tm.sendMessage(config.notDynamic, info.login)
         return
@@ -78,29 +81,33 @@ export default class TimerWidget extends StaticComponent {
       const strObject = {
         title: info.title,
         adminName: tm.utils.strip(info.nickname),
-        time: tm.utils.getVerboseTime(tm.timer.remainingRaceTime)
+        time: tm.utils.getVerboseTime(tm.timer.remainingRaceTime),
       }
       tm.sendMessage(tm.utils.strVar(config.set, strObject))
     })
     addManialinkListener(this.subtractButtonId, (info) => {
-      if (info.privilege < config.timerActionsPrivilege) { return }
+      if (info.privilege < config.timerActionsPrivilege) {
+        return
+      }
       if (!tm.timer.isDynamic) {
         tm.sendMessage(config.notDynamic, info.login)
         return
       }
       const subtracted: boolean = tm.timer.subtractTime(config.timeSubtractedOnClick)
-      if (!subtracted) { return }
+      if (!subtracted) {
+        return
+      }
       const strObject = {
         title: info.title,
         adminName: tm.utils.strip(info.nickname),
-        time: tm.utils.getVerboseTime(tm.timer.remainingRaceTime)
+        time: tm.utils.getVerboseTime(tm.timer.remainingRaceTime),
       }
       tm.sendMessage(tm.utils.strVar(config.set, strObject))
     })
   }
 
   getHeight(): number {
-    const isStunts = tm.getGameMode() === "Stunts"
+    const isStunts = tm.getGameMode() === 'Stunts'
     if (isStunts && tm.timer.isDynamic) {
       return config.height + config.stuntsDynamicMarginTop
     }
@@ -120,8 +127,12 @@ export default class TimerWidget extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
-    if (this.isPaused && tm.timer.isPaused) { return }
+    if (!this.isDisplayed) {
+      return
+    }
+    if (this.isPaused && tm.timer.isPaused) {
+      return
+    }
     // if (tm.getGameMode() === 'Stunts' && !tm.timer.isDynamic) {
     //   return [this.hide()]
     // }
@@ -134,7 +145,9 @@ export default class TimerWidget extends StaticComponent {
   }
 
   displayToPlayer(login: string, privilege?: number) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     // if (tm.getGameMode() === 'Stunts' && !tm.timer.isDynamic) {
     //   return { xml: this.hide() ?? '', login }
     // }
@@ -142,12 +155,12 @@ export default class TimerWidget extends StaticComponent {
     if (this.isOnRestart || !tm.timer.isDynamic || privilege < config.timerActionsPrivilege) {
       return {
         xml: this.noButtonXml,
-        login
+        login,
       }
     } else {
       return {
         xml: this.xmlWithButtons,
-        login
+        login,
       }
     }
   }
@@ -172,7 +185,7 @@ export default class TimerWidget extends StaticComponent {
         timeXml = centeredText(config.pausedText, config.width, bottomH, {
           specialFont: true,
           yOffset: -0.3,
-          xOffset: 0.2
+          xOffset: 0.2,
         })
       } else {
         const time = Math.floor(tm.timer.remainingRaceTime / 1000)
@@ -189,11 +202,11 @@ export default class TimerWidget extends StaticComponent {
         const timeStr = hoursAmount < 100 ? `${hours}${minutes}:${seconds}` : `${hoursAmount} hours`
         timeXml = centeredText('$' + timeColour + timeStr, config.width, bottomH, {
           specialFont: true,
-          yOffset: config.textYOffset
+          yOffset: config.textYOffset,
         })
       }
     }
-    const stuntsMargin = (isStunts && isDynamic) ? config.stuntsDynamicMarginTop : 0
+    const stuntsMargin = isStunts && isDynamic ? config.stuntsDynamicMarginTop : 0
     if (isStunts && !isDynamic) {
       return `
     <manialink id="${this.id}">
@@ -247,8 +260,8 @@ export default class TimerWidget extends StaticComponent {
       buttonXml += `<quad posn="${x} 0 0" sizen="${w} ${h}" bgcolor="${this.header.options.iconBackground}" />
       <quad posn="${x + m} ${-m} 1" sizen="${w - 2 * m} ${h - 2 * m}" imagefocus="${hoverIcon}" image="${icon}" action="${id}"/>`
     }
-    return this.header.constructXml(config.title, config.icon, this.side,
-      { rectangleWidth: headerRectWidth }) + buttonXml
+    return (
+      this.header.constructXml(config.title, config.icon, this.side, { rectangleWidth: headerRectWidth }) + buttonXml
+    )
   }
-
 }

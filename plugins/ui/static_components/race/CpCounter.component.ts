@@ -8,25 +8,24 @@ import config from './CpCounter.config.js'
 import { dedimania, type DediRecord } from '../../../dedimania/Dedimania.js'
 
 interface CheckpointData {
-  index: number,
-  best?: number,
-  current?: number,
-  isFinish: boolean,
+  index: number
+  best?: number
+  current?: number
+  isFinish: boolean
 }
 
 export default class CpCounter extends StaticComponent {
-
   private readonly header: StaticHeader
   private prevTimes: {
-    login: string,
-    best?: number,
-    current: number,
+    login: string
+    best?: number
+    current: number
     isFinish: boolean
   }[] = []
   private prevLapTimes: {
-    login: string,
-    best?: number,
-    current: number,
+    login: string
+    best?: number
+    current: number
     isFinish: boolean
   }[] = []
 
@@ -35,48 +34,56 @@ export default class CpCounter extends StaticComponent {
     this.header = new StaticHeader('race', { rectangleWidth: config.rectangleWidth })
     this.renderOnEvent('PlayerCheckpoint', this.calculateData)
     // Using TM event to reset the counter on backspace press
-    tm.addListener('TrackMania.PlayerFinish', ([_, login, time]): void => {
-      const player = tm.players.get(login)
-      if (player === undefined) { return }
-      let best: number | undefined
-      let lap: undefined | CheckpointData & {
-        cpIndex: number
-      }
-      if (time !== 0) {
-        const local: tm.LocalRecord | undefined = tm.records.getLocal(login)
-        const dedi: DediRecord | undefined = dedimania.isUploadingLaps ? undefined : dedimania.getRecord(login)
-        best = dedi?.time ?? local?.time
-        if (dedi !== undefined && local !== undefined) {
-          best = Math.min(local?.time, dedi?.time)
+    tm.addListener(
+      'TrackMania.PlayerFinish',
+      ([_, login, time]): void => {
+        const player = tm.players.get(login)
+        if (player === undefined) {
+          return
         }
-        if (tm.maps.current.isInLapsMode && tm.maps.current.lapsAmount !== 1) {
-          const local: tm.LocalRecord | undefined = tm.records.getLap(login)
-          const dedi: DediRecord | undefined = !dedimania.isUploadingLaps ? undefined : dedimania.getRecord(login)
-          let pb: number | undefined = dedi?.time ?? local?.time
+        let best: number | undefined
+        let lap:
+          | undefined
+          | (CheckpointData & {
+              cpIndex: number
+            })
+        if (time !== 0) {
+          const local: tm.LocalRecord | undefined = tm.records.getLocal(login)
+          const dedi: DediRecord | undefined = dedimania.isUploadingLaps ? undefined : dedimania.getRecord(login)
+          best = dedi?.time ?? local?.time
           if (dedi !== undefined && local !== undefined) {
-            pb = Math.min(local?.time, dedi?.time)
+            best = Math.min(local?.time, dedi?.time)
           }
-          const startIndex = tm.maps.current.checkpointsAmount - (tm.maps.current.checkpointsPerLap + 1)
-          lap = {
-            cpIndex: 0,
-            index: 1,
-            best: pb,
-            current: time - (player.currentCheckpoints[startIndex]?.time ?? 0),
-            isFinish: true
+          if (tm.maps.current.isInLapsMode && tm.maps.current.lapsAmount !== 1) {
+            const local: tm.LocalRecord | undefined = tm.records.getLap(login)
+            const dedi: DediRecord | undefined = !dedimania.isUploadingLaps ? undefined : dedimania.getRecord(login)
+            let pb: number | undefined = dedi?.time ?? local?.time
+            if (dedi !== undefined && local !== undefined) {
+              pb = Math.min(local?.time, dedi?.time)
+            }
+            const startIndex = tm.maps.current.checkpointsAmount - (tm.maps.current.checkpointsPerLap + 1)
+            lap = {
+              cpIndex: 0,
+              index: 1,
+              best: pb,
+              current: time - (player.currentCheckpoints[startIndex]?.time ?? 0),
+              isFinish: true,
+            }
           }
         }
-      }
-      const obj = this.displayToPlayer(login, {
-        index: 0,
-        current: time === 0 ? undefined : time,
-        best,
-        isFinish: time !== 0,
-        lap
-      })
-      if (obj !== undefined) {
-        tm.sendManialink(obj.xml, obj.login)
-      }
-    }, true)
+        const obj = this.displayToPlayer(login, {
+          index: 0,
+          current: time === 0 ? undefined : time,
+          best,
+          isFinish: time !== 0,
+          lap,
+        })
+        if (obj !== undefined) {
+          tm.sendManialink(obj.xml, obj.login)
+        }
+      },
+      true
+    )
     this.renderOnEvent('BeginMap', () => {
       this.prevTimes.length = 0
       this.prevLapTimes.length = 0
@@ -85,28 +92,38 @@ export default class CpCounter extends StaticComponent {
     this.onPanelHide((player) => {
       this.sendMultipleManialinks(this.displayToPlayer(player.login))
     })
-    tm.addListener('PlayerInfoChanged', info => {
+    tm.addListener('PlayerInfoChanged', (info) => {
       const id = info.currentTargetId
-      if (id % 255 === 0) { return }
+      if (id % 255 === 0) {
+        return
+      }
       const player = tm.players.get(info.login)
       if (player === undefined) {
         tm.log.error(`Player ${info.login} triggered PlayerInfoChanged, but does not exist.`)
         return
       }
-      const target = tm.players.list.find(a => a.id === id)
-      if (target === undefined) { return }
+      const target = tm.players.list.find((a) => a.id === id)
+      if (target === undefined) {
+        return
+      }
       if (target.currentCheckpoints.length === 0) {
         const ret = this.displayToPlayer(info.login)
-        if (ret === undefined) { return }
+        if (ret === undefined) {
+          return
+        }
         tm.sendManialink(ret.xml, ret.login)
       }
       const cpInfo = target.currentCheckpoints.at(-1)
-      if (cpInfo === undefined) { return }
+      if (cpInfo === undefined) {
+        return
+      }
       const ret = this.calculateData({
         ...cpInfo,
-        player: target
+        player: target,
       })
-      if (ret === undefined) { return }
+      if (ret === undefined) {
+        return
+      }
       tm.sendManialink(ret.xml, player.login)
     })
   }
@@ -116,7 +133,9 @@ export default class CpCounter extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     const arr = []
     for (const e of tm.players.list) {
       arr.push(this.displayToPlayer(e.login))
@@ -135,14 +154,17 @@ export default class CpCounter extends StaticComponent {
     if (dedi !== undefined && local !== undefined) {
       pb = Math.min(local?.checkpoints?.[info.index], dedi?.checkpoints?.[info.index])
     }
-    let lap: undefined | CheckpointData & {
-      cpIndex: number
-    }
+    let lap:
+      | undefined
+      | (CheckpointData & {
+          cpIndex: number
+        })
     if (tm.maps.current.isInLapsMode && tm.maps.current.lapsAmount !== 1) {
       let cpIndex = info.lapCheckpointIndex + 1
       const local: tm.LocalRecord | undefined = tm.records.getLap(info.player.login)
-      const dedi: DediRecord | undefined = !dedimania.isUploadingLaps ? undefined :
-        dedimania.getRecord(info.player.login)
+      const dedi: DediRecord | undefined = !dedimania.isUploadingLaps
+        ? undefined
+        : dedimania.getRecord(info.player.login)
       let pb: number | undefined
       if (info.isLapFinish) {
         cpIndex = 0
@@ -161,7 +183,7 @@ export default class CpCounter extends StaticComponent {
         index: info.lap + 1,
         best: pb,
         current: info.lapCheckpointTime,
-        isFinish: info.isLapFinish
+        isFinish: info.isLapFinish,
       }
     }
     return this.displayToPlayer(info.player.login, {
@@ -169,17 +191,25 @@ export default class CpCounter extends StaticComponent {
       best: pb,
       current: info.time,
       isFinish: false,
-      lap
+      lap,
     })
   }
 
-  private constructTimeXml(login: string, isLap: boolean, icon: string, isFinish?: boolean, currentTime?: number,
-    bestTime?: number): string {
+  private constructTimeXml(
+    login: string,
+    isLap: boolean,
+    icon: string,
+    isFinish?: boolean,
+    currentTime?: number,
+    bestTime?: number
+  ): string {
     const isStunts = tm.getGameMode() === 'Stunts'
     const arr = isLap ? this.prevLapTimes : this.prevTimes
-    const prev = arr.find(a => a.login === login)
+    const prev = arr.find((a) => a.login === login)
     if (currentTime === undefined) {
-      if (prev === undefined) { return '' }
+      if (prev === undefined) {
+        return ''
+      }
       currentTime = prev?.current
       bestTime = prev?.best
       isFinish = prev?.isFinish
@@ -188,7 +218,7 @@ export default class CpCounter extends StaticComponent {
         login,
         best: bestTime,
         current: currentTime,
-        isFinish: isFinish === true
+        isFinish: isFinish === true,
       })
     } else {
       prev.best = bestTime
@@ -214,11 +244,11 @@ export default class CpCounter extends StaticComponent {
       }
     }
     const h: StaticHeaderOptions = this.header.options
-    const w: number = ((config.width - h.squareWidth) - config.margin) / 2
+    const w: number = (config.width - h.squareWidth - config.margin) / 2
     const timeColour: string = '$' + (isFinish === true ? config.colours.finish : config.colours.default)
     return `${this.header.constructXml(timeColour + tm.utils.getTimeString(currentTime), icon, config.side, {
       rectangleWidth: w,
-      centerText: true
+      centerText: true,
     })}
     <frame posn="${w + config.margin * 2 + h.squareWidth} 0 3">
       <quad posn="0 0 3" sizen="${w} ${h.height}" bgcolor="${h.textBackground}"/>
@@ -226,12 +256,17 @@ export default class CpCounter extends StaticComponent {
     </frame>`
   }
 
-  displayToPlayer(login: string, params?: CheckpointData & {
-    lap?: CheckpointData & {
-      cpIndex: number
+  displayToPlayer(
+    login: string,
+    params?: CheckpointData & {
+      lap?: CheckpointData & {
+        cpIndex: number
+      }
     }
-  }) {
-    if (!this.isDisplayed) { return }
+  ) {
+    if (!this.isDisplayed) {
+      return
+    }
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
@@ -267,7 +302,7 @@ export default class CpCounter extends StaticComponent {
     const centerText = !config.useRelative
     let [posX, posY] = [config.posX, config.posY]
     if (config.useRelative) {
-      [posX, posY] = [this.positionX, this.positionY]
+      ;[posX, posY] = [this.positionX, this.positionY]
     }
     const spectators = tm.players.get(login)?.spectators
     const logins = spectators !== undefined ? Array.from(spectators) : []
@@ -276,9 +311,18 @@ export default class CpCounter extends StaticComponent {
     let times = ''
     if (config.times) {
       times = `<frame posn="0 ${-(config.height + config.margin)} 2">
-                ${cpAmount === 0 ? '' :
-        this.constructTimeXml(login, false, config.iconBottom, params?.isFinish, params?.current,
-          params?.best)}</frame>`
+                ${
+                  cpAmount === 0
+                    ? ''
+                    : this.constructTimeXml(
+                        login,
+                        false,
+                        config.iconBottom,
+                        params?.isFinish,
+                        params?.current,
+                        params?.best
+                      )
+                }</frame>`
     }
 
     return {
@@ -288,21 +332,26 @@ export default class CpCounter extends StaticComponent {
               ${this.getLapsXml(login, params?.lap)}
               <format textsize="1"/>
               ${this.header.constructXml('$' + config.colours.default + text, config.icon, config.side, {
-        rectangleWidth,
-        centerText
-      })}
+                rectangleWidth,
+                centerText,
+              })}
               ${counterXml}
               ${times}
             </frame>
         </manialink>`,
-      login: logins
+      login: logins,
     }
   }
 
-  private getLapsXml(login: string, data?: CheckpointData & {
-    cpIndex: number
-  }) {
-    if (!tm.maps.current.isInLapsMode || tm.maps.current.lapsAmount === 1) { return '' }
+  private getLapsXml(
+    login: string,
+    data?: CheckpointData & {
+      cpIndex: number
+    }
+  ) {
+    if (!tm.maps.current.isInLapsMode || tm.maps.current.lapsAmount === 1) {
+      return ''
+    }
     const h: StaticHeaderOptions = this.header.options
     const lapCounterW: number = config.lap.lapCounterWidth
     const lapsAmount = tm.maps.current.lapsAmount
@@ -333,11 +382,18 @@ export default class CpCounter extends StaticComponent {
     </frame>`
     return `<frame posn="0 ${this.header.options.height * 2 + config.margin * 2} 4">
     <format textsize="1"/>
-    ${cpAmount === 0 ? '' :
-      this.constructTimeXml(login, true, config.lap.iconTop, data?.isFinish, data?.current, data?.best)}
+    ${
+      cpAmount === 0
+        ? ''
+        : this.constructTimeXml(login, true, config.lap.iconTop, data?.isFinish, data?.current, data?.best)
+    }
     <frame posn="0 ${-(config.height + config.margin)} 2">
-      ${this.header.constructXml('$' + config.colours.default + config.lap.lapText, config.lap.iconBottom, config.side,
-      { rectangleWidth: lapTextW })}
+      ${this.header.constructXml(
+        '$' + config.colours.default + config.lap.lapText,
+        config.lap.iconBottom,
+        config.side,
+        { rectangleWidth: lapTextW }
+      )}
       ${lapCounterXml}
       <frame posn="${cpX} 0 3">
         <quad posn="0 0 3" sizen="${cpTextW} ${h.height}" bgcolor="${h.textBackground}"/>
@@ -347,5 +403,4 @@ export default class CpCounter extends StaticComponent {
     </frame>
   </frame>`
   }
-
 }

@@ -1,9 +1,18 @@
 import config from './ServerLinks.config.js'
-import { centeredText, componentIds, Grid, type GridCellFunction, leftAlignedText, Paginator, StaticComponent, StaticHeader, type StaticHeaderOptions } from '../../ui/UI.js'
+import {
+  centeredText,
+  componentIds,
+  Grid,
+  type GridCellFunction,
+  leftAlignedText,
+  Paginator,
+  StaticComponent,
+  StaticHeader,
+  type StaticHeaderOptions,
+} from '../../ui/UI.js'
 import type { ServerInfo } from '../ServerLinks.js'
 
 export default class ServerLinks extends StaticComponent {
-
   private readonly paginator: Paginator
   private readonly header: StaticHeader
   private readonly grid: Grid
@@ -14,7 +23,7 @@ export default class ServerLinks extends StaticComponent {
     Teams: 'TEAM',
     Cup: 'CUP',
     Laps: 'LAP',
-    Stunts: 'STNT'
+    Stunts: 'STNT',
   }
   private readonly gameModeIcons: { [gameMode in tm.GameMode]: string } = config.icons.gameMode
   private currentDefaultPage = 0 // Gets incremented to 1 at first update
@@ -23,8 +32,12 @@ export default class ServerLinks extends StaticComponent {
   constructor() {
     super(componentIds.serverLinks)
     this.header = new StaticHeader('race')
-    this.grid = new Grid(config.width, config.height - this.header.options.height, [1],
-      new Array(config.entries).fill(1))
+    this.grid = new Grid(
+      config.width,
+      config.height - this.header.options.height,
+      [1],
+      new Array(config.entries).fill(1)
+    )
     this.paginator = new Paginator(this.id, 0, 0, 4)
     this.paginator.onPageChange = (login) => {
       const obj = this.displayToPlayer(login)
@@ -49,8 +62,8 @@ export default class ServerLinks extends StaticComponent {
       this.currentDefaultPage = 1
     }
     for (const e of tm.players.list) {
-      if (this.pageSwitchTimeouts.some(a => a === e.login)) {
-        this.pageSwitchTimeouts = this.pageSwitchTimeouts.filter(a => a !== e.login)
+      if (this.pageSwitchTimeouts.some((a) => a === e.login)) {
+        this.pageSwitchTimeouts = this.pageSwitchTimeouts.filter((a) => a !== e.login)
       } else {
         this.paginator.setPageForLogin(e.login, this.currentDefaultPage)
       }
@@ -59,7 +72,9 @@ export default class ServerLinks extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     const arr = []
     for (const player of tm.players.list) {
       arr.push(this.displayToPlayer(player.login))
@@ -68,7 +83,9 @@ export default class ServerLinks extends StaticComponent {
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
@@ -89,7 +106,7 @@ export default class ServerLinks extends StaticComponent {
         </frame>
       </frame>
     </manialink>`,
-      login
+      login,
     }
   }
 
@@ -114,10 +131,12 @@ export default class ServerLinks extends StaticComponent {
     let buttonsXml: string = ''
     for (let i: number = 0; i < buttonAmount; i++) {
       const action: string = ids[i] === undefined ? '' : `action="${ids[i]}"`
-      const icon: string = icons[i] === undefined ? '' :
-        `<quad posn="${headerCfg.iconHorizontalPadding} ${-headerCfg.iconVerticalPadding} 4" 
+      const icon: string =
+        icons[i] === undefined
+          ? ''
+          : `<quad posn="${headerCfg.iconHorizontalPadding} ${-headerCfg.iconVerticalPadding} 4" 
       sizen="${headerCfg.iconWidth} ${headerCfg.iconHeight}" image="${icons[i]}" imagefocus="${iconsHover[i]}" ${action}/>`
-      buttonsXml += `<frame posn="${(config.width + config.margin) - (headerCfg.squareWidth + config.margin) * ((buttonAmount - i))} 0 1">
+      buttonsXml += `<frame posn="${config.width + config.margin - (headerCfg.squareWidth + config.margin) * (buttonAmount - i)} 0 1">
         <quad posn="0 0 1" sizen="${headerCfg.squareWidth} ${headerCfg.height}" bgcolor="${headerCfg.textBackground}"/>
         ${icon}
       </frame>`
@@ -126,11 +145,15 @@ export default class ServerLinks extends StaticComponent {
     <quad posn="${headerCfg.iconHorizontalPadding} ${-headerCfg.iconVerticalPadding} 4" sizen="${headerCfg.iconWidth} ${headerCfg.iconHeight}" image="${config.icon}"/> 
     <frame posn="${headerCfg.squareWidth + config.margin} 0 1">
     <quad posn="0 0 1" sizen="${config.width - (headerCfg.squareWidth + config.margin) * (1 + buttonAmount)} ${headerCfg.height}" bgcolor="${headerCfg.textBackground}"/>
-      ${leftAlignedText(config.title, config.width - (headerCfg.squareWidth + config.margin) * (1 + buttonAmount),
-      headerCfg.height, {
-        textScale: headerCfg.textScale,
-        padding: headerCfg.horizontalPadding
-      })}
+      ${leftAlignedText(
+        config.title,
+        config.width - (headerCfg.squareWidth + config.margin) * (1 + buttonAmount),
+        headerCfg.height,
+        {
+          textScale: headerCfg.textScale,
+          padding: headerCfg.horizontalPadding,
+        }
+      )}
     </frame>
     ${buttonsXml}
     `
@@ -139,27 +162,36 @@ export default class ServerLinks extends StaticComponent {
   private constructEntry(ii: number, jj: number, ww: number, hh: number, startIndex: number): string {
     const data = this.serverList[(ii + startIndex) % this.serverList.length]
     const m = config.margin
-    const arr: GridCellFunction[] = [(i, j, w, h): string => {
-      return `${this.icon(icons.name, iw, h)}
+    const arr: GridCellFunction[] = [
+      (i, j, w, h): string => {
+        return `${this.icon(icons.name, iw, h)}
         ${this.text(tm.utils.strip(data.name, false), w - iw - m, h, iw + m, config.iconBackground, true)}`
-    }, (i, j, w, h): string => {
-      const width = 7
-      return `${this.icon(icons.map, iw, h)}
+      },
+      (i, j, w, h): string => {
+        const width = 7
+        return `${this.icon(icons.map, iw, h)}
         ${this.text(data.currentMap, width, h, iw + m)}
         ${this.icon(icons.playerCount, iw, h, iw + width + 2 * m)}
-        ${this.text(`${data.playerCount}/${data.maxPlayerCount}`, w - (2 * iw + width + 3 * m), h,
-        2 * iw + width + 3 * m)}`
-    }, (i, j, w, h): string => {
-      const width = 7
-      return `${this.icon(icons.author, iw, h)}
+        ${this.text(
+          `${data.playerCount}/${data.maxPlayerCount}`,
+          w - (2 * iw + width + 3 * m),
+          h,
+          2 * iw + width + 3 * m
+        )}`
+      },
+      (i, j, w, h): string => {
+        const width = 7
+        return `${this.icon(icons.author, iw, h)}
         ${this.text(data.currentMapAuthor, width, h, iw + m)}
         ${this.icon(this.gameModeIcons[data.gameMode], iw, h, iw + width + 2 * m)}
         ${this.text(this.gameModeMap[data.gameMode], w - (2 * iw + width + 3 * m), h, 2 * iw + width + 3 * m)}`
-    }]
+      },
+    ]
     const iw = config.iconWidth
     const icons = config.icons
-    const grid = new Grid(ww + config.margin * 2, hh + config.margin, [1], new Array(3).fill(1),
-      { margin: config.margin })
+    const grid = new Grid(ww + config.margin * 2, hh + config.margin, [1], new Array(3).fill(1), {
+      margin: config.margin,
+    })
     return `<frame posn="${-config.margin} 0 2">${grid.constructXml(arr)}</frame>`
   }
 
@@ -169,19 +201,28 @@ export default class ServerLinks extends StaticComponent {
      image="${url}"/>`
   }
 
-  private text(text: string, w: number, h: number, xOffset: number = 0, background?: string,
-    leftAligned?: boolean): string {
+  private text(
+    text: string,
+    w: number,
+    h: number,
+    xOffset: number = 0,
+    background?: string,
+    leftAligned?: boolean
+  ): string {
     xOffset = xOffset ?? 0
     return `<quad posn="${xOffset ?? 0} 0 2" sizen="${w} ${h}" bgcolor="${background ?? config.textBackground}"/>
-    ${leftAligned ? leftAlignedText(text, w, h, {
-      textScale: config.textScale,
-      padding: config.textPadding,
-      xOffset: xOffset + config.margin
-    }) : centeredText(text, w, h, {
-      textScale: config.textScale,
-      padding: config.textPadding,
-      xOffset
-    })}`
+    ${
+      leftAligned
+        ? leftAlignedText(text, w, h, {
+            textScale: config.textScale,
+            padding: config.textPadding,
+            xOffset: xOffset + config.margin,
+          })
+        : centeredText(text, w, h, {
+            textScale: config.textScale,
+            padding: config.textPadding,
+            xOffset,
+          })
+    }`
   }
-
 }

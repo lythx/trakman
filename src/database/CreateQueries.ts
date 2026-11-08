@@ -1,4 +1,5 @@
-export const createQueries = [`CREATE TABLE IF NOT EXISTS map_ids(
+export const createQueries = [
+  `CREATE TABLE IF NOT EXISTS map_ids(
   id INT4 GENERATED ALWAYS AS IDENTITY,
   uid VARCHAR(27) NOT NULL UNIQUE,
   PRIMARY KEY(id)
@@ -148,4 +149,5 @@ export const createQueries = [`CREATE TABLE IF NOT EXISTS map_ids(
     CONSTRAINT fk_caller_id
       FOREIGN KEY(caller_id)
 	      REFERENCES players(id)
-  );`]
+  );`,
+]

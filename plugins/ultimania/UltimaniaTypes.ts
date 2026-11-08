@@ -5,10 +5,14 @@ export interface UltimaniaRecord {
   date: Date
 }
 
-export type NewUltimaniaRecord = Omit<tm.Player & UltimaniaRecord & {
-  readonly position: number
-  readonly previous?: {
-    readonly score: number,
-    readonly position: number
-  }
-}, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>
+export type NewUltimaniaRecord = Omit<
+  tm.Player &
+    UltimaniaRecord & {
+      readonly position: number
+      readonly previous?: {
+        readonly score: number
+        readonly position: number
+      }
+    },
+  'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'
+>

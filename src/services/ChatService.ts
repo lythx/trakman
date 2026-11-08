@@ -17,21 +17,20 @@ type ModifyTextFunction = (info: tm.MessageInfo) => Promise<string | Error | und
  * This service manages chat table and chat commands
  */
 export abstract class ChatService {
-
   private static readonly messagesArraySize: number = config.chatMessagesInRuntime
   private static readonly _messages: tm.Message[] = []
   private static readonly repo: ChatRepository = new ChatRepository()
   private static readonly _commandList: tm.Command[] = []
   private static readonly customPrefixes: {
-    callback: MessageFunction,
+    callback: MessageFunction
     position: number
   }[] = []
   private static readonly messageStyleFunctions: {
-    importance: number,
+    importance: number
     callback: MessageFunction
   }[] = []
   private static readonly messageTextModifiers: {
-    importance: number,
+    importance: number
     callback: ModifyTextFunction
   }[] = []
   static readonly manualChatRoutingEnabled = config.manualChatRoutingEnabled
@@ -40,17 +39,17 @@ export abstract class ChatService {
    * Fetches messages from database
    */
   static async initialize(): Promise<void> {
-    this._messages.push(...await this.repo.get({ limit: this.messagesArraySize }))
+    this._messages.push(...(await this.repo.get({ limit: this.messagesArraySize })))
     tm.addListener('Startup', () => {
       Client.callNoRes('ChatEnableManualRouting', [{ boolean: this.manualChatRoutingEnabled }, { boolean: true }])
     })
     Events.addListener('PlayerChat', (info): void => {
       const input: string = info.text?.trim()
-      const [alias, ...params] = input.split(' ').filter(a => a !== '')
+      const [alias, ...params] = input.split(' ').filter((a) => a !== '')
       const aliasUsed: string | undefined = alias?.toLowerCase()
-      const matches = this._commandList.filter(command => {
+      const matches = this._commandList.filter((command) => {
         const prefix: string = command.privilege === 0 ? '/' : '//'
-        return command.aliases.some((alias: string): boolean => aliasUsed === (prefix + alias))
+        return command.aliases.some((alias: string): boolean => aliasUsed === prefix + alias)
       })
       if (matches.length === 1) {
         void this.commandCallback(matches[0], info, input, params, aliasUsed)
@@ -92,8 +91,8 @@ export abstract class ChatService {
       text: command,
       date: new Date(),
       id: 0,
-      country: "",
-      countryCode: "",
+      country: '',
+      countryCode: '',
       region: ServerConfig.config.zone,
       timePlayed: 0,
       joinTimestamp: 0,
@@ -104,7 +103,7 @@ export abstract class ChatService {
       ladderPoints: 0,
       ladderRank: 0,
       spectators: new Set<string>(),
-      title: "Server",
+      title: 'Server',
       wins: 0,
       privilege: 4,
       isSpectator: true,
@@ -114,13 +113,18 @@ export abstract class ChatService {
       average: 0,
       roundsPoints: 0,
       roundTimes: [],
-      isCupFinalist: false
+      isCupFinalist: false,
     }
     Events.emit('PlayerChat', mi)
   }
 
-  private static async commandCallback(command: tm.Command, info: tm.MessageInfo, input: string, params: string[],
-    alias: string): Promise<void> {
+  private static async commandCallback(
+    command: tm.Command,
+    info: tm.MessageInfo,
+    input: string,
+    params: string[],
+    alias: string
+  ): Promise<void> {
     if (info.privilege < command.privilege) {
       this.sendErrorMessage(messages.noPermission, info.login)
       return
@@ -129,12 +133,17 @@ export abstract class ChatService {
       this.sendErrorMessage(messages.playerMuted, info.login)
       return
     }
-    Logger.info(`${Utils.strip(info.nickname)} (${info.login}) used command ${alias}${params.length === 0 ? '' :
-      ` with params ${params.join(', ')}`}`)
+    Logger.info(
+      `${Utils.strip(info.nickname)} (${info.login}) used command ${alias}${
+        params.length === 0 ? '' : ` with params ${params.join(', ')}`
+      }`
+    )
     const parsedParams: (string | number | boolean | undefined | tm.Player | tm.OfflinePlayer)[] = []
     if (command.params !== undefined) {
       for (const [i, param] of command.params.entries()) {
-        if (params[i] === undefined && param.optional === true) { continue }
+        if (params[i] === undefined && param.optional === true) {
+          continue
+        }
         if (params[i] === undefined && param.optional === undefined) {
           this.sendErrorMessage(Utils.strVar(messages.noParam, { name: param.name }), info.login)
           return
@@ -144,18 +153,21 @@ export abstract class ChatService {
           continue
         }
         if (param.validValues !== undefined) {
-          const enumVal = param.validValues.find(a => a.toString().toLowerCase() === params[i].toLowerCase())
+          const enumVal = param.validValues.find((a) => a.toString().toLowerCase() === params[i].toLowerCase())
           if (enumVal === undefined) {
-            this.sendErrorMessage(Utils.strVar(messages.invalidValue, {
-              name: param.name,
-              values: param.validValues.join(', ')
-            }), info.login)
+            this.sendErrorMessage(
+              Utils.strVar(messages.invalidValue, {
+                name: param.name,
+                values: param.validValues.join(', '),
+              }),
+              info.login
+            )
             return
           }
           parsedParams.push(enumVal)
           continue
         }
-        switch(param.type) {
+        switch (param.type) {
           case 'int': {
             if (!Number.isInteger(Number(params[i]))) {
               this.sendErrorMessage(Utils.strVar(messages.notInt, { name: param.name }), info.login)
@@ -241,7 +253,7 @@ export abstract class ChatService {
     } = {
       ...info,
       text: input.split(' ').splice(1).join(' '),
-      aliasUsed: alias.slice(1)
+      aliasUsed: alias.slice(1),
     }
     command.callback(messageInfo, ...parsedParams)
   }
@@ -267,17 +279,19 @@ export abstract class ChatService {
       login,
       nickname: player.nickname,
       text,
-      date: new Date()
+      date: new Date(),
     }
     const messageInfo: tm.MessageInfo = {
       text,
-      date: message.date, ...player
+      date: message.date,
+      ...player,
     }
-    if (text[0] !== '/') { // I dont trim here cuz if u put space in front of slash the message gets displayed
+    if (text[0] !== '/') {
+      // I dont trim here cuz if u put space in front of slash the message gets displayed
       Logger.trace(`${Utils.strip(player.nickname)} (${player.login}) sent message: ${text}`)
       if (this.manualChatRoutingEnabled) {
         let str = ''
-        for (const e of this.customPrefixes.filter(a => a.position < 0)) {
+        for (const e of this.customPrefixes.filter((a) => a.position < 0)) {
           str += await e.callback(messageInfo)
         }
         let customStyle = false
@@ -302,12 +316,14 @@ export abstract class ChatService {
             break
           }
         }
-        for (const e of this.customPrefixes.filter(a => a.position >= 0)) {
+        for (const e of this.customPrefixes.filter((a) => a.position >= 0)) {
           str += await e.callback(messageInfo)
         }
-        Client.callNoRes('ChatSendServerMessage', [{
-          string: str + text
-        }])
+        Client.callNoRes('ChatSendServerMessage', [
+          {
+            string: str + text,
+          },
+        ])
       }
       this._messages.unshift(message)
       void this.repo.add(login, text, message.date)
@@ -325,7 +341,7 @@ export abstract class ChatService {
   static addMessagePrefix(callback: MessageFunction, position: number): void {
     this.customPrefixes.push({
       callback,
-      position
+      position,
     })
     this.customPrefixes.sort((a, b) => b.position - a.position)
   }
@@ -339,7 +355,7 @@ export abstract class ChatService {
   static setMessageStyle(callback: MessageFunction, importance: number) {
     this.messageStyleFunctions.push({
       callback,
-      importance
+      importance,
     })
     this.messageStyleFunctions.sort((a, b) => b.importance - a.importance)
   }
@@ -354,7 +370,7 @@ export abstract class ChatService {
   static addMessageTextModifier(callback: ModifyTextFunction, importance: number) {
     this.messageTextModifiers.push({
       callback,
-      importance
+      importance,
     })
     this.messageTextModifiers.sort((a, b) => b.importance - a.importance)
   }
@@ -365,10 +381,13 @@ export abstract class ChatService {
    * @param options Limit is maximum amount of fetched messages, date is timestamp after which messages will be fetched
    * @returns Array of message objects
    */
-  static async fetchByLogin(login: string, options: {
-    limit?: number;
-    date?: Date;
-  }): Promise<tm.Message[]> {
+  static async fetchByLogin(
+    login: string,
+    options: {
+      limit?: number
+      date?: Date
+    }
+  ): Promise<tm.Message[]> {
     return await this.repo.getByLogin(login, options)
   }
 
@@ -377,10 +396,7 @@ export abstract class ChatService {
    * @param options Limit is maximum amount of fetched messages, date is timestamp after which messages will be fetched
    * @returns Array of message objects
    */
-  static async fetch(options: {
-    limit?: number;
-    date?: Date;
-  }): Promise<tm.Message[]> {
+  static async fetch(options: { limit?: number; date?: Date }): Promise<tm.Message[]> {
     return await this.repo.get(options)
   }
 
@@ -390,7 +406,7 @@ export abstract class ChatService {
    * @returns Array of message objects
    */
   static get(login: string): Readonly<tm.Message>[] {
-    return this._messages.filter(a => a.login === login)
+    return this._messages.filter((a) => a.login === login)
   }
 
   /**
@@ -420,5 +436,4 @@ export abstract class ChatService {
   static get commandCount(): number {
     return this._commandList.length
   }
-
 }

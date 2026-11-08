@@ -7,7 +7,7 @@ const options = {
   '+': 1,
   '-': -1,
   '--': -2,
-  '---': -3
+  '---': -3,
 } as const
 
 const processVote = (vote: '---' | '--' | '-' | '+' | '++' | '+++', info: tm.MessageInfo): void => {
@@ -25,5 +25,5 @@ tm.commands.add({
   callback: async (info): Promise<void> => {
     processVote(info.aliasUsed as keyof typeof options, info)
   },
-  privilege: 0
+  privilege: 0,
 })

@@ -10,7 +10,6 @@ import config from '../../config/Config.js'
 import { RoundsService } from './RoundsService.js'
 
 export class RecordService {
-
   private static repo: RecordRepository = new RecordRepository()
   private static _localRecords: tm.LocalRecord[] = []
   private static _lapRecords: tm.LocalRecord[] = []
@@ -19,16 +18,16 @@ export class RecordService {
   static readonly maxLocalsAmount: number = config.localRecordsLimit
   private static _initialLocals: tm.LocalRecord[] = []
   private static _playerRanks: {
-    login: string,
-    mapId: string,
+    login: string
+    mapId: string
     rank: number
   }[] = []
   private static _queueRecords: {
-    mapId: string,
+    mapId: string
     records: tm.Record[]
   }[] = []
   private static _historyRecords: {
-    mapId: string,
+    mapId: string
     records: tm.Record[]
   }[] = []
 
@@ -48,23 +47,25 @@ export class RecordService {
     await this.fetchAndStoreRanks()
     // Recreate list when Match Settings get changed
     if (!config.manualMapLoading.enabled) {
-      Client.addProxy(['LoadMatchSettings', 'AppendPlaylistFromMatchSettings', 'InsertPlaylistFromMatchSettings'],
+      Client.addProxy(
+        ['LoadMatchSettings', 'AppendPlaylistFromMatchSettings', 'InsertPlaylistFromMatchSettings'],
         async (): Promise<void> => {
           this._playerRanks.length = 0
           await this.fetchAndStoreRanks()
-        })
+        }
+      )
     }
     Events.addListener('JukeboxChanged', () => this.updateQueue())
     Events.addListener('LocalRecord', (info) => {
-      const ranks = this._playerRanks.filter(a => a.mapId === MapService.current.id)
-      const rec = ranks.find(a => a.login === info.login)
+      const ranks = this._playerRanks.filter((a) => a.mapId === MapService.current.id)
+      const rec = ranks.find((a) => a.login === info.login)
       if (rec !== undefined) {
         rec.rank = info.position
       } else {
         this._playerRanks.push({
           login: info.login,
           rank: info.position,
-          mapId: info.map
+          mapId: info.map,
         })
       }
       for (const e of ranks) {
@@ -97,7 +98,7 @@ export class RecordService {
   static async nextMap(): Promise<void> {
     this._historyRecords.unshift({
       mapId: MapService.history[0].id,
-      records: [...this._localRecords]
+      records: [...this._localRecords],
     })
     this._liveRecords.length = 0
     if (MapService.current.isInLapsMode) {
@@ -119,11 +120,15 @@ export class RecordService {
    */
   static async fetchAndStoreRanks(...logins: string[]): Promise<void> {
     // If logins length is 0 get online players
-    this._playerRanks = this._playerRanks.filter(a => !logins.includes(a.login))
-    const presentMaps = new Set(MapService.maps.map(a => a.id))
-    if (logins.length === 0) { logins = PlayerService.players.map(a => a.login) }
+    this._playerRanks = this._playerRanks.filter((a) => !logins.includes(a.login))
+    const presentMaps = new Set(MapService.maps.map((a) => a.id))
+    if (logins.length === 0) {
+      logins = PlayerService.players.map((a) => a.login)
+    }
     const records: tm.Record[] = await this.repo.getAll()
-    if (records.length === 0) { return }
+    if (records.length === 0) {
+      return
+    }
     let rank = 1
     let prevMap = records[0].map
     let curMap = records[0].map
@@ -137,12 +142,14 @@ export class RecordService {
           continue
         }
       }
-      if (!mapPresent) { continue }
+      if (!mapPresent) {
+        continue
+      }
       if (logins.includes(records[i].login)) {
         this._playerRanks.push({
           login: records[i].login,
           mapId: records[i].map,
-          rank
+          rank,
         })
       }
       rank++
@@ -160,13 +167,20 @@ export class RecordService {
    * containing tm.FinishInfo object, localRecord object if record was a local record and liveRecord object if
    * record was a live record
    */
-  static async add(map: string, player: tm.Player, time: number): Promise<false | {
-    finishInfo: tm.FinishInfo,
-    localRecord?: tm.RecordInfo,
-    liveRecord?: tm.RecordInfo
-  }> {
+  static async add(
+    map: string,
+    player: tm.Player,
+    time: number
+  ): Promise<
+    | false
+    | {
+        finishInfo: tm.FinishInfo
+        localRecord?: tm.RecordInfo
+        liveRecord?: tm.RecordInfo
+      }
+  > {
     const date: Date = new Date()
-    const checkpoints: number[] = [...player.currentCheckpoints.map(a => a.time)]
+    const checkpoints: number[] = [...player.currentCheckpoints.map((a) => a.time)]
     // If number of checkpoints doesn't match the map checkpoints amount reset checkpoints array and return
     if (checkpoints.length !== MapService.current.checkpointsAmount - 1) {
       checkpoints.length = 0
@@ -178,24 +192,37 @@ export class RecordService {
       checkpoints: [...checkpoints],
       map,
       time,
-      roundPoints: points
+      roundPoints: points,
     }
     RoundsService.registerRoundRecord(finishInfo, player)
-    const localRecord: tm.RecordInfo | undefined = await this.handleLocalRecord(map, time, date, [...checkpoints],
-      player)
+    const localRecord: tm.RecordInfo | undefined = await this.handleLocalRecord(
+      map,
+      time,
+      date,
+      [...checkpoints],
+      player
+    )
     const liveRecord: tm.RecordInfo | undefined = this.handleLiveRecord(map, time, date, [...checkpoints], player)
     return {
       localRecord,
       finishInfo,
-      liveRecord
+      liveRecord,
     }
   }
 
-  static async addLap(map: string, player: tm.Player, time: number, checkpoints: number[],
-    isFinish: boolean): Promise<false | {
-    lapInfo: tm.LapFinishInfo,
-    lapRecord?: tm.LapRecordInfo
-  }> {
+  static async addLap(
+    map: string,
+    player: tm.Player,
+    time: number,
+    checkpoints: number[],
+    isFinish: boolean
+  ): Promise<
+    | false
+    | {
+        lapInfo: tm.LapFinishInfo
+        lapRecord?: tm.LapRecordInfo
+      }
+  > {
     const date: Date = new Date()
     // If number of checkpoints doesn't match the map checkpoints amount reset checkpoints array and return
     if (checkpoints.length !== MapService.current.checkpointsPerLap - 1) {
@@ -207,16 +234,22 @@ export class RecordService {
       checkpoints: [...checkpoints],
       map,
       time,
-      isFinish
+      isFinish,
     }
-    const localRecord: Partial<tm.LapRecordInfo> | undefined = await this.handleLocalRecord(map, time, date,
-      [...checkpoints], player, true)
+    const localRecord: Partial<tm.LapRecordInfo> | undefined = await this.handleLocalRecord(
+      map,
+      time,
+      date,
+      [...checkpoints],
+      player,
+      true
+    )
     if (localRecord !== undefined) {
-      (localRecord as any).isFinish = isFinish
+      ;(localRecord as any).isFinish = isFinish
     }
     return {
       lapRecord: localRecord as tm.LapRecordInfo,
-      lapInfo: finishInfo
+      lapInfo: finishInfo,
     }
   }
 
@@ -224,45 +257,56 @@ export class RecordService {
    * Updates the player nickname in runtime memory
    * @param players Objects containing player logins and nicknames
    */
-  static updateInfo(...players: {
-    login: string,
-    nickname?: string,
-    region?: string,
-    title?: string
-  }[]): void {
-    const replaceInfos = (obj: {
-      nickname: string,
-      region: string,
-      country: string,
-      countryCode: string,
+  static updateInfo(
+    ...players: {
+      login: string
+      nickname?: string
+      region?: string
       title?: string
-    }, replacer: {
-      nickname?: string,
-      region?: string,
-      title?: string
-    }) => {
-      if (replacer.nickname !== undefined) { obj.nickname = replacer.nickname }
+    }[]
+  ): void {
+    const replaceInfos = (
+      obj: {
+        nickname: string
+        region: string
+        country: string
+        countryCode: string
+        title?: string
+      },
+      replacer: {
+        nickname?: string
+        region?: string
+        title?: string
+      }
+    ) => {
+      if (replacer.nickname !== undefined) {
+        obj.nickname = replacer.nickname
+      }
       if (replacer.region !== undefined) {
-        const {
-          region,
-          country,
-          countryCode
-        } = Utils.getRegionInfo(replacer.region)
+        const { region, country, countryCode } = Utils.getRegionInfo(replacer.region)
         if (countryCode !== undefined) {
           obj.region = region
           obj.country = country
           obj.countryCode = countryCode
         }
       }
-      if (replacer.title !== undefined && obj.title !== undefined) { obj.title = replacer.title }
+      if (replacer.title !== undefined && obj.title !== undefined) {
+        obj.title = replacer.title
+      }
     }
     for (const p of players) {
-      const obj1 = this._liveRecords.find(a => a.login === p.login)
-      if (obj1 !== undefined) { replaceInfos(obj1, p) }
-      const obj2 = this._localRecords.find(a => a.login === p.login)
-      if (obj2 !== undefined) { replaceInfos(obj2, p) }
-      const obj3 = this._initialLocals.find(a => a.login === p.login)
-      if (obj3 !== undefined) { replaceInfos(obj3, p) }
+      const obj1 = this._liveRecords.find((a) => a.login === p.login)
+      if (obj1 !== undefined) {
+        replaceInfos(obj1, p)
+      }
+      const obj2 = this._localRecords.find((a) => a.login === p.login)
+      if (obj2 !== undefined) {
+        replaceInfos(obj2, p)
+      }
+      const obj3 = this._initialLocals.find((a) => a.login === p.login)
+      if (obj3 !== undefined) {
+        replaceInfos(obj3, p)
+      }
     }
   }
 
@@ -276,23 +320,39 @@ export class RecordService {
    * @param player Player object
    * @returns Record object if local record gets added, undefined otherwise
    */
-  private static async handleLocalRecord(mapId: string, time: number, date: Date, checkpoints: number[],
-    player: tm.Player, isLap?: true): Promise<tm.RecordInfo | undefined> {
+  private static async handleLocalRecord(
+    mapId: string,
+    time: number,
+    date: Date,
+    checkpoints: number[],
+    player: tm.Player,
+    isLap?: true
+  ): Promise<tm.RecordInfo | undefined> {
     const records = isLap ? this._lapRecords : this._localRecords
     const isStunts = GameService.gameMode === 'Stunts'
     const recType = isLap ? 'lap' : 'local'
-    const previousIndex = records.findIndex(a => a.login === player.login)
+    const previousIndex = records.findIndex((a) => a.login === player.login)
     let position: number
     if (isStunts) {
-      position = records.findIndex(a => a.time < time) + 1
+      position = records.findIndex((a) => a.time < time) + 1
     } else {
-      position = records.findIndex(a => a.time > time) + 1
+      position = records.findIndex((a) => a.time > time) + 1
     }
     // If player gets the worst record on the server set position to array length + 1
-    if (position === 0) { position = records.length + 1 }
+    if (position === 0) {
+      position = records.length + 1
+    }
     if (previousIndex === -1) {
-      const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, undefined,
-        position, undefined)
+      const recordInfo: tm.RecordInfo = this.constructRecordObject(
+        player,
+        mapId,
+        date,
+        checkpoints,
+        time,
+        undefined,
+        position,
+        undefined
+      )
       records.splice(position - 1, 0, recordInfo)
       Logger.info(...this.getLogString(undefined, position, undefined, time, player, recType, isStunts))
       if (MapService.current.isInLapsMode && !isLap) {
@@ -304,24 +364,53 @@ export class RecordService {
     }
     const pb: number | undefined = records[previousIndex].time
     if (time === pb) {
-      const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, time,
-        previousIndex + 1, previousIndex + 1)
+      const recordInfo: tm.RecordInfo = this.constructRecordObject(
+        player,
+        mapId,
+        date,
+        checkpoints,
+        time,
+        time,
+        previousIndex + 1,
+        previousIndex + 1
+      )
       Logger.info(...this.getLogString(previousIndex + 1, previousIndex + 1, time, time, player, recType, isStunts))
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
     if ((time < pb && !isStunts) || (time > pb && isStunts)) {
       const previousTime: number | undefined = records[previousIndex].time
-      const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, previousTime,
-        position, previousIndex + 1)
+      const recordInfo: tm.RecordInfo = this.constructRecordObject(
+        player,
+        mapId,
+        date,
+        checkpoints,
+        time,
+        previousTime,
+        position,
+        previousIndex + 1
+      )
       records.splice(previousIndex, 1)
       records.splice(position - 1, 0, recordInfo)
       Logger.info(...this.getLogString(previousIndex + 1, position, previousTime, time, player, recType, isStunts))
       if (MapService.current.isInLapsMode && !isLap) {
-        void this.repo.update(recordInfo.map, recordInfo.login, recordInfo.time, recordInfo.checkpoints,
-          recordInfo.date, false, MapService.current.lapsAmount)
+        void this.repo.update(
+          recordInfo.map,
+          recordInfo.login,
+          recordInfo.time,
+          recordInfo.checkpoints,
+          recordInfo.date,
+          false,
+          MapService.current.lapsAmount
+        )
       } else {
-        void this.repo.update(recordInfo.map, recordInfo.login, recordInfo.time, recordInfo.checkpoints,
-          recordInfo.date, isStunts)
+        void this.repo.update(
+          recordInfo.map,
+          recordInfo.login,
+          recordInfo.time,
+          recordInfo.checkpoints,
+          recordInfo.date,
+          isStunts
+        )
       }
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
@@ -336,40 +425,70 @@ export class RecordService {
    * @param player Player object
    * @returns Record object if live record gets added, undefined otherwise
    */
-  private static handleLiveRecord(mapId: string, time: number, date: Date, checkpoints: number[],
-    player: tm.Player): tm.RecordInfo | undefined {
-    const pb: number | undefined = this._liveRecords.find(a => a.login === player.login)?.time
+  private static handleLiveRecord(
+    mapId: string,
+    time: number,
+    date: Date,
+    checkpoints: number[],
+    player: tm.Player
+  ): tm.RecordInfo | undefined {
+    const pb: number | undefined = this._liveRecords.find((a) => a.login === player.login)?.time
     const isStunts = GameService.gameMode === 'Stunts'
     let position: number
     if (isStunts) {
-      position = this._liveRecords.filter(a => a.time >= time).length + 1
+      position = this._liveRecords.filter((a) => a.time >= time).length + 1
     } else {
-      position = this._liveRecords.filter(a => a.time <= time).length + 1
+      position = this._liveRecords.filter((a) => a.time <= time).length + 1
     }
     if (pb === undefined) {
-      const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, undefined,
-        position, undefined)
+      const recordInfo: tm.RecordInfo = this.constructRecordObject(
+        player,
+        mapId,
+        date,
+        checkpoints,
+        time,
+        undefined,
+        position,
+        undefined
+      )
       this._liveRecords.splice(position - 1, 0, recordInfo)
       Logger.trace(...this.getLogString(undefined, position, undefined, time, player, 'live', isStunts))
       return recordInfo
     }
     if (time === pb) {
-      const previousPosition: number = this._liveRecords.findIndex(
-        a => a.login === this._liveRecords.find(a => a.login === player.login)?.login) + 1
-      const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, time,
-        previousPosition, previousPosition)
+      const previousPosition: number =
+        this._liveRecords.findIndex((a) => a.login === this._liveRecords.find((a) => a.login === player.login)?.login) +
+        1
+      const recordInfo: tm.RecordInfo = this.constructRecordObject(
+        player,
+        mapId,
+        date,
+        checkpoints,
+        time,
+        time,
+        previousPosition,
+        previousPosition
+      )
       Logger.trace(...this.getLogString(previousPosition, previousPosition, time, time, player, 'live', isStunts))
       return recordInfo
     }
     if ((time < pb && !isStunts) || (time > pb && isStunts)) {
-      const previousIndex: number = this._liveRecords.findIndex(a => a.login === player.login)
+      const previousIndex: number = this._liveRecords.findIndex((a) => a.login === player.login)
       if (previousIndex === -1) {
         Logger.error(`Can't find player ${player.nickname} (${player.login}) in memory`)
         return
       }
       const previousTime: number | undefined = this._liveRecords[previousIndex].time
-      const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, previousTime,
-        position, previousIndex + 1)
+      const recordInfo: tm.RecordInfo = this.constructRecordObject(
+        player,
+        mapId,
+        date,
+        checkpoints,
+        time,
+        previousTime,
+        position,
+        previousIndex + 1
+      )
       this._liveRecords.splice(previousIndex, 1)
       this._liveRecords.splice(position - 1, 0, recordInfo)
       Logger.trace(...this.getLogString(previousIndex + 1, position, previousTime, time, player, 'live', isStunts))
@@ -382,18 +501,18 @@ export class RecordService {
    */
   private static async updateQueue(): Promise<void> {
     const arr: {
-      mapId: string,
+      mapId: string
       records: tm.Record[]
     }[] = []
     const mapsToFetch: string[] = []
     const queue = MapService.queue
     for (let i = 0; i < queue.length; i++) {
       const mapId: string = queue[i].id
-      const r = this._queueRecords.find(a => a.mapId === mapId)
+      const r = this._queueRecords.find((a) => a.mapId === mapId)
       if (r === undefined) {
         arr[i] = {
           mapId,
-          records: []
+          records: [],
         }
         mapsToFetch.push(mapId)
       } else {
@@ -402,8 +521,10 @@ export class RecordService {
     }
     const res = await this.fetch(...mapsToFetch)
     for (const e of mapsToFetch) {
-      const entry = arr.find(a => a.mapId === e)
-      if (entry !== undefined) { entry.records = res.filter(a => a.map === e) }
+      const entry = arr.find((a) => a.mapId === e)
+      if (entry !== undefined) {
+        entry.records = res.filter((a) => a.map === e)
+      }
     }
     this._queueRecords = arr
     Events.emit('RecordsPrefetch', res)
@@ -415,20 +536,26 @@ export class RecordService {
    * @param mapId Map uid
    * @param caller Caller player object
    */
-  static remove(player: {
-    login: string,
-    nickname: string
-  }, mapId: string, caller?: {
-    login: string,
-    nickname: string
-  }, laps?: number): void {
+  static remove(
+    player: {
+      login: string
+      nickname: string
+    },
+    mapId: string,
+    caller?: {
+      login: string
+      nickname: string
+    },
+    laps?: number
+  ): void {
     if (caller !== undefined) {
       Logger.info(
-        `${caller.nickname} (${caller.login}) has removed the record of ${player.nickname} (${player.login}) on map ${mapId}`)
+        `${caller.nickname} (${caller.login}) has removed the record of ${player.nickname} (${player.login}) on map ${mapId}`
+      )
     } else {
       Logger.info(`The record of ${player.nickname} (${player.login}) on map ${mapId} has been removed`)
     }
-    const index = this._localRecords.findIndex(a => a.login === player.login && a.map === mapId)
+    const index = this._localRecords.findIndex((a) => a.login === player.login && a.map === mapId)
     if (index !== -1) {
       const record = this._localRecords[index]
       this._localRecords.splice(index, 1)
@@ -443,10 +570,14 @@ export class RecordService {
    * @param caller Caller player object
    * @returns Database response
    */
-  static removeAll(mapId: string, caller?: {
-    login: string,
-    nickname: string
-  }, laps?: number): void {
+  static removeAll(
+    mapId: string,
+    caller?: {
+      login: string
+      nickname: string
+    },
+    laps?: number
+  ): void {
     if (caller !== undefined) {
       Logger.info(`${caller.nickname} (${caller.login}) has removed all records on map ${mapId}`)
     } else {
@@ -470,9 +601,16 @@ export class RecordService {
    * @param previousPosition Previous record position
    * @returns Record object
    */
-  private static constructRecordObject(player: tm.Player, mapId: string, date: Date, checkpoints: number[],
-    time: number, previousTime: number | undefined, position: number,
-    previousPosition: number | undefined): tm.RecordInfo {
+  private static constructRecordObject(
+    player: tm.Player,
+    mapId: string,
+    date: Date,
+    checkpoints: number[],
+    time: number,
+    previousTime: number | undefined,
+    position: number,
+    previousPosition: number | undefined
+  ): tm.RecordInfo {
     return {
       id: player.id,
       map: mapId,
@@ -489,10 +627,13 @@ export class RecordService {
       privilege: player.privilege,
       visits: player.visits,
       position,
-      previous: (previousTime && previousPosition) ? {
-        time: previousTime,
-        position: previousPosition
-      } : undefined,
+      previous:
+        previousTime && previousPosition
+          ? {
+              time: previousTime,
+              position: previousPosition,
+            }
+          : undefined,
       ip: player.ip,
       region: player.region,
       isUnited: player.isUnited,
@@ -504,7 +645,7 @@ export class RecordService {
       hasPlayerSlot: player.hasPlayerSlot,
       roundsPoints: player.roundsPoints,
       roundTimes: player.roundTimes,
-      isCupFinalist: player.isCupFinalist
+      isCupFinalist: player.isCupFinalist,
     }
   }
 
@@ -519,23 +660,38 @@ export class RecordService {
    * @param isStunts The record is not a time but a stunts score
    * @returns Array of strings formatted for Logger output
    */
-  private static getLogString(previousPosition: number | undefined, position: number, previousTime: number | undefined,
-    time: number, player: {
-      login: string,
+  private static getLogString(
+    previousPosition: number | undefined,
+    position: number,
+    previousTime: number | undefined,
+    time: number,
+    player: {
+      login: string
       nickname: string
-    }, recordType: 'live' | 'local' | 'lap', isStunts: boolean): string[] {
+    },
+    recordType: 'live' | 'local' | 'lap',
+    isStunts: boolean
+  ): string[] {
     const t = isStunts ? 'Score' : 'Time'
     const sign = isStunts ? '+' : '-'
-    const rs = Utils.getRankingString({
-      time,
-      position
-    }, (previousPosition && previousTime) ? {
-      position: previousPosition,
-      time: previousTime
-    } : undefined)
-    return [`${Utils.strip(player.nickname)} (${player.login}) has ${rs.status} the` + ` ${Utils.getOrdinalSuffix(
-      position)} ${recordType} record. ${t}: ` + `
-    ${Utils.getTimeString(time)}${rs.difference !== undefined ? ` (${sign}${rs.difference})` : ``}`]
+    const rs = Utils.getRankingString(
+      {
+        time,
+        position,
+      },
+      previousPosition && previousTime
+        ? {
+            position: previousPosition,
+            time: previousTime,
+          }
+        : undefined
+    )
+    return [
+      `${Utils.strip(player.nickname)} (${player.login}) has ${rs.status} the` +
+        ` ${Utils.getOrdinalSuffix(position)} ${recordType} record. ${t}: ` +
+        `
+    ${Utils.getTimeString(time)}${rs.difference !== undefined ? ` (${sign}${rs.difference})` : ``}`,
+    ]
   }
 
   /**
@@ -551,32 +707,46 @@ export class RecordService {
    * @param mapIds Array of map uids
    * @returns Array of objects with player ranks and map uids
    */
-  static async getRank(login: string, mapIds?: string[]): Promise<{
-    mapId: string;
-    rank: number
-  }[]>
+  static async getRank(
+    login: string,
+    mapIds?: string[]
+  ): Promise<
+    {
+      mapId: string
+      rank: number
+    }[]
+  >
   /**
    * Gets given player local ranks on all maps
    * @param login Player login
    * @returns Array of objects with player ranks and map uids
    */
-  static async getRank(login: string): Promise<{
-    mapId: string;
-    rank: number
-  }[]>
-  static async getRank(login: string, mapIds?: string | string[]): Promise<number | {
-    mapId: string;
-    rank: number
-  }[] | undefined> {
+  static async getRank(login: string): Promise<
+    {
+      mapId: string
+      rank: number
+    }[]
+  >
+  static async getRank(
+    login: string,
+    mapIds?: string | string[]
+  ): Promise<
+    | number
+    | {
+        mapId: string
+        rank: number
+      }[]
+    | undefined
+  > {
     if (mapIds === undefined) {
-      return this._playerRanks.filter(a => login === a.login && a.rank !== -1)
+      return this._playerRanks.filter((a) => login === a.login && a.rank !== -1)
     }
     if (typeof mapIds === 'string') {
-      const find = this._playerRanks.find(a => a.login === login && a.rank !== -1 && mapIds === a.mapId)
+      const find = this._playerRanks.find((a) => a.login === login && a.rank !== -1 && mapIds === a.mapId)
       return find?.rank
     }
     const mapIdSet = new Set(mapIds)
-    return this._playerRanks.filter(a => a.login === login && a.rank !== -1 && mapIdSet.has(a.mapId))
+    return this._playerRanks.filter((a) => a.login === login && a.rank !== -1 && mapIdSet.has(a.mapId))
   }
 
   /**
@@ -594,9 +764,9 @@ export class RecordService {
   static getLocal(logins: string[]): tm.LocalRecord[]
   static getLocal(logins: string | string[]): tm.LocalRecord | undefined | tm.LocalRecord[] {
     if (typeof logins === 'string') {
-      return this._localRecords.find(a => a.login === logins)
+      return this._localRecords.find((a) => a.login === logins)
     }
-    return this._localRecords.filter(a => logins.includes(a.login))
+    return this._localRecords.filter((a) => logins.includes(a.login))
   }
 
   /**
@@ -619,9 +789,9 @@ export class RecordService {
       return this.getLocal(logins as any)
     }
     if (typeof logins === 'string') {
-      return this._lapRecords.find(a => a.login === logins)
+      return this._lapRecords.find((a) => a.login === logins)
     }
-    return this._lapRecords.filter(a => logins.includes(a.login))
+    return this._lapRecords.filter((a) => logins.includes(a.login))
   }
 
   /**
@@ -631,7 +801,10 @@ export class RecordService {
    * @returns Array of record objects
    */
   static getFromQueue(...mapIds: string[]): tm.Record[] {
-    return this._queueRecords.filter(a => mapIds.includes(a.mapId)).map(a => a.records).flat(1)
+    return this._queueRecords
+      .filter((a) => mapIds.includes(a.mapId))
+      .map((a) => a.records)
+      .flat(1)
   }
 
   /**
@@ -641,8 +814,8 @@ export class RecordService {
    * @returns Record object or undefined if record doesn't exist
    */
   static getOneFromQueue(login: string, mapId: string): tm.Record | undefined {
-    const arr = this._queueRecords.find(a => mapId === a.mapId)
-    return arr?.records?.find?.(a => a.login === login)
+    const arr = this._queueRecords.find((a) => mapId === a.mapId)
+    return arr?.records?.find?.((a) => a.login === login)
   }
 
   /**
@@ -652,7 +825,10 @@ export class RecordService {
    * @returns Array of record objects
    */
   static getFromHistory(...mapIds: string[]): tm.Record[] {
-    return this._historyRecords.filter(a => mapIds.includes(a.mapId)).map(a => a.records).flat(1)
+    return this._historyRecords
+      .filter((a) => mapIds.includes(a.mapId))
+      .map((a) => a.records)
+      .flat(1)
   }
 
   /**
@@ -662,8 +838,8 @@ export class RecordService {
    * @returns Record object or undefined if record doesn't exist
    */
   static getOneFromHistory(login: string, mapId: string): tm.Record | undefined {
-    const arr = this._historyRecords.find(a => mapId === a.mapId)
-    return arr?.records?.find?.(a => a.login === login)
+    const arr = this._historyRecords.find((a) => mapId === a.mapId)
+    return arr?.records?.find?.((a) => a.login === login)
   }
 
   /**
@@ -681,9 +857,9 @@ export class RecordService {
   static getLive(logins: string[]): tm.FinishInfo[]
   static getLive(logins: string | string[]): tm.FinishInfo | undefined | tm.FinishInfo[] {
     if (typeof logins === 'string') {
-      return this._liveRecords.find(a => a.login === logins)
+      return this._liveRecords.find((a) => a.login === logins)
     }
-    return this._liveRecords.filter(a => logins.includes(a.login))
+    return this._liveRecords.filter((a) => logins.includes(a.login))
   }
 
   /**
@@ -749,9 +925,9 @@ export class RecordService {
    * @returns All online player ranks on all maps
    */
   static get playerRanks(): Readonly<{
-    login: string;
-    mapId: string;
-    rank: number;
+    login: string
+    mapId: string
+    rank: number
   }>[] {
     return [...this._playerRanks]
   }
@@ -797,5 +973,4 @@ export class RecordService {
   static get lapRecordCount(): number {
     return this._lapRecords.length
   }
-
 }

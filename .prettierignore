@@ -1,0 +1,14 @@
+# Ignore artifacts:
+built
+trakman
+node_modules
+.prettierrc
+.github
+CHANGELOG.md
+docker-compose.yml
+eslint.config.mjs
+package-lock.json
+package.json
+README.md
+tsconfig.json
+SpecialCharmap.js

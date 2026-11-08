@@ -1,14 +1,13 @@
-import type { ButtonData } from "./ButtonData.js"
-import { UiButton } from "./UiButton.js"
-import config from "./ButtonsWidget.config.js"
-import messages from "./Messages.config.js"
+import type { ButtonData } from './ButtonData.js'
+import { UiButton } from './UiButton.js'
+import config from './ButtonsWidget.config.js'
+import messages from './Messages.config.js'
 import { actions } from '../../../../actions/Actions.js'
 
 const msg = messages.paySkip
 const cfg = config.paySkip
 
 export class PaySkip extends UiButton {
-
   buttonData: ButtonData
   isReplay = false
   isLastMapReplay = false
@@ -26,7 +25,7 @@ export class PaySkip extends UiButton {
       iconHeight: cfg.height,
       padding: cfg.padding,
       actionId: cfg.actionId + this.parentId,
-      equalTexts: cfg.texts[0].equal
+      equalTexts: cfg.texts[0].equal,
     }
     tm.addListener('ManialinkClick', (info) => {
       if (info.actionId === cfg.actionId + this.parentId) {
@@ -39,18 +38,22 @@ export class PaySkip extends UiButton {
   }
 
   private handleClick = async (login: string, nickname: string): Promise<void> => {
-    if (this.isLastMapReplay || this.isReplay || this.isSkip || tm.getState() === 'result') { return }
+    if (this.isLastMapReplay || this.isReplay || this.isSkip || tm.getState() === 'result') {
+      return
+    }
     const res: boolean | Error = await tm.utils.sendCoppers(login, cfg.cost, cfg.billMessage)
     if (res instanceof Error) {
       tm.sendMessage(msg.paymentFail, login)
     } else if (res) {
       let countDown: number = cfg.countdown
       const startTime: number = Date.now()
-      tm.sendMessage(tm.utils.strVar(msg.success, {
-        name: tm.utils.strip(nickname),
-        amount: cfg.cost,
-        seconds: countDown
-      }))
+      tm.sendMessage(
+        tm.utils.strVar(msg.success, {
+          name: tm.utils.strip(nickname),
+          amount: cfg.cost,
+          seconds: countDown,
+        })
+      )
       this.isSkip = true
       this.buttonData.text1 = cfg.texts[1][0]
       this.buttonData.text2 = tm.utils.strVar(cfg.texts[1][1], { seconds: countDown.toString() })
@@ -86,7 +89,7 @@ export class PaySkip extends UiButton {
         iconHeight: cfg.height,
         padding: cfg.padding,
         actionId: cfg.actionId + this.parentId,
-        equalTexts: cfg.texts[0].equal
+        equalTexts: cfg.texts[0].equal,
       }
       this.isLastMapReplay = false
     } else {
@@ -97,7 +100,7 @@ export class PaySkip extends UiButton {
         iconWidth: cfg.width,
         iconHeight: cfg.height,
         padding: cfg.padding,
-        equalTexts: cfg.texts[2].equal
+        equalTexts: cfg.texts[2].equal,
       }
       this.isLastMapReplay = true
     }
@@ -107,12 +110,16 @@ export class PaySkip extends UiButton {
   }
 
   private handleReplay(): void {
-    if (this.isReplay) { return }
+    if (this.isReplay) {
+      return
+    }
     const plus = tm.timer.isDynamic ? 2 : 0
     if (!tm.timer.isDynamic) {
       this.isReplay = true
     }
-    if (this.isSkip || this.isLastMapReplay) { return }
+    if (this.isSkip || this.isLastMapReplay) {
+      return
+    }
     this.buttonData.text1 = cfg.texts[2 + plus][0]
     this.buttonData.text2 = cfg.texts[2 + plus][1]
     this.buttonData.equalTexts = cfg.texts[2 + plus].equal
@@ -121,7 +128,9 @@ export class PaySkip extends UiButton {
   }
 
   private handleSkipNoCountdown(): void {
-    if (this.isSkip) { return }
+    if (this.isSkip) {
+      return
+    }
     this.isSkip = true
     this.buttonData.text1 = cfg.texts[3][0]
     this.buttonData.text2 = cfg.texts[3][1]
@@ -129,5 +138,4 @@ export class PaySkip extends UiButton {
     this.buttonData.actionId = undefined
     this.emitUpdate()
   }
-
 }

@@ -8,7 +8,6 @@ import { componentIds, StaticComponent } from '../../UI.js'
 import config from './RankWidget.config.js'
 
 export default class RankWidget extends StaticComponent {
-
   private xml: string = ''
 
   constructor() {
@@ -26,20 +25,24 @@ export default class RankWidget extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     return this.xml
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     return {
       xml: this.xml,
-      login
+      login,
     }
   }
 
   private constructXml(): void {
-    // Z posn is set to -37 because the rank text is at around -36 
+    // Z posn is set to -37 because the rank text is at around -36
     this.xml = `
     <manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} -37">
@@ -47,5 +50,4 @@ export default class RankWidget extends StaticComponent {
       </frame>
     </manialink>`
   }
-
 }

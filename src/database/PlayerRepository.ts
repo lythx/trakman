@@ -15,9 +15,8 @@ interface TableEntry {
 }
 
 export class PlayerRepository extends Repository {
-
   readonly cachedIds: {
-    login: string,
+    login: string
     id: number
   }[] = []
 
@@ -31,23 +30,39 @@ export class PlayerRepository extends Repository {
       const res = await this.query(query, logins)
       return res[0] === undefined ? undefined : this.constructPlayerObject(res[0])
     }
-    if (logins.length === 0) { return [] }
+    if (logins.length === 0) {
+      return []
+    }
     const query: string = `SELECT players.login, nickname, region, wins, time_played, visits, is_united, last_online, average, privilege FROM players 
     LEFT JOIN privileges ON players.login=privileges.login
-    WHERE ${logins.map((a, i) => `players.login=$${i + 1} OR `).join('').slice(0, -3)}`
+    WHERE ${logins
+      .map((a, i) => `players.login=$${i + 1} OR `)
+      .join('')
+      .slice(0, -3)}`
     const res = await this.query(query, ...logins)
-    return res.map(a => this.constructPlayerObject(a))
+    return res.map((a) => this.constructPlayerObject(a))
   }
 
   async add(...players: tm.OfflinePlayer[]): Promise<void> {
-    if (players.length === 0) { return }
+    if (players.length === 0) {
+      return
+    }
     const query: string = `INSERT INTO players(login, nickname, region, wins, time_played, visits, is_united, last_online, average) 
     ${this.getInsertValuesString(9, players.length)};`
     const values: any[] = []
     for (const player of players) {
       // people have discovered how to increase the name character cap. shucks.
-      values.push(player.login, player.nickname.substring(0, 45), player.region, player.wins,
-        Math.round(player.timePlayed / 1000), player.visits, player.isUnited, player.lastOnline, player.average)
+      values.push(
+        player.login,
+        player.nickname.substring(0, 45),
+        player.region,
+        player.wins,
+        Math.round(player.timePlayed / 1000),
+        player.visits,
+        player.isUnited,
+        player.lastOnline,
+        player.average
+      )
     }
     await this.query(query, ...values)
   }
@@ -72,8 +87,13 @@ export class PlayerRepository extends Repository {
     await this.query(query, wins, login)
   }
 
-  async updateOnJoin(login: string, nickname: string, region: string, visits: number,
-    isUnited: boolean): Promise<void> {
+  async updateOnJoin(
+    login: string,
+    nickname: string,
+    region: string,
+    visits: number,
+    isUnited: boolean
+  ): Promise<void> {
     const query: string = `UPDATE players SET nickname=$1, region=$2, visits=$3, is_united=$4 WHERE login=$5;`
     await this.query(query, nickname.substring(0, 45), region, visits, isUnited, login)
   }
@@ -84,23 +104,34 @@ export class PlayerRepository extends Repository {
   }
 
   async getAverage(login: string): Promise<number | undefined>
-  async getAverage(logins: string[]): Promise<{
-    login: string,
-    average: number
-  }[]>
-  async getAverage(logins: string | string[]): Promise<number | {
-    login: string,
-    average: number
-  }[] | undefined> {
+  async getAverage(logins: string[]): Promise<
+    {
+      login: string
+      average: number
+    }[]
+  >
+  async getAverage(logins: string | string[]): Promise<
+    | number
+    | {
+        login: string
+        average: number
+      }[]
+    | undefined
+  > {
     if (typeof logins === 'string') {
       const query: string = `SELECT average FROM players
       WHERE players.login=$1`
       const res = await this.query(query, logins)
       return res[0] === undefined ? undefined : res[0].average
     }
-    if (logins.length === 0) { return [] }
+    if (logins.length === 0) {
+      return []
+    }
     const query: string = `SELECT players.login, average FROM players 
-    WHERE ${logins.map((a, i) => `players.login=$${i + 1} OR `).join('').slice(0, -3)}
+    WHERE ${logins
+      .map((a, i) => `players.login=$${i + 1} OR `)
+      .join('')
+      .slice(0, -3)}
     ORDER BY average ASC`
     const res = await this.query(query, ...logins)
     return res
@@ -110,7 +141,7 @@ export class PlayerRepository extends Repository {
     const query: string = `SELECT players.login FROM players
     ORDER BY average ASC`
     const res = await this.query(query)
-    return res.map(a => a.login)
+    return res.map((a) => a.login)
   }
 
   /**
@@ -124,33 +155,49 @@ export class PlayerRepository extends Repository {
    * @param logins Array of player logins
    * @returns Array of objects containing player id and login. If map is not in the database it won't be in the array
    */
-  async getId(logins: string[]): Promise<{
-    login: string,
-    id: number
-  }[]>
-  async getId(logins: string[] | string): Promise<{
-    login: string,
-    id: number
-  }[] | number | undefined> {
+  async getId(logins: string[]): Promise<
+    {
+      login: string
+      id: number
+    }[]
+  >
+  async getId(logins: string[] | string): Promise<
+    | {
+        login: string
+        id: number
+      }[]
+    | number
+    | undefined
+  > {
     let isArr = true
     const ret: {
-      login: string,
+      login: string
       id: number
     }[] = []
     if (typeof logins === 'string') {
-      const cached = this.cachedIds.find(a => a.login === logins)
-      if (cached !== undefined) { return cached.id }
+      const cached = this.cachedIds.find((a) => a.login === logins)
+      if (cached !== undefined) {
+        return cached.id
+      }
       logins = [logins]
       isArr = false
     } else {
-      ret.push(...this.cachedIds.filter(a => {
-        const isCached = (logins as any).includes(a.login)
-        if (isCached === true) { logins = (logins as any).filter((b: string) => b !== a.login) }
-        return isCached
-      }))
-      if (logins.length === 0) { return ret }
+      ret.push(
+        ...this.cachedIds.filter((a) => {
+          const isCached = (logins as any).includes(a.login)
+          if (isCached === true) {
+            logins = (logins as any).filter((b: string) => b !== a.login)
+          }
+          return isCached
+        })
+      )
+      if (logins.length === 0) {
+        return ret
+      }
     }
-    const query = `SELECT id, login FROM players WHERE ${logins.map((a, i) => `login=$${i + 1} OR `).join('')
+    const query = `SELECT id, login FROM players WHERE ${logins
+      .map((a, i) => `login=$${i + 1} OR `)
+      .join('')
       .slice(0, -3)}`
     const res = await this.query(query, ...logins)
     this.cachedIds.push(...res)
@@ -159,10 +206,7 @@ export class PlayerRepository extends Repository {
   }
 
   private constructPlayerObject(entry: TableEntry): tm.OfflinePlayer {
-    const {
-      countryCode,
-      country
-    } = Utils.getRegionInfo(entry.region)
+    const { countryCode, country } = Utils.getRegionInfo(entry.region)
     return {
       login: entry.login,
       nickname: entry.nickname,
@@ -175,8 +219,7 @@ export class PlayerRepository extends Repository {
       isUnited: entry.is_united,
       wins: entry.wins,
       privilege: entry.privilege ?? 0,
-      average: entry.average
+      average: entry.average,
     }
   }
-
 }

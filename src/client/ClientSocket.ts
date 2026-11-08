@@ -3,7 +3,6 @@ import { ClientResponse } from './ClientResponse.js'
 import { Events } from '../Events.js'
 
 export class ClientSocket extends net.Socket {
-
   private handshakeHeader: string = ''
   private handshakeStatus: null | true | Error = null
   private response: ClientResponse | null = null
@@ -19,7 +18,8 @@ export class ClientSocket extends net.Socket {
       // handshake has no id so it has to be treated differently from normal data
       if (this.handshakeStatus === null) {
         this.handleHandshake(buffer)
-      } else if (!this.receivingResponse) { // all data except for the handshake
+      } else if (!this.receivingResponse) {
+        // all data except for the handshake
         this.handleResponseStart(buffer)
       } else if (this.receivingResponse) {
         this.handleResponseChunk(buffer)
@@ -61,7 +61,7 @@ export class ClientSocket extends net.Socket {
     const startTimestamp: number = Date.now()
     return await new Promise((resolve): void => {
       const poll = (): void => {
-        const response: ClientResponse | undefined = this.responses.find(a => a.id === id && a.status === 'completed')
+        const response: ClientResponse | undefined = this.responses.find((a) => a.id === id && a.status === 'completed')
         if (response !== undefined) {
           if (response.isError) {
             resolve(new Error(`${response.errorString} Code: ${response.errorCode}`))
@@ -95,13 +95,15 @@ export class ClientSocket extends net.Socket {
    */
   private handleResponseStart = (buffer: Buffer): void => {
     this.responses.length = Math.min(this.responses.length, 20) // trim responses array so it doesn't grow inifinitely
-    if (buffer.length < 8) { // rarely buffer header will get split between two data chunks
+    if (buffer.length < 8) {
+      // rarely buffer header will get split between two data chunks
       this.response = null
       this.receivingResponse = false
       this.incompleteHeader = buffer
       return
     }
-    if (this.incompleteHeader !== null) { // concating header if it got split
+    if (this.incompleteHeader !== null) {
+      // concating header if it got split
       buffer = Buffer.concat([this.incompleteHeader, buffer])
       this.incompleteHeader = null
     }
@@ -114,7 +116,9 @@ export class ClientSocket extends net.Socket {
    * Adds data to response object and handles response end
    */
   private handleResponseChunk = (buffer: Buffer): void => {
-    if (this.response === null) { return }
+    if (this.response === null) {
+      return
+    }
     this.response.addData(buffer)
     if (this.response.status === 'overloaded') {
       const nextResponseBuffer: Buffer = this.response.extractOverload()

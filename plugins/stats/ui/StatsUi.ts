@@ -1,4 +1,4 @@
-import TopDonations from "./TopDonations.component.js";
+import TopDonations from './TopDonations.component.js'
 import TopPlaytimes from './TopPlaytimes.component.js'
 import TopRanks from './TopRanks.component.js'
 import TopRecords from './TopRecords.component.js'

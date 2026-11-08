@@ -22,8 +22,12 @@ import './Trakman.js'
 await Logger.initialize()
 Logger.info('Starting the controller...')
 Logger.trace('Establishing connection with the dedicated server...')
-if (process.env.SERVER_IP === undefined) { await Logger.fatal('SERVER_IP is undefined. Check your .env file') }
-if (process.env.SERVER_PORT === undefined) { await Logger.fatal('SERVER_PORT is undefined. Check your .env file') }
+if (process.env.SERVER_IP === undefined) {
+  await Logger.fatal('SERVER_IP is undefined. Check your .env file')
+}
+if (process.env.SERVER_PORT === undefined) {
+  await Logger.fatal('SERVER_PORT is undefined. Check your .env file')
+}
 await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
 Logger.trace('Connection with the dedicated server established')
 Logger.trace('Authenticating...')
@@ -33,8 +37,10 @@ if (process.env.SUPER_ADMIN_NAME === undefined) {
 if (process.env.SUPER_ADMIN_PASSWORD === undefined) {
   await Logger.fatal('SUPER_ADMIN_PASSWORD is undefined. Check your .env file')
 }
-const authenticationStatus: any | Error = await Client.call('Authenticate',
-  [{ string: process.env.SUPER_ADMIN_NAME }, { string: process.env.SUPER_ADMIN_PASSWORD }])
+const authenticationStatus: any | Error = await Client.call('Authenticate', [
+  { string: process.env.SUPER_ADMIN_NAME },
+  { string: process.env.SUPER_ADMIN_PASSWORD },
+])
 if (authenticationStatus instanceof Error) {
   await Logger.fatal('Authentication failed. Server responded with an error:', authenticationStatus.message)
 }
@@ -112,12 +118,12 @@ setInterval(async () => {
 Logger.info('Press Enter to execute a command as the server (include slashes)')
 const rl = readline.createInterface({
   input,
-  output
+  output,
 })
 while (running) {
-  await rl.question("")
+  await rl.question('')
   Logger.disableConsole()
-  const command = await rl.question("Run command as server: ")
+  const command = await rl.question('Run command as server: ')
   Logger.enableConsole()
   ChatService.serverCommand(command)
 }

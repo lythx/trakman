@@ -2,7 +2,6 @@
  * Abstract class for dynamic manialink components.
  */
 export default abstract class DynamicComponent {
-
   /**
    * Component manialink ID
    */
@@ -42,5 +41,4 @@ export default abstract class DynamicComponent {
   static onComponentCreated(callback: (component: DynamicComponent) => void) {
     this.componentCreateListeners.push(callback)
   }
-
 }

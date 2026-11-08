@@ -7,7 +7,6 @@ import { componentIds, StaticComponent } from '../../UI.js'
 import config from './RankWidgetResult.config.js'
 
 export default class RankWidgetResult extends StaticComponent {
-
   private xml: string = ''
 
   constructor() {
@@ -20,22 +19,28 @@ export default class RankWidgetResult extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     return this.xml
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     return {
       xml: this.xml,
-      login
+      login,
     }
   }
 
   protected onPositionChange(): void {
     this.constructXml()
     const xml = this.display()
-    if (xml !== undefined) { tm.sendManialink(xml) }
+    if (xml !== undefined) {
+      tm.sendManialink(xml)
+    }
   }
 
   private constructXml(): void {
@@ -47,5 +52,4 @@ export default class RankWidgetResult extends StaticComponent {
       </frame>
     </manialink>`
   }
-
 }

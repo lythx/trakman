@@ -13,8 +13,11 @@ const getRandomMessage = (): string => {
 }
 
 const sendInfoMessage = (): void => {
-  tm.sendMessage(config.messagePrefix + `${config.defaultFormatting}` + getRandomMessage(), undefined,
-    config.chatPrefixEnabled)
+  tm.sendMessage(
+    config.messagePrefix + `${config.defaultFormatting}` + getRandomMessage(),
+    undefined,
+    config.chatPrefixEnabled
+  )
 }
 
 if (config.isEnabled) {
@@ -24,7 +27,9 @@ if (config.isEnabled) {
       return
     }
     // This is here because we don't emit BeginMap on Startup
-    if (!config.sendOnInterval) { return }
+    if (!config.sendOnInterval) {
+      return
+    }
     currentInterval = setInterval(async (): Promise<void> => {
       sendInfoMessage()
     }, config.messageInterval * 1000)

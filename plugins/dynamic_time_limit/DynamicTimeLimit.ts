@@ -7,7 +7,7 @@ let dynamicTimeLimitMode: DynamicTimeLimitMode = config.defaultMode as DynamicTi
 let dynamicTimeLimitMultiplier = config.defaultMultiplier
 
 const modeFunctions: { [mode in DynamicTimeLimitMode]: (map: tm.Map) => number } = {
-  author: map => map.authorTime * dynamicTimeLimitMultiplier
+  author: (map) => map.authorTime * dynamicTimeLimitMultiplier,
 }
 
 function setStaticTimeLimitForNextMap() {
@@ -21,39 +21,48 @@ function setDynamicTimeLimitForCurrentMap() {
   tm.timer.setTimeLimit(timeLimit)
 }
 
-tm.addListener("ServerStateChanged", state => {
-  if (!isActive) { return }
-  if (state === "race" && tm.timer.isDynamic) {
-    setDynamicTimeLimitForCurrentMap()
+tm.addListener('ServerStateChanged', (state) => {
+  if (!isActive) {
+    return
   }
-  else if (state === "result" && !tm.timer.isDynamicOnNextRound) {
+  if (state === 'race' && tm.timer.isDynamic) {
+    setDynamicTimeLimitForCurrentMap()
+  } else if (state === 'result' && !tm.timer.isDynamicOnNextRound) {
     setStaticTimeLimitForNextMap()
   }
 })
 
-tm.addListener("JukeboxChanged", () => {
-  if (!isActive) { return }
+tm.addListener('JukeboxChanged', () => {
+  if (!isActive) {
+    return
+  }
   setStaticTimeLimitForNextMap()
 })
 
-tm.addListener("DynamicTimerStateChanged", state => {
-  if (!isActive || state !== 'disabled') { return }
+tm.addListener('DynamicTimerStateChanged', (state) => {
+  if (!isActive || state !== 'disabled') {
+    return
+  }
   setStaticTimeLimitForNextMap()
 })
 
-tm.addListener("BeginMap", () => {
-  if (!isActive || !config.sendTimeLimitMessage) { return }
+tm.addListener('BeginMap', () => {
+  if (!isActive || !config.sendTimeLimitMessage) {
+    return
+  }
   const timeLimit = modeFunctions[dynamicTimeLimitMode](tm.maps.current)
-  tm.sendMessage(tm.utils.strVar(config.messages[dynamicTimeLimitMode], {
-    limit: tm.utils.getVerboseTime(timeLimit),
-    authorTime: tm.utils.getTimeString(tm.maps.current.authorTime)
-  }))
+  tm.sendMessage(
+    tm.utils.strVar(config.messages[dynamicTimeLimitMode], {
+      limit: tm.utils.getVerboseTime(timeLimit),
+      authorTime: tm.utils.getTimeString(tm.maps.current.authorTime),
+    })
+  )
 })
 
 tm.commands.add({
   aliases: config.enableCommand.aliases,
   help: config.enableCommand.help,
-  callback: info => {
+  callback: (info) => {
     if (isActive) {
       tm.sendMessage(config.enableCommand.alreadyActive, info.login)
       return
@@ -62,29 +71,35 @@ tm.commands.add({
     if (!tm.timer.isDynamic) {
       setStaticTimeLimitForNextMap()
     }
-    tm.sendMessage(tm.utils.strVar(config.enableCommand.success, {
-      title: info.title,
-      name: tm.utils.strip(info.nickname)
-    }), config.enableCommand.public ? undefined : info.login)
+    tm.sendMessage(
+      tm.utils.strVar(config.enableCommand.success, {
+        title: info.title,
+        name: tm.utils.strip(info.nickname),
+      }),
+      config.enableCommand.public ? undefined : info.login
+    )
   },
-  privilege: config.enableCommand.privilege
+  privilege: config.enableCommand.privilege,
 })
 
 tm.commands.add({
   aliases: config.disableCommand.aliases,
   help: config.disableCommand.help,
-  callback: info => {
+  callback: (info) => {
     if (!isActive) {
       tm.sendMessage(config.disableCommand.alreadyDisabled, info.login)
       return
     }
     isActive = false
-    tm.sendMessage(tm.utils.strVar(config.disableCommand.success, {
-      title: info.title,
-      name: tm.utils.strip(info.nickname)
-    }), config.disableCommand.public ? undefined : info.login)
+    tm.sendMessage(
+      tm.utils.strVar(config.disableCommand.success, {
+        title: info.title,
+        name: tm.utils.strip(info.nickname),
+      }),
+      config.disableCommand.public ? undefined : info.login
+    )
   },
-  privilege: config.disableCommand.privilege
+  privilege: config.disableCommand.privilege,
 })
 
 /**
@@ -98,7 +113,9 @@ export const dynamicTimeLimit = {
    * @returns Boolean indicating whether the plugin is enabled.
    */
   activate(): boolean {
-    if (!config.isEnabled) { return false }
+    if (!config.isEnabled) {
+      return false
+    }
     isActive = true
     return true
   },
@@ -107,7 +124,9 @@ export const dynamicTimeLimit = {
    * @returns Boolean indicating whether the plugin is enabled.
    */
   deactivate(): boolean {
-    if (!config.isEnabled) { return false }
+    if (!config.isEnabled) {
+      return false
+    }
     isActive = false
     return true
   },
@@ -150,6 +169,5 @@ export const dynamicTimeLimit = {
   /**
    * Plugin status
    */
-  isEnabled: config.isEnabled
-
+  isEnabled: config.isEnabled,
 }

@@ -11,21 +11,24 @@ export const getCpTypes = (checkpoints: number[][]): ('best' | 'worst' | 'equal'
   const cps: number[][] = Array.from(new Array(cpAmount), (): never[] => [])
   for (let i: number = 0; i < checkpoints.length; i++) {
     const cpRow: number[] = checkpoints?.[i]
-    if (cpRow === undefined) { break }
+    if (cpRow === undefined) {
+      break
+    }
     for (let j: number = 0; j < cpAmount; j++) {
       cps[j][i] = cpRow[j]
     }
   }
-  const cpTypes: ('best' | 'worst' | 'equal' | undefined)[][] = Array.from(Array(cps[0].length),
-    (): any[] => new Array(cps.length).fill(undefined))
+  const cpTypes: ('best' | 'worst' | 'equal' | undefined)[][] = Array.from(Array(cps[0].length), (): any[] =>
+    new Array(cps.length).fill(undefined)
+  )
   for (const [i, e] of cps.entries()) {
     if (cps?.[0]?.length < 2) {
       break
     }
-    const max: number = Math.max(...e.filter(a => !isNaN(a)))
-    const worst: number[] = e.filter(a => a === max)
-    const min: number = Math.min(...e.filter(a => !isNaN(a)))
-    const best: number[] = e.filter(a => a === min)
+    const max: number = Math.max(...e.filter((a) => !isNaN(a)))
+    const worst: number[] = e.filter((a) => a === max)
+    const min: number = Math.min(...e.filter((a) => !isNaN(a)))
+    const best: number[] = e.filter((a) => a === min)
     if (max === min) {
       continue
     }
@@ -35,7 +38,7 @@ export const getCpTypes = (checkpoints: number[][]): ('best' | 'worst' | 'equal'
     if (best.length === 1) {
       cpTypes[e.indexOf(best[0])][i] = 'best'
     } else {
-      const indexes: number[] = e.reduce((acc: number[], cur, i): number[] => cur === min ? [...acc, i] : acc, [])
+      const indexes: number[] = e.reduce((acc: number[], cur, i): number[] => (cur === min ? [...acc, i] : acc), [])
       for (const index of indexes) {
         cpTypes[index][i] = 'equal'
       }

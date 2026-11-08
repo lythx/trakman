@@ -17,7 +17,7 @@ const sendLive = async (): Promise<true | Error> => {
     manialiveVersion: config.manialiveVersion, // Check if > 40 and set to 40 in that case
     maxPlayers: cfg.currentMaxPlayers > 40 ? 40 : cfg.currentMaxPlayers, // Public is 1, private is 0
     visibility: cfg.password.length === 0 ? 1 : 0,
-    classHash: config.manialiveHash
+    classHash: config.manialiveHash,
   }
   // Append freezone to the server name if it isn't there already
   if (!data.serverName.toLowerCase().includes('freezone')) {
@@ -31,8 +31,8 @@ const sendLive = async (): Promise<true | Error> => {
     path: `/freezone/live/`,
     method: 'POST',
     headers: {
-      'Authorization': auth
-    }
+      Authorization: auth,
+    },
   }
   return new Promise<true | Error>((resolve, reject): void => {
     const req: ClientRequest = http.request(options, (res): void => {
@@ -41,15 +41,20 @@ const sendLive = async (): Promise<true | Error> => {
         return
       }
       let data: string = ''
-      res.on('data', (chunk): void => { data += chunk })
+      res.on('data', (chunk): void => {
+        data += chunk
+      })
       res.on('end', (): void => reject(new Error(`Status code: ${res.statusCode}, message: ${data}`)))
     })
     req.write(JSON.stringify(data))
-    req.on('error', (): void => {
-      reject(new Error(`HTTP request error.`))
-    }).on('timeout', (): void => {
-      reject(new Error(`HTTP request timeout.`))
-    }).end()
+    req
+      .on('error', (): void => {
+        reject(new Error(`HTTP request error.`))
+      })
+      .on('timeout', (): void => {
+        reject(new Error(`HTTP request timeout.`))
+      })
+      .end()
   }).catch((err): Error => {
     const errStr = `Couldn't send Freezone Manialive request. Error: ${err?.message}`
     tm.log.error(errStr)
@@ -76,7 +81,11 @@ if (config.isEnabled) {
   tm.addListener('Startup', async (): Promise<void> => {
     tm.log.trace('Connecting to ManiaLive...')
     const status: true | Error = await initialize()
-    if (status instanceof Error) { tm.log.error(status.message) } else { tm.log.trace('Connected to ManiaLive') }
+    if (status instanceof Error) {
+      tm.log.error(status.message)
+    } else {
+      tm.log.trace('Connected to ManiaLive')
+    }
   })
 }
 
@@ -86,7 +95,6 @@ if (config.isEnabled) {
  * @since 0.3
  */
 export const freezone = {
-
   /**
    * Plugin status
    */
@@ -97,6 +105,5 @@ export const freezone = {
    */
   get isConnected(): boolean {
     return isConnected
-  }
-
+  },
 }

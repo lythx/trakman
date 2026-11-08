@@ -7,7 +7,6 @@ import { Logger } from '../Logger.js'
 const { Pool } = postgres
 
 export class Database {
-
   private static pool: postgres.Pool = Database.createPool(process.env.DB_NAME ?? '')
 
   private static reconnectingPool: boolean = false
@@ -29,7 +28,7 @@ export class Database {
       database: dbName,
       host: process.env.DB_IP,
       port: Number(process.env.DB_PORT),
-      connectionTimeoutMillis: 15000
+      connectionTimeoutMillis: 15000,
     })
   }
 
@@ -45,12 +44,11 @@ export class Database {
 
     try {
       await this.pool.query('select 1;')
-    } catch(err: any) {
+    } catch (err: any) {
       if (err instanceof postgres.DatabaseError && err.code === '3D000') {
         await Logger.error(`Database "${dbName}" does not exist, attempting to create it...`, err.message)
 
-        await this.pool.end().catch(() => {
-        })
+        await this.pool.end().catch(() => {})
 
         const adminPool = new Pool({
           user: process.env.DB_USER,
@@ -58,20 +56,18 @@ export class Database {
           database: 'postgres',
           host: process.env.DB_IP,
           port: Number(process.env.DB_PORT),
-          connectionTimeoutMillis: 15000
+          connectionTimeoutMillis: 15000,
         })
 
         try {
           await adminPool.query(`CREATE DATABASE "${dbName}"`)
           await Logger.info(`Database "${dbName}" created successfully.`)
-        } catch(createErr: any) {
+        } catch (createErr: any) {
           await Logger.fatal('Failed to create database.', `Error: ${createErr.message}`, createErr.stack)
-          await adminPool.end().catch(() => {
-          })
+          await adminPool.end().catch(() => {})
           throw createErr
         } finally {
-          await adminPool.end().catch(() => {
-          })
+          await adminPool.end().catch(() => {})
         }
 
         this.pool = this.createPool(dbName)
@@ -100,14 +96,15 @@ export class Database {
         }
         this.reconnectingPool = true
         Logger.error(
-          `Lost connection to database, attempting to reconnect in ${this.reconnectTimeout / 1000} second(s)`)
+          `Lost connection to database, attempting to reconnect in ${this.reconnectTimeout / 1000} second(s)`
+        )
         setTimeout(async () => {
           Logger.debug('Reconnecting to database...')
           try {
             await this.pool.query('select version();')
             await this.getDBInfo()
             Logger.info('Reconnected to database successfully')
-          } catch(reErr: any) {
+          } catch (reErr: any) {
             await Logger.fatal('Failed to reconnect to database', reErr.message, reErr.stack)
           } finally {
             this.reconnectingPool = false
@@ -120,10 +117,12 @@ export class Database {
   }
 
   private static async getDBInfo(): Promise<void> {
-    const versionRes = await this.pool.query('select version();') as any
+    const versionRes = (await this.pool.query('select version();')) as any
     this.dbVersion = String(versionRes?.rows[0]?.version?.split(' ', 2)[1])
 
-    const sizeRes = await this.pool.query('select pg_size_pretty(pg_database_size($1));', [process.env.DB_NAME]) as any
+    const sizeRes = (await this.pool.query('select pg_size_pretty(pg_database_size($1));', [
+      process.env.DB_NAME,
+    ])) as any
     this.dbSize = String(sizeRes?.rows[0]?.pg_size_pretty)
   }
 
@@ -176,5 +175,4 @@ export class Database {
     }
     return this.client.query(from(`COPY ${q} FROM STDIN;`))
   }
-
 }

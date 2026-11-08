@@ -21,5 +21,5 @@ export const stats = {
   donations: topDonations,
   records: topRecords,
   playtimes: topPlaytimes,
-  sums: topSums
+  sums: topSums,
 }

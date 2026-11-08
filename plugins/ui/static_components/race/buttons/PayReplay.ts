@@ -1,13 +1,12 @@
-import type { ButtonData } from "./ButtonData.js"
-import { UiButton } from "./UiButton.js"
-import config from "./ButtonsWidget.config.js"
+import type { ButtonData } from './ButtonData.js'
+import { UiButton } from './UiButton.js'
+import config from './ButtonsWidget.config.js'
 import messages from './Messages.config.js'
 
 const cfg = config.payReplay
 const msg = messages.payReplay
 
 export class PayReplay extends UiButton {
-
   buttonData: ButtonData
   costIndex = 0
   isReplay = false
@@ -21,14 +20,14 @@ export class PayReplay extends UiButton {
     this.buttonData = {
       icon: cfg.icon,
       text1: tm.utils.strVar(cfg.texts[0 + plus][0], {
-        cost: cfg.costs[0]
+        cost: cfg.costs[0],
       }),
       text2: cfg.texts[0 + plus][1],
       iconWidth: cfg.width,
       iconHeight: cfg.height,
       padding: cfg.padding,
       actionId: cfg.actionId + this.parentId,
-      equalTexts: cfg.texts[0 + plus].equal
+      equalTexts: cfg.texts[0 + plus].equal,
     }
     tm.addListener('ManialinkClick', (info) => {
       if (info.actionId === cfg.actionId + this.parentId) {
@@ -41,31 +40,41 @@ export class PayReplay extends UiButton {
   }
 
   private handleClick = async (login: string, nickname: string): Promise<void> => {
-    if (this.isReplay || this.isSkip) { return }
+    if (this.isReplay || this.isSkip) {
+      return
+    }
     const action = tm.timer.isDynamic ? msg.extendStr : msg.replayStr
     const cost: number = cfg.costs[this.costIndex]
-    if (cost === undefined) { return }
+    if (cost === undefined) {
+      return
+    }
     const res: boolean | Error = await tm.utils.sendCoppers(login, cost, cfg.billMessage)
     if (res instanceof Error) {
       tm.sendMessage(msg.paymentFail, login)
     } else if (res) {
       if ((this.isReplay as boolean) || (this.isSkip as boolean)) {
         let refundMessage = ''
-        if (cost >= 100) { // Its not worth to return under 100 due to nadeo tax growing exponentially
+        if (cost >= 100) {
+          // Its not worth to return under 100 due to nadeo tax growing exponentially
           refundMessage = msg.refund
           void tm.utils.payCoppers(login, tm.utils.getCoppersAfterTax(cost), msg.refundMail)
         }
-        tm.sendMessage(tm.utils.strVar(msg.interrupt, {
-          event: this.isReplay ? msg.replayEvent : msg.skipEvent,
-          refund: refundMessage
-        }), login)
+        tm.sendMessage(
+          tm.utils.strVar(msg.interrupt, {
+            event: this.isReplay ? msg.replayEvent : msg.skipEvent,
+            refund: refundMessage,
+          }),
+          login
+        )
         return
       }
-      tm.sendMessage(tm.utils.strVar(msg.success, {
-        name: tm.utils.strip(nickname),
-        amount: cost,
-        action
-      }))
+      tm.sendMessage(
+        tm.utils.strVar(msg.success, {
+          name: tm.utils.strip(nickname),
+          amount: cost,
+          action,
+        })
+      )
       this.costIndex++
       this.replayOrExtendTime()
     }
@@ -85,19 +94,21 @@ export class PayReplay extends UiButton {
 
   private handleMapStart(): void {
     const plus = tm.timer.isDynamic ? 4 : 0
-    if (!this.isReplay) { this.costIndex = 0 }
+    if (!this.isReplay) {
+      this.costIndex = 0
+    }
     if (cfg.costs[this.costIndex] !== undefined) {
       this.buttonData = {
         icon: cfg.icon,
         text1: tm.utils.strVar(cfg.texts[0 + plus][0], {
-          cost: cfg.costs[this.costIndex]
+          cost: cfg.costs[this.costIndex],
         }),
         text2: cfg.texts[0 + plus][1],
         iconWidth: cfg.width,
         iconHeight: cfg.height,
         padding: cfg.padding,
         equalTexts: cfg.texts[0 + plus].equal,
-        actionId: cfg.actionId + this.parentId
+        actionId: cfg.actionId + this.parentId,
       }
     } else {
       this.buttonData = {
@@ -107,7 +118,7 @@ export class PayReplay extends UiButton {
         iconWidth: cfg.width,
         iconHeight: cfg.height,
         padding: cfg.padding,
-        equalTexts: cfg.texts[1].equal
+        equalTexts: cfg.texts[1].equal,
       }
     }
     this.isReplay = false
@@ -135,5 +146,4 @@ export class PayReplay extends UiButton {
     this.buttonData.actionId = undefined
     this.emitUpdate()
   }
-
 }

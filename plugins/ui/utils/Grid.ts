@@ -11,7 +11,6 @@ export interface GridCellObject {
  * Util to display tabular data in manialinks.
  */
 export class Grid {
-
   /** Grid width */
   readonly width: number
   /** Grid height */
@@ -39,18 +38,24 @@ export class Grid {
    * @param rowProportions Grid row proportions
    * @param options Optional properties
    */
-  constructor(width: number, height: number, columnProportions: number[], rowProportions: number[], options?: {
-    background?: string,
-    margin?: number,
-    headerBackground?: string
-  }) {
+  constructor(
+    width: number,
+    height: number,
+    columnProportions: number[],
+    rowProportions: number[],
+    options?: {
+      background?: string
+      margin?: number
+      headerBackground?: string
+    }
+  ) {
     this.width = width
     this.height = height
     this.margin = options?.margin ?? 0
     const columnSum: number = columnProportions.reduce((acc, cur): number => acc + cur, 0)
     const rowSum: number = rowProportions.reduce((acc, cur): number => acc + cur, 0)
-    this.columnWidths = columnProportions.map(a => (a / columnSum) * (this.width - this.margin))
-    this.rowHeights = rowProportions.map(a => (a / rowSum) * (this.height - this.margin))
+    this.columnWidths = columnProportions.map((a) => (a / columnSum) * (this.width - this.margin))
+    this.rowHeights = rowProportions.map((a) => (a / rowSum) * (this.height - this.margin))
     this.columns = columnProportions.length
     this.rows = rowProportions.length
     this.background = options?.background
@@ -73,8 +78,10 @@ export class Grid {
           indexOffset++
           continue
         }
-        const obj: GridCellFunction | GridCellObject = objectsOrFunctions[(i * this.columns) + j - indexOffset]
-        if (obj === undefined) { break }
+        const obj: GridCellFunction | GridCellObject = objectsOrFunctions[i * this.columns + j - indexOffset]
+        if (obj === undefined) {
+          break
+        }
         let callback: (i: number, j: number, w: number, h: number) => string
         let rowspan: number = 1
         let colspan: number = 1
@@ -87,10 +94,12 @@ export class Grid {
         } else {
           callback = obj
         }
-        const posY: number = -this.rowHeights.filter((val, index): boolean => index < i)
-        .reduce((acc, cur): number => acc + cur, 0) - this.margin
-        const posX: number = this.columnWidths.filter((val, index): boolean => index < j)
-        .reduce((acc, cur): number => acc + cur, 0) + this.margin
+        const posY: number =
+          -this.rowHeights.filter((val, index): boolean => index < i).reduce((acc, cur): number => acc + cur, 0) -
+          this.margin
+        const posX: number =
+          this.columnWidths.filter((val, index): boolean => index < j).reduce((acc, cur): number => acc + cur, 0) +
+          this.margin
         let h: number = -this.margin
         for (let k: number = i; k < i + rowspan; k++) {
           h += this.rowHeights[k]
@@ -106,7 +115,10 @@ export class Grid {
           xml += `<quad posn="0 0 2" sizen="${w} ${h}" bgcolor="${background}"/>`
         } else if (this.headerBg !== undefined && i === 0) {
           xml += `<quad posn="0 0 2" sizen="${w} ${h}" bgcolor="${this.headerBg}"/>`
-        } else if ((this.background !== undefined && i !== 0) || (this.headerBg === undefined && this.background !== undefined)) {
+        } else if (
+          (this.background !== undefined && i !== 0) ||
+          (this.headerBg === undefined && this.background !== undefined)
+        ) {
           xml += `<quad posn="0 0 2" sizen="${w} ${h}" bgcolor="${this.background}"/>`
         }
         xml += callback(i, j, w, h)
@@ -119,5 +131,4 @@ export class Grid {
   private checkConstructFunctionType(obj: any): obj is GridCellObject {
     return obj?.callback !== undefined
   }
-
 }

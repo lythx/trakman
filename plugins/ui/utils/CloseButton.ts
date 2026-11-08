@@ -1,8 +1,8 @@
 import config from './CloseButton.config.js'
 
 interface CloseButtonOptions {
-  width?: number,
-  height?: number,
+  width?: number
+  height?: number
   padding?: number
 }
 
@@ -14,8 +14,12 @@ interface CloseButtonOptions {
  * @param options Optional properties
  * @returns Button XML string
  */
-export const closeButton = (actionId: number, parentWidth: number, parentHeight: number,
-  options?: CloseButtonOptions): string => {
+export const closeButton = (
+  actionId: number,
+  parentWidth: number,
+  parentHeight: number,
+  options?: CloseButtonOptions
+): string => {
   const width: number = options?.width ?? config.buttonWidth
   const height: number = options?.height ?? config.buttonHeight
   const padding: number = options?.padding ?? config.padding

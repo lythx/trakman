@@ -1,5 +1,4 @@
 export class ClientRequest {
-
   private readonly xml: string
 
   /**
@@ -10,7 +9,9 @@ export class ClientRequest {
     this.xml = `<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>${method}</methodName><params>`
     for (const param of params) {
       const str = this.handleParamType(param)
-      if (str instanceof Error) { throw str }
+      if (str instanceof Error) {
+        throw str
+      }
       this.xml += `<param><value>${str}</value></param>`
     }
     this.xml += '</params></methodCall>'
@@ -39,7 +40,7 @@ export class ClientRequest {
     if (value === undefined) {
       return new Error(`Received undefined while creating dedicated server XML request, expected ${type}.`)
     }
-    switch(type) {
+    switch (type) {
       case 'boolean':
         return `<boolean>${value === true ? '1' : '0'}</boolean>`
       case 'int':
@@ -86,9 +87,10 @@ export class ClientRequest {
       '<': '&lt;',
       '>': '&gt;',
       '"': '&quot;',
-      "'": '&#039;'
+      "'": '&#039;',
     }
-    return str.replace(/[&<>"']/g, (m): string => { return map[m as keyof typeof map] })
+    return str.replace(/[&<>"']/g, (m): string => {
+      return map[m as keyof typeof map]
+    })
   }
-
 }

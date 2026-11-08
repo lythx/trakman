@@ -3,14 +3,21 @@
  * @since 1.1
  */
 
-import { centeredText, closeButton, componentIds, Grid, type GridCellFunction, type GridCellObject, PopupWindow } from '../UI.js'
+import {
+  centeredText,
+  closeButton,
+  componentIds,
+  Grid,
+  type GridCellFunction,
+  type GridCellObject,
+  PopupWindow,
+} from '../UI.js'
 import config from './ServerInfo.config.js'
 import { arch, cpus, freemem, loadavg, platform, totalmem } from 'node:os'
 import { memoryUsage, uptime, version } from 'node:process'
 import 'dotenv/config'
 
 export default class ServerInfoWindow extends PopupWindow {
-
   private readonly grid: Grid
   private reRenderInterval?: NodeJS.Timeout
 
@@ -22,10 +29,15 @@ export default class ServerInfoWindow extends PopupWindow {
       callback: (info): void => {
         tm.openManialink(this.openId, info.login)
       },
-      privilege: config.command.privilege
+      privilege: config.command.privilege,
     })
-    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
-      new Array((config.serverCells.length + config.hostCells.length) / 2 + 1).fill(1), config.grid)
+    this.grid = new Grid(
+      this.contentWidth,
+      this.contentHeight,
+      config.columnProportions,
+      new Array((config.serverCells.length + config.hostCells.length) / 2 + 1).fill(1),
+      config.grid
+    )
   }
 
   private async getServerInfo(): Promise<string[]> {
@@ -36,15 +48,27 @@ export default class ServerInfoWindow extends PopupWindow {
     // Configurable (or not) server variables
     const serverName: string = tm.utils.strip(tm.config.server.name, false)
     const serverLogin: string = tm.config.server.login
-    const serverZone: string = (tm.config.server.zone).split(`|`, 2).join(`|`)
+    const serverZone: string = tm.config.server.zone.split(`|`, 2).join(`|`)
     const serverRights: string = tm.config.server.isUnited ? `United` : `Nations`
     const serverMaxPlayers: string = tm.config.server.currentMaxPlayers.toString()
     const serverMaxSpecs: string = tm.config.server.currentMaxSpectators.toString()
     const serverMaxRecs: string = tm.config.controller.localRecordsLimit.toString()
     const serverMapCount: string = tm.maps.count.toString()
     const serverVisitorsCount: string = tm.players.totalCount.toString()
-    return [dedicatedUptime, dedicatedVersion, dedicatedBuild, serverName, serverLogin, serverZone, serverRights,
-      serverMaxPlayers, serverMaxSpecs, serverMaxRecs, serverMapCount, serverVisitorsCount]
+    return [
+      dedicatedUptime,
+      dedicatedVersion,
+      dedicatedBuild,
+      serverName,
+      serverLogin,
+      serverZone,
+      serverRights,
+      serverMaxPlayers,
+      serverMaxSpecs,
+      serverMaxRecs,
+      serverMapCount,
+      serverVisitorsCount,
+    ]
   }
 
   private getHostInfo(): string[] {
@@ -53,23 +77,38 @@ export default class ServerInfoWindow extends PopupWindow {
     const osArch: string = arch()
     const osCPU: string = cpus()[0].model
     const osCPULoad = String(loadavg()[0] + `%`)
-    const osRAM = String(~~((totalmem() - freemem()) / (1024 ** 2)) + ` MB`) // Bytes
+    const osRAM = String(~~((totalmem() - freemem()) / 1024 ** 2) + ` MB`) // Bytes
     const osKernel: string = platform().toUpperCase()
     // Trakman information
     const trakmanVersion: string = tm.config.controller.version
     const trakmanUptime: string = tm.utils.getVerboseTime(~~uptime() * 1000) // Seconds
     // Node information
     const nodeVersion: string = version
-    const nodeRAMUsage = String(~~(memoryUsage().heapTotal / (1024 ** 2)) + ` MB`)
-    return [osUptime, osArch, osCPU, osCPULoad, osRAM, osKernel, trakmanVersion, trakmanUptime, nodeVersion,
-      nodeRAMUsage, tm.db.dbVersion, tm.db.dbSize]
+    const nodeRAMUsage = String(~~(memoryUsage().heapTotal / 1024 ** 2) + ` MB`)
+    return [
+      osUptime,
+      osArch,
+      osCPU,
+      osCPULoad,
+      osRAM,
+      osKernel,
+      trakmanVersion,
+      trakmanUptime,
+      nodeVersion,
+      nodeRAMUsage,
+      tm.db.dbVersion,
+      tm.db.dbSize,
+    ]
   }
 
   protected onOpen(info: tm.ManialinkClickInfo): void {
     this.displayToPlayer(info.login)
     // If loop was already running no need to start it again
-    if (this.reRenderInterval !== undefined) { return }
-    this.reRenderInterval = setInterval((): void => { // Start the loop on window open
+    if (this.reRenderInterval !== undefined) {
+      return
+    }
+    this.reRenderInterval = setInterval((): void => {
+      // Start the loop on window open
       this.reRender()
       if (this.getPlayersWithWindowOpen().length === 0) {
         clearInterval(this.reRenderInterval)
@@ -88,21 +127,24 @@ export default class ServerInfoWindow extends PopupWindow {
   protected async constructContent(): Promise<string> {
     const serverInfo: string[] = await this.getServerInfo()
     const hostInfo: string[] = await this.getHostInfo()
-    const headers: GridCellObject[] = [{
-      background: config.grid.headerBackground,
-      colspan: 2,
-      callback: (i, j, w, h): string => centeredText(config.serverCellHeader, w, h)
-    }, {
-      background: config.grid.headerBackground,
-      colspan: 2,
-      callback: (i, j, w, h): string => centeredText(config.hostCellHeader, w, h)
-    }]
+    const headers: GridCellObject[] = [
+      {
+        background: config.grid.headerBackground,
+        colspan: 2,
+        callback: (i, j, w, h): string => centeredText(config.serverCellHeader, w, h),
+      },
+      {
+        background: config.grid.headerBackground,
+        colspan: 2,
+        callback: (i, j, w, h): string => centeredText(config.hostCellHeader, w, h),
+      },
+    ]
     const nameCell: GridCellObject = {
       background: config.nameColumnBackground,
       callback: (i, j, w, h): string => {
         const arr: string[] = j === 2 ? config.hostCells : config.serverCells
         return centeredText(arr[i - 1], w, h)
-      }
+      },
     }
     const infoCell: GridCellFunction = (i, j, w, h): string => {
       const arr: string[] = j === 3 ? hostInfo : serverInfo

@@ -30,11 +30,9 @@ const DB: Database = new Database()
 const packageObject = JSON.parse(await fs.readFile('package.json', { encoding: 'utf-8' }))
 
 namespace trakman {
-
   export const utils = Utils
 
   export const db = {
-
     getMapId: mapIdsRepo.splitGet.bind(mapIdsRepo),
 
     getPlayerId: playersRepo.getId.bind(playersRepo),
@@ -73,26 +71,26 @@ namespace trakman {
       }
     },
 
-    get dbSize() { return Database.dbSize },
+    get dbSize() {
+      return Database.dbSize
+    },
 
-    get dbVersion() { return Database.dbVersion }
-
+    get dbVersion() {
+      return Database.dbVersion
+    },
   }
 
   export const tmx = {
-
     fetchMapInfo: TMXFetcher.fetchMapInfo.bind(TMXFetcher),
 
     fetchMapFile: TMXFetcher.fetchMapFile.bind(TMXFetcher),
 
     searchForMap: TMXFetcher.searchForMap.bind(TMXFetcher),
 
-    fetchRandomMapFile: TMXFetcher.fetchRandomMapFile.bind(TMXFetcher)
-
+    fetchRandomMapFile: TMXFetcher.fetchRandomMapFile.bind(TMXFetcher),
   }
 
   export const players = {
-
     get: PlayerService.get.bind(PlayerService),
 
     fetch: PlayerService.fetch.bind(PlayerService),
@@ -100,22 +98,26 @@ namespace trakman {
     /**
      All online players
      */
-    get list() { return PlayerService.players },
+    get list() {
+      return PlayerService.players
+    },
 
     /**
      * Number of online players
      */
-    get count(): number { return PlayerService.playerCount },
+    get count(): number {
+      return PlayerService.playerCount
+    },
 
     /**
      * Number of all players who visited the server
      */
-    get totalCount(): number { return PlayerService.totalPlayerCount }
-
+    get totalCount(): number {
+      return PlayerService.totalPlayerCount
+    },
   }
 
   export const records = {
-
     getLocal: RecordService.getLocal.bind(RecordService),
 
     getLive: RecordService.getLive.bind(RecordService),
@@ -151,109 +153,143 @@ namespace trakman {
     /**
      * Current map local records.
      */
-    get local(): Readonly<tm.LocalRecord>[] { return RecordService.localRecords },
+    get local(): Readonly<tm.LocalRecord>[] {
+      return RecordService.localRecords
+    },
 
     /**
      * Number of local records on the current map.
      */
-    get localCount(): number { return RecordService.localRecordCount },
+    get localCount(): number {
+      return RecordService.localRecordCount
+    },
 
     /**
      * Current live records.
      */
-    get live(): Readonly<tm.FinishInfo>[] { return RecordService.liveRecords },
+    get live(): Readonly<tm.FinishInfo>[] {
+      return RecordService.liveRecords
+    },
 
     /**
      * Number of live records.
      */
-    get liveCount(): number { return RecordService.liveRecordCount },
+    get liveCount(): number {
+      return RecordService.liveRecordCount
+    },
 
     /**
      * Maximum amount of local records.
      * All local records get fetched, but only ones below max amount count towards server rank.
      */
-    get maxLocalsAmount(): number { return RecordService.maxLocalsAmount },
+    get maxLocalsAmount(): number {
+      return RecordService.maxLocalsAmount
+    },
 
     /**
      * Current map lap records. Same as local records if the map is not in multilap mode.
      */
-    get lap(): Readonly<tm.LocalRecord>[] { return RecordService.lapRecords },
+    get lap(): Readonly<tm.LocalRecord>[] {
+      return RecordService.lapRecords
+    },
 
     /**
      * Number of lap records on the current map. Same as local records if the map is not in multilap mode.
      */
-    get lapCount(): number { return RecordService.lapRecordCount },
+    get lapCount(): number {
+      return RecordService.lapRecordCount
+    },
 
     /**
      * Current round records.
      */
-    get roundRecords(): Readonly<tm.FinishInfo>[] { return RoundsService.roundRecords },
+    get roundRecords(): Readonly<tm.FinishInfo>[] {
+      return RoundsService.roundRecords
+    },
 
     /**
      * Number of current round records.
      */
-    get roundRecordCount(): number { return RoundsService.roundRecordCount }
-
+    get roundRecordCount(): number {
+      return RoundsService.roundRecordCount
+    },
   }
 
   export const rounds = {
-
     getRecord: RoundsService.getRoundRecord.bind(RecordService),
 
     /**
      * Current round records.
      */
-    get currentRecords() { return RoundsService.roundRecords },
+    get currentRecords() {
+      return RoundsService.roundRecords
+    },
 
     /**
      * Number of current round records.
      */
-    get currentRecordCount(): number { return RoundsService.roundRecordCount },
+    get currentRecordCount(): number {
+      return RoundsService.roundRecordCount
+    },
 
     /**
      * Current team scores (Teams mode only).
      */
-    get teamScores() { return RoundsService.teamScores },
+    get teamScores() {
+      return RoundsService.teamScores
+    },
 
     /**
      * Point system for Rounds and Cup mode.
      */
-    get roundsPointSystem() { return RoundsService.roundsPointSystem },
+    get roundsPointSystem() {
+      return RoundsService.roundsPointSystem
+    },
 
     /**
      * Amount of points to end the map in Rounds mode.
      */
-    get roundsPointsLimit() { return RoundsService.roundsPointsLimit },
+    get roundsPointsLimit() {
+      return RoundsService.roundsPointsLimit
+    },
 
     /**
      * Amount of points to become a finalist in Cup mode.
      */
-    get cupPointsLimit() { return RoundsService.cupPointsLimit },
+    get cupPointsLimit() {
+      return RoundsService.cupPointsLimit
+    },
 
     /**
      * Amount of points to end map in Teams mode.
      */
-    get teamsPointsLimit() { return RoundsService.teamsPointsLimit },
+    get teamsPointsLimit() {
+      return RoundsService.teamsPointsLimit
+    },
 
     /**
      * Current round points ranking (Rounds/Cup mode only).
      */
-    get pointsRanking() { return RoundsService.pointsRanking },
+    get pointsRanking() {
+      return RoundsService.pointsRanking
+    },
 
     /**
      * Max amount of winners in Cup mode.
      */
-    get cupMaxWinnersCount() { return RoundsService.cupMaxWinnersCount },
+    get cupMaxWinnersCount() {
+      return RoundsService.cupMaxWinnersCount
+    },
 
     /**
      * Current Cup winners (Cup mode only).
      */
-    get cupWinners() { return RoundsService.cupWinners }
-
+    get cupWinners() {
+      return RoundsService.cupWinners
+    },
   }
 
   export const chat = {
-
     fetch: ChatService.fetch.bind(ChatService),
 
     fetchByLogin: ChatService.fetchByLogin.bind(ChatService),
@@ -269,43 +305,45 @@ namespace trakman {
     /**
      * Recent chat messages.
      */
-    get messages(): tm.Message[] { return ChatService.messages },
+    get messages(): tm.Message[] {
+      return ChatService.messages
+    },
 
     /**
      * Number of recent chat messages.
      */
-    get messageCount(): number { return ChatService.messageCount }
-
+    get messageCount(): number {
+      return ChatService.messageCount
+    },
   }
 
   export const commands = {
-
     add: ChatService.addCommand.bind(ChatService),
 
     /**
      * All registered chat commands.
      */
-    get list(): tm.Command[] { return ChatService.commandList },
+    get list(): tm.Command[] {
+      return ChatService.commandList
+    },
 
     /**
      * Number of commands.
      */
-    get count(): number { return ChatService.commandCount }
-
+    get count(): number {
+      return ChatService.commandCount
+    },
   }
 
   export const client = {
-
     call: Client.call.bind(Client),
 
     callNoRes: Client.callNoRes.bind(Client),
 
-    addProxy: Client.addProxy.bind(Client)
-
+    addProxy: Client.addProxy.bind(Client),
   }
 
   export const maps = {
-
     get: MapService.get.bind(MapService),
 
     fetch: MapService.fetch.bind(MapService),
@@ -321,22 +359,26 @@ namespace trakman {
     /**
      * All maps from current playlist.
      */
-    get list(): Readonly<tm.Map>[] { return MapService.maps },
+    get list(): Readonly<tm.Map>[] {
+      return MapService.maps
+    },
 
     /**
      * Currently played map.
      */
-    get current(): Readonly<tm.CurrentMap> { return MapService.current },
+    get current(): Readonly<tm.CurrentMap> {
+      return MapService.current
+    },
 
     /**
      * Amount of maps in current playlist.
      */
-    get count(): number { return MapService.mapCount }
-
+    get count(): number {
+      return MapService.mapCount
+    },
   }
 
   export const log = {
-
     fatal: Logger.fatal.bind(Logger),
 
     error: Logger.error.bind(Logger),
@@ -347,12 +389,10 @@ namespace trakman {
 
     debug: Logger.debug.bind(Logger),
 
-    trace: Logger.trace.bind(Logger)
-
+    trace: Logger.trace.bind(Logger),
   }
 
   export const jukebox = {
-
     add: MapService.addToJukebox.bind(MapService),
 
     remove: MapService.removeFromQueue.bind(MapService),
@@ -373,53 +413,69 @@ namespace trakman {
      * Amount of maps in the queue (maps juked by the players and the server).
      * This is always equal to maxQueueCount.
      */
-    get queueCount(): number { return MapService.queueSize },
+    get queueCount(): number {
+      return MapService.queueSize
+    },
 
     /**
      * Amount of maps in the history.
      */
-    get historyCount(): number { return MapService.historyCount },
+    get historyCount(): number {
+      return MapService.historyCount
+    },
 
     /**
      * Max amount of maps in the queue (maps juked by the players and the server).
      * This is always equal to queueCount.
      */
-    get maxQueueCount(): number { return MapService.queueSize },
+    get maxQueueCount(): number {
+      return MapService.queueSize
+    },
 
     /**
      * Max amount of maps in the history.
      */
-    get maxHistoryCount(): number { return MapService.historySize },
+    get maxHistoryCount(): number {
+      return MapService.historySize
+    },
 
     /**
      * Amount of maps juked by the players.
      */
-    get jukedCount(): number { return MapService.jukeboxCount },
+    get jukedCount(): number {
+      return MapService.jukeboxCount
+    },
 
     /**
      * Map queue (maps juked by the players and the server).
      */
-    get queue(): Readonly<tm.Map>[] { return MapService.queue },
+    get queue(): Readonly<tm.Map>[] {
+      return MapService.queue
+    },
 
     /**
      * Map history.
      */
-    get history(): Readonly<tm.Map>[] { return MapService.history },
+    get history(): Readonly<tm.Map>[] {
+      return MapService.history
+    },
 
     /**
      * Currently played map.
      */
-    get current(): Readonly<tm.CurrentMap> { return MapService.current },
+    get current(): Readonly<tm.CurrentMap> {
+      return MapService.current
+    },
 
     /**
      * Maps juked by the players.
      */
-    get juked() { return MapService.jukebox }
-
+    get juked() {
+      return MapService.jukebox
+    },
   }
 
   export const karma = {
-
     add: VoteService.add.bind(VoteService),
 
     fetch: VoteService.fetch.bind(VoteService),
@@ -429,23 +485,27 @@ namespace trakman {
     /**
      * Current map votes.
      */
-    get current(): Readonly<tm.Vote>[] { return VoteService.current },
+    get current(): Readonly<tm.Vote>[] {
+      return VoteService.current
+    },
 
     /**
      * Current map vote count.
      */
-    get currentCount(): number { return VoteService.currentCount },
+    get currentCount(): number {
+      return VoteService.currentCount
+    },
 
     /**
      * All votes in runtime memory. Only votes for maps in the history,
      * queue and the current map are stored.
      */
-    get allVotes() { return VoteService.votes }
-
+    get allVotes() {
+      return VoteService.votes
+    },
   }
 
   export const timer = {
-
     enableDynamic: GameService.enableDynamicTimer.bind(GameService),
 
     disableDynamic: GameService.disableDynamicTimer.bind(GameService),
@@ -516,12 +576,10 @@ namespace trakman {
      */
     get isDynamicOnNextRound(): boolean {
       return GameService.dynamicTimerOnNextRound
-    }
-
+    },
   }
 
   export const admin = {
-
     setPrivilege: AdministrationService.setPrivilege.bind(AdministrationService),
 
     ban: AdministrationService.ban.bind(AdministrationService),
@@ -551,88 +609,121 @@ namespace trakman {
     /**
      * Banned players.
      */
-    get banlist(): Readonly<tm.BanlistEntry>[] { return AdministrationService.banlist },
+    get banlist(): Readonly<tm.BanlistEntry>[] {
+      return AdministrationService.banlist
+    },
 
     /**
      * Blacklisted players.
      */
-    get blacklist(): Readonly<tm.BlacklistEntry>[] { return AdministrationService.blacklist },
+    get blacklist(): Readonly<tm.BlacklistEntry>[] {
+      return AdministrationService.blacklist
+    },
 
     /**
      * Muted players.
      */
-    get mutelist(): Readonly<tm.MutelistEntry>[] { return AdministrationService.mutelist },
+    get mutelist(): Readonly<tm.MutelistEntry>[] {
+      return AdministrationService.mutelist
+    },
 
     /**
      * Server guests.
      */
-    get guestlist(): Readonly<tm.GuestlistEntry>[] { return AdministrationService.guestlist },
+    get guestlist(): Readonly<tm.GuestlistEntry>[] {
+      return AdministrationService.guestlist
+    },
 
     /**
      * Number of banned players.
      */
-    get banCount(): number { return AdministrationService.banCount },
+    get banCount(): number {
+      return AdministrationService.banCount
+    },
 
     /**
      * Number of blacklisted players.
      */
-    get blacklistCount(): number { return AdministrationService.blacklistCount },
+    get blacklistCount(): number {
+      return AdministrationService.blacklistCount
+    },
 
     /**
      * Number of muted players.
      */
-    get muteCount(): number { return AdministrationService.muteCount },
+    get muteCount(): number {
+      return AdministrationService.muteCount
+    },
 
     /**
      * Number of guests.
      */
-    get guestCount(): number { return AdministrationService.guestCount },
+    get guestCount(): number {
+      return AdministrationService.guestCount
+    },
 
     /**
      * Privilege levels for each of the administrative actions.
      */
-    get privileges() { return AdministrationService.privileges },
+    get privileges() {
+      return AdministrationService.privileges
+    },
 
     /**
      * Relative path (/GameData/Config/) to the blacklist file.
      */
-    get blacklistFile() { return AdministrationService.blacklistFile },
+    get blacklistFile() {
+      return AdministrationService.blacklistFile
+    },
 
     /**
      * Relative path (/GameData/Config/) to the guestlist file.
      */
-    get guestlistFile() { return AdministrationService.guestlistFile },
+    get guestlistFile() {
+      return AdministrationService.guestlistFile
+    },
 
     /**
      * Server operators.
      */
-    get oplist(): Readonly<tm.PrivilegeEntry>[] { return AdministrationService.oplist },
+    get oplist(): Readonly<tm.PrivilegeEntry>[] {
+      return AdministrationService.oplist
+    },
 
     /**
      * Number of server operators.
      */
-    get opCount(): number { return AdministrationService.opCount },
+    get opCount(): number {
+      return AdministrationService.opCount
+    },
 
     /**
      * Server admins.
      */
-    get adminlist(): Readonly<tm.PrivilegeEntry>[] { return AdministrationService.adminlist },
+    get adminlist(): Readonly<tm.PrivilegeEntry>[] {
+      return AdministrationService.adminlist
+    },
 
     /**
      * Number of server admins.
      */
-    get adminCount(): number { return AdministrationService.adminCount },
+    get adminCount(): number {
+      return AdministrationService.adminCount
+    },
 
     /**
      * Server masteradmins.
      */
-    get masteradminlist(): Readonly<tm.PrivilegeEntry>[] { return AdministrationService.masteradminlist },
+    get masteradminlist(): Readonly<tm.PrivilegeEntry>[] {
+      return AdministrationService.masteradminlist
+    },
 
     /**
      * Number of server masteradmins.
      */
-    get masteradminCount(): number { return AdministrationService.masteradminCount }
-
+    get masteradminCount(): number {
+      return AdministrationService.masteradminCount
+    },
   }
 
   /**
@@ -647,8 +738,10 @@ namespace trakman {
       if (login === ServerConfig.config.login || login?.includes(ServerConfig.config.login)) {
         Logger.consoleLog(Utils.strip(m), false) // send message to console if one of the recipients is the server
       }
-      Client.callNoRes('ChatSendServerMessageToLogin',
-        [{ string: m }, { string: typeof login === 'string' ? login : login.join(',') }])
+      Client.callNoRes('ChatSendServerMessageToLogin', [
+        { string: m },
+        { string: typeof login === 'string' ? login : login.join(',') },
+      ])
       return
     }
     Client.callNoRes('ChatSendServerMessage', [{ string: (prefix ? prefixes.prefixes.serverToAll : '') + message }])
@@ -661,32 +754,46 @@ namespace trakman {
    * @param deleteOnClick Whether to remove the manialink on player interaction
    * @param expireTime Amount of time (in seconds) for the manialink to disappear
    */
-  export const sendManialink = (manialink: string, login?: string | string[], deleteOnClick: boolean = false,
-    expireTime: number = 0): void => {
-    if (tm.players.count === 0) { return }
-    if (login !== undefined) {
-      Client.callNoRes('SendDisplayManialinkPageToLogin',
-        [{ string: typeof login === 'string' ? login : login.join(',') }, { string: manialink }, { int: expireTime },
-          { boolean: deleteOnClick }])
+  export const sendManialink = (
+    manialink: string,
+    login?: string | string[],
+    deleteOnClick: boolean = false,
+    expireTime: number = 0
+  ): void => {
+    if (tm.players.count === 0) {
       return
     }
-    Client.callNoRes('SendDisplayManialinkPage',
-      [{ string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
+    if (login !== undefined) {
+      Client.callNoRes('SendDisplayManialinkPageToLogin', [
+        { string: typeof login === 'string' ? login : login.join(',') },
+        { string: manialink },
+        { int: expireTime },
+        { boolean: deleteOnClick },
+      ])
+      return
+    }
+    Client.callNoRes('SendDisplayManialinkPage', [
+      { string: manialink },
+      { int: expireTime },
+      { boolean: deleteOnClick },
+    ])
   }
 
   /**
    * Updates player information in runtime memory and database
    * @param players Objects containing player login and infos to update
    */
-  export const updatePlayerInfo = async (...players: {
-    login: string,
-    nickname?: string,
-    region?: string,
-    title?: string
-  }[]): Promise<void> => {
+  export const updatePlayerInfo = async (
+    ...players: {
+      login: string
+      nickname?: string
+      region?: string
+      title?: string
+    }[]
+  ): Promise<void> => {
     await PlayerService.updateInfo(...players)
     RecordService.updateInfo(...players)
-    AdministrationService.updateNickname(...players.filter(a => a.nickname !== undefined) as any)
+    AdministrationService.updateNickname(...(players.filter((a) => a.nickname !== undefined) as any))
     Events.emit('PlayerDataUpdated', players)
   }
 
@@ -734,35 +841,39 @@ namespace trakman {
    */
   export const openManialink = (id: number, login: string): void => {
     const player = PlayerService.get(login)
-    if (player === undefined) { return }
+    if (player === undefined) {
+      return
+    }
     const info: tm.ManialinkClickInfo = {
       ...player,
-      actionId: id
+      actionId: id,
     }
     Events.emit('ManialinkClick', info)
   }
 
   export const config = {
-
     /**
      * Controller config.
      */
     controller: {
       ...controllerConfig,
-      version: packageObject.version ??= "unknown",
-      repo: packageObject.homepage ??= "http://github.com/lythx/trakman"
+      version: (packageObject.version ??= 'unknown'),
+      repo: (packageObject.homepage ??= 'http://github.com/lythx/trakman'),
     },
 
     /**
      * Current dedicated server config.
      */
-    get server() { return ServerConfig.config },
+    get server() {
+      return ServerConfig.config
+    },
 
     /**
      * Current game config.
      */
-    get game() { return GameService.config }
-
+    get game() {
+      return GameService.config
+    },
   }
 }
 
@@ -770,4 +881,4 @@ declare global {
   const tm: typeof trakman
 }
 
-(global as any).tm = trakman
+;(global as any).tm = trakman

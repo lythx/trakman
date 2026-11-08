@@ -4,33 +4,33 @@ import resultConfig from './StaticHeaderResult.config.js'
 
 export interface StaticHeaderOptions {
   /** Header height */
-  height: number,
+  height: number
   /** Image width */
-  iconWidth: number,
+  iconWidth: number
   /** Image height */
-  iconHeight: number,
+  iconHeight: number
   /** Click action ID */
   actionId?: number
   /** Header text scale */
-  textScale: number,
+  textScale: number
   /** Width of the rectangle containing text */
-  rectangleWidth: number,
+  rectangleWidth: number
   /** Text horizontal padding */
-  horizontalPadding: number,
+  horizontalPadding: number
   /** Text vertical padding */
-  verticalPadding: number,
+  verticalPadding: number
   /** Image vertical padding */
-  iconVerticalPadding: number,
+  iconVerticalPadding: number
   /** Image horizontal padding */
-  iconHorizontalPadding: number,
+  iconHorizontalPadding: number
   /** If true the text will be centered */
-  centerText: boolean,
+  centerText: boolean
   /** Image background */
-  iconBackground: string,
+  iconBackground: string
   /** Header text background */
-  textBackground: string,
+  textBackground: string
   /** Width of the square containing the image */
-  squareWidth: number,
+  squareWidth: number
   /** Margin between the square and the rectangle */
   margin: number
 }
@@ -39,7 +39,6 @@ export interface StaticHeaderOptions {
  * Util to display manialink headers in static UI.
  */
 export default class StaticHeader {
-
   /** Header options */
   options: StaticHeaderOptions
   /** Default height in race preset */
@@ -63,7 +62,7 @@ export default class StaticHeader {
       this.options = { ...raceConfig }
     }
     for (const [k, v] of Object.entries(options)) {
-      (this.options as any)[k] = v
+      ;(this.options as any)[k] = v
     }
   }
 
@@ -78,7 +77,7 @@ export default class StaticHeader {
   constructXml(text: string, icon: string, side: boolean, options: Partial<StaticHeaderOptions> = {}): string {
     const cfg = { ...this.options }
     for (const [k, v] of Object.entries(options)) {
-      (cfg as any)[k] = v
+      ;(cfg as any)[k] = v
     }
     if (side) {
       let label: string
@@ -86,13 +85,13 @@ export default class StaticHeader {
         label = centeredText(text, cfg.rectangleWidth, cfg.height, {
           textScale: cfg.textScale,
           padding: cfg.horizontalPadding,
-          xOffset: cfg.squareWidth + cfg.margin
+          xOffset: cfg.squareWidth + cfg.margin,
         })
       } else {
         label = leftAlignedText(text, cfg.rectangleWidth, cfg.height, {
           textScale: cfg.textScale,
           padding: cfg.horizontalPadding,
-          xOffset: cfg.squareWidth + cfg.margin
+          xOffset: cfg.squareWidth + cfg.margin,
         })
       }
       return `<quad posn="0 0 5" sizen="${cfg.squareWidth + cfg.rectangleWidth + cfg.margin} ${cfg.height}" action="${cfg.actionId}"/>
@@ -107,7 +106,7 @@ export default class StaticHeader {
       if (cfg.centerText) {
         label = centeredText(text, cfg.rectangleWidth, cfg.height, {
           textScale: cfg.textScale,
-          padding: cfg.horizontalPadding
+          padding: cfg.horizontalPadding,
         })
       } else {
         label = rightAlignedText(text, cfg.rectangleWidth, cfg.height, { textScale: cfg.textScale })
@@ -116,10 +115,9 @@ export default class StaticHeader {
           <quad posn="0 0 1" sizen="${cfg.rectangleWidth} ${cfg.height}" bgcolor="${cfg.textBackground}"/>
           ${label}
           <quad posn="${cfg.rectangleWidth + cfg.margin} 0 1" sizen="${cfg.squareWidth} ${cfg.height}" bgcolor="${cfg.iconBackground}"/>
-          <quad posn="${cfg.rectangleWidth + cfg.margin + (cfg.iconHorizontalPadding)} -${cfg.iconVerticalPadding} 2"
+          <quad posn="${cfg.rectangleWidth + cfg.margin + cfg.iconHorizontalPadding} -${cfg.iconVerticalPadding} 2"
            sizen="${cfg.iconWidth} ${cfg.iconHeight}" image="${icon}"/>
          `
     }
   }
-
 }

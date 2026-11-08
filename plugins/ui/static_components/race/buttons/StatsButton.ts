@@ -1,12 +1,11 @@
-import type { ButtonData } from "./ButtonData.js"
-import { UiButton } from "./UiButton.js"
-import config from "./ButtonsWidget.config.js"
+import type { ButtonData } from './ButtonData.js'
+import { UiButton } from './UiButton.js'
+import config from './ButtonsWidget.config.js'
 import { componentIds } from '../../../UI.js'
 
 const cfg = config.statsButton
 
 export class StatsButton extends UiButton {
-
   buttonData: ButtonData
 
   constructor() {
@@ -19,8 +18,7 @@ export class StatsButton extends UiButton {
       iconHeight: cfg.height,
       padding: cfg.padding,
       actionId: componentIds.topRanks,
-      equalTexts: cfg.texts.equal
+      equalTexts: cfg.texts.equal,
     }
   }
-
-}  
+}

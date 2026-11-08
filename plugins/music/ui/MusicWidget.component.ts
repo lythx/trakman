@@ -3,7 +3,6 @@ import type { Song } from '../Types.js'
 import config from './MusicWidget.config.js'
 
 export default class MusicWidget extends StaticComponent {
-
   private song: Song | undefined
   private readonly header: StaticHeader
   private xml: string = ''
@@ -29,19 +28,23 @@ export default class MusicWidget extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     this.updateXML()
     return this.xml
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
     return {
       xml: this.xml,
-      login
+      login,
     }
   }
 
@@ -79,8 +82,7 @@ export default class MusicWidget extends StaticComponent {
     ${leftAlignedText(text, w, h, {
       textScale: config.textScale,
       padding: config.textPadding,
-      xOffset
+      xOffset,
     })}`
   }
-
 }

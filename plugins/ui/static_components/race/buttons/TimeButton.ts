@@ -1,11 +1,10 @@
-import type { ButtonData } from "./ButtonData.js"
-import { UiButton } from "./UiButton.js"
-import config from "./ButtonsWidget.config.js"
+import type { ButtonData } from './ButtonData.js'
+import { UiButton } from './UiButton.js'
+import config from './ButtonsWidget.config.js'
 
 const cfg = config.timeButton
 
 export class TimeButton extends UiButton {
-
   buttonData: ButtonData
 
   constructor() {
@@ -18,7 +17,7 @@ export class TimeButton extends UiButton {
       iconWidth: cfg.width,
       iconHeight: cfg.height,
       padding: cfg.padding,
-      equalTexts: cfg.texts.equal
+      equalTexts: cfg.texts.equal,
     }
     setInterval((): void => {
       const newTimeString: string = this.getTimeString()
@@ -33,5 +32,4 @@ export class TimeButton extends UiButton {
   private getTimeString(): string {
     return `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}`
   }
-
 }

@@ -7,7 +7,6 @@ import { componentIds, StaticComponent } from '../../UI.js'
 import config from './PreviousAndBest.config.js'
 
 export default class PreviousAndBest extends StaticComponent {
-
   private xml: string = ''
 
   constructor() {
@@ -25,20 +24,24 @@ export default class PreviousAndBest extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     return this.xml
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     return {
       xml: this.xml,
-      login
+      login,
     }
   }
 
   private constructXml(): void {
-    // Z posn is set to -37 because the previous best text is at around -36 
+    // Z posn is set to -37 because the previous best text is at around -36
     this.xml = `
     <manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} -37">
@@ -46,5 +49,4 @@ export default class PreviousAndBest extends StaticComponent {
       </frame>
     </manialink>`
   }
-
 }

@@ -3,12 +3,19 @@
  * @since 1.5.0
  */
 
-import { ultimania } from "../Ultimania.js"
-import { centeredText, closeButton, componentIds, Grid, type GridCellFunction, Paginator, PopupWindow } from '../../ui/UI.js'
+import { ultimania } from '../Ultimania.js'
+import {
+  centeredText,
+  closeButton,
+  componentIds,
+  Grid,
+  type GridCellFunction,
+  Paginator,
+  PopupWindow,
+} from '../../ui/UI.js'
 import config from './UltiRecords.config.js'
 
 export default class UltiRecords extends PopupWindow {
-
   private readonly entries: number = config.entries
   private readonly paginator: Paginator
   private readonly selfColour: string = config.selfColour
@@ -16,8 +23,12 @@ export default class UltiRecords extends PopupWindow {
   constructor() {
     super(componentIds.ultiRecords, config.icon, config.title, config.navbar)
     const records = ultimania.records
-    this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight,
-      Math.ceil(records.length / this.entries))
+    this.paginator = new Paginator(
+      this.openId,
+      this.windowWidth,
+      this.footerHeight,
+      Math.ceil(records.length / this.entries)
+    )
     this.paginator.onPageChange = (login: string): void => {
       this.getPagesAndOpen(login)
     }
@@ -33,7 +44,7 @@ export default class UltiRecords extends PopupWindow {
       aliases: config.command.aliases,
       help: config.command.help,
       callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
-      privilege: config.command.privilege
+      privilege: config.command.privilege,
     })
     tm.addListener('PlayerDataUpdated', () => this.reRender())
   }
@@ -42,9 +53,12 @@ export default class UltiRecords extends PopupWindow {
     this.getPagesAndOpen(info.login)
   }
 
-  protected constructContent(login: string, params: {
-    page: number
-  }): string {
+  protected constructContent(
+    login: string,
+    params: {
+      page: number
+    }
+  ): string {
     const records = ultimania.records
     const playerIndex: number = (params.page - 1) * this.entries - 1
     const entriesToDisplay = records.length - (playerIndex + 1)
@@ -57,7 +71,8 @@ export default class UltiRecords extends PopupWindow {
 
     const loginCell = (i: number, j: number, w: number, h: number): string => {
       const ret: string = centeredText(records[i + playerIndex].login, w, h)
-      if (login === records[i + playerIndex].login) { // Add colour for yourself
+      if (login === records[i + playerIndex].login) {
+        // Add colour for yourself
         return `<format textcolor="${this.selfColour}"/>` + ret
       }
       return ret
@@ -71,11 +86,20 @@ export default class UltiRecords extends PopupWindow {
       return centeredText(tm.utils.getTimeString(records[i + playerIndex].score), w, h)
     }
 
-    const headers: GridCellFunction[] = [(i, j, w, h) => centeredText(' Lp. ', w, h), (i, j, w, h) => centeredText(' Nickname ', w, h),
-      (i, j, w, h) => centeredText(' Login ', w, h), (i, j, w, h) => centeredText(' Date ', w, h),
-      (i, j, w, h) => centeredText(' Score ', w, h)]
-    const grid: Grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
-      new Array(this.entries + 1).fill(1), config.grid)
+    const headers: GridCellFunction[] = [
+      (i, j, w, h) => centeredText(' Lp. ', w, h),
+      (i, j, w, h) => centeredText(' Nickname ', w, h),
+      (i, j, w, h) => centeredText(' Login ', w, h),
+      (i, j, w, h) => centeredText(' Date ', w, h),
+      (i, j, w, h) => centeredText(' Score ', w, h),
+    ]
+    const grid: Grid = new Grid(
+      this.contentWidth,
+      this.contentHeight,
+      config.columnProportions,
+      new Array(this.entries + 1).fill(1),
+      config.grid
+    )
     const arr = [...headers]
     for (let i = 0; i < entriesToDisplay; i++) {
       arr.push(indexCell, nickNameCell, loginCell, dateCell, finishCell)
@@ -99,7 +123,6 @@ export default class UltiRecords extends PopupWindow {
       this.getPagesAndOpen(login)
     }
   }
-
 }
 
 tm.addListener('Startup', () => {

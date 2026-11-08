@@ -10,14 +10,13 @@ import './ui/CheckpointRecords.component.js'
  * @since 0.3
  */
 export const checkpointRecords = {
-
   /**
    * @returns an array of current map best checkpoint records or null if checkpoint record doesn't exist
    */
   get mapCheckpoints(): ({
-    login: string,
-    nickname: string,
-    checkpoint: number,
+    login: string
+    nickname: string
+    checkpoint: number
     date: Date
   } | null)[] {
     return getMapCheckpoints()
@@ -26,11 +25,11 @@ export const checkpointRecords = {
   /**
    * @returns an array of current map online players and their checkpoint records
    */
-  get playerCheckpoints(): ({
-    login: string,
-    nickname: string,
+  get playerCheckpoints(): {
+    login: string
+    nickname: string
     checkpoints: (number | null)[]
-  })[] {
+  }[] {
     return getPlayerCheckpoints()
   },
 
@@ -44,6 +43,5 @@ export const checkpointRecords = {
   /**
    * Plugin status
    */
-  isEnabled: config.isEnabled
-
+  isEnabled: config.isEnabled,
 }
