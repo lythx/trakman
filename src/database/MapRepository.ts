@@ -93,7 +93,16 @@ export class MapRepository extends Repository {
             map.leaderboardRating,
             map.awards,
           ]
-            .map((a) => (a === undefined ? '\\N' : a.toString().replaceAll('\t', ' ').replaceAll('\\', '\\\\').replaceAll('\r', '\\r').replaceAll('\n', '\\n')))
+            .map((a) =>
+              a === undefined
+                ? '\\N'
+                : a
+                    .toString()
+                    .replaceAll('\t', ' ')
+                    .replaceAll('\\', '\\\\')
+                    .replaceAll('\r', '\\r')
+                    .replaceAll('\n', '\\n')
+            )
             .join('\t')
         ) // ugly replace to prevent DB errors
       }

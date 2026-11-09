@@ -150,6 +150,10 @@ export class DedimaniaResponse {
     for (const param of obj.params) {
       for (const p of param.param) {
         // some callbacks return multiple values instead of an array. NICE!!!!
+        // also some return none.
+        if (p.value === undefined || p.value.length === 0) {
+          continue
+        }
         const value: any = p.value[0]
         if (Object.keys(value)[0] === 'array') {
           for (const el of value.array) {
