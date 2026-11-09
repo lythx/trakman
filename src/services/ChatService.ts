@@ -33,6 +33,7 @@ export abstract class ChatService {
     importance: number
     callback: ModifyTextFunction
   }[] = []
+  private static readonly timeouts: { [login: string]: number } = {}
   static readonly manualChatRoutingEnabled = config.manualChatRoutingEnabled
 
   /**
@@ -44,6 +45,12 @@ export abstract class ChatService {
       Client.callNoRes('ChatEnableManualRouting', [{ boolean: this.manualChatRoutingEnabled }, { boolean: true }])
     })
     Events.addListener('PlayerChat', (info): void => {
+      // ignore messages from spamming player
+      if (ChatService.timeouts[info.login] > Date.now() + config.manialinkInteractionTimeout) {
+        return
+      }
+      ChatService.timeouts[info.login] = Date.now()
+
       const input: string = info.text?.trim()
       const [alias, ...params] = input.split(' ').filter((a) => a !== '')
       const aliasUsed: string | undefined = alias?.toLowerCase()

@@ -76,7 +76,7 @@ export class MapRepository extends Repository {
         values.push(
           [
             i,
-            map.name.replaceAll('\n', ' '),
+            map.name,
             map.fileName,
             map.author,
             environments[map.environment as keyof typeof environments] ?? environments['Stadium'],
@@ -93,7 +93,7 @@ export class MapRepository extends Repository {
             map.leaderboardRating,
             map.awards,
           ]
-            .map((a) => (a === undefined ? '\\N' : a.toString().replaceAll('\t', ' ').replaceAll('\\', '')))
+            .map((a) => (a === undefined ? '\\N' : a.toString().replaceAll('\t', ' ').replaceAll('\\', '\\\\').replaceAll('\r', '\\r').replaceAll('\n', '\\n')))
             .join('\t')
         ) // ugly replace to prevent DB errors
       }

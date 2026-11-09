@@ -875,9 +875,9 @@ export class MapService {
 
     return {
       id: info.UId,
-      name: info.Name,
+      name: info.Name.substring(0, 60),
       fileName: info.FileName,
-      author: info.Author,
+      author: info.Author.substring(0, 40),
       environment: validEnvs.includes(info.Environnement) ? info.Environnement : 'Stadium',
       mood: info.Mood,
       bronzeTime: info.BronzeTime,
