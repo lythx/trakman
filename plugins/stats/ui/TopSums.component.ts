@@ -18,7 +18,22 @@ import userConfig from './TopSums.config.js'
 
 const config = tm.utils.withDefaults(userConfig, {
   gridColumns: [0.8, 4, 3, 1, 1, 1, 1.3, 0.8, 4, 3, 1, 1, 1, 1.3],
-  headers: ['Lp.', 'Nickname', 'Login', '1st', '2nd', '3rd', 'Other', 'Lp.', 'Nickname', 'Login', '1st', '2nd', '3rd', 'Other'],
+  headers: [
+    'Lp.',
+    'Nickname',
+    'Login',
+    '1st',
+    '2nd',
+    '3rd',
+    'Other',
+    'Lp.',
+    'Nickname',
+    'Login',
+    '1st',
+    '2nd',
+    '3rd',
+    'Other',
+  ],
   entries: 30,
   navbar: [
     {

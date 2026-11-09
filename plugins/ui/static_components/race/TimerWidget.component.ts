@@ -3,7 +3,14 @@
  * @since 0.1
  */
 
-import { addManialinkListener, centeredText, componentIds, raceConfig, StaticComponent, StaticHeader } from '../../UI.js'
+import {
+  addManialinkListener,
+  centeredText,
+  componentIds,
+  raceConfig,
+  StaticComponent,
+  StaticHeader,
+} from '../../UI.js'
 import icons from '../../config/Icons.js'
 import userConfig from './TimerWidget.config.js'
 

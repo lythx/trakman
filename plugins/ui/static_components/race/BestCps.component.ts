@@ -21,7 +21,8 @@ const config = tm.utils.withDefaults(userConfig, {
   entryHeight: 2.16,
   entries: 6,
   width: raceConfig.width,
-  horizontalModeWidth: raceConfig.rightPosition - raceConfig.leftPosition - raceConfig.width * 2 - raceConfig.margin * 4,
+  horizontalModeWidth:
+    raceConfig.rightPosition - raceConfig.leftPosition - raceConfig.width * 2 - raceConfig.margin * 4,
   posX: raceConfig.leftPosition + raceConfig.marginBig + raceConfig.width,
   horizontalModePosX: raceConfig.leftPosition + raceConfig.width + raceConfig.margin,
   posY: raceConfig.topBorder,
