@@ -3,7 +3,6 @@ import fs from 'fs/promises'
 import UiComponent from './ui/ServerLinks.component.js'
 import http from 'http'
 import fetch from 'node-fetch'
-import { Logger } from '../../src/Logger'
 
 const config = tm.utils.withDefaults(userConfig, {
   isEnabled: false,

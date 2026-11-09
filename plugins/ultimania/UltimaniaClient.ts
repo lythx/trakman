@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import type { UltimaniaRecord } from './UltimaniaTypes'
+import type { UltimaniaRecord } from './UltimaniaTypes.js'
 import userConfig from './Config.js'
 
 export const config = tm.utils.withDefaults(userConfig, {
