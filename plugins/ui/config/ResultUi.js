@@ -10,9 +10,29 @@ export default {
   topBorder: 47.85,
   rightPosition: 49.13,
   leftPosition: -63.75,
-  rightSideOrder: ['MapWidgetResult', 'NextMapRecords', 'TimerWidgetResult', 'KarmaRanking', 'VotersRanking',
-    'VisitorsRanking', 'DonationPanelResult'],
-  leftSideOrder: ['AveragesRanking', 'RankWidgetResult', 'KarmaWidgetResult', 'LocalRankingResult', 'DediRankingResult',
-    'RoundAveragesRanking', 'AdminPanelResult'],
-  otherComponents: ['DonatorsRanking', 'MostRecordsRanking', 'PlaytimeRanking', 'WinnersRanking', 'BannerWidget']
+  rightSideOrder: [
+    'MapWidgetResult',
+    'NextMapRecords',
+    'TimerWidgetResult',
+    'KarmaRanking',
+    'VotersRanking',
+    'VisitorsRanking',
+    'DonationPanelResult'
+  ],
+  leftSideOrder: [
+    'AveragesRanking',
+    'RankWidgetResult',
+    'KarmaWidgetResult',
+    'LocalRankingResult',
+    'DediRankingResult',
+    'RoundAveragesRanking',
+    'AdminPanelResult'
+  ],
+  otherComponents: [
+    'DonatorsRanking',
+    'MostRecordsRanking',
+    'PlaytimeRanking',
+    'WinnersRanking',
+    'BannerWidget'
+  ]
 }

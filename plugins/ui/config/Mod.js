@@ -1,4 +1,5 @@
-export default // Environments are Stadium, Desert, Snow, Bay, Coast, Island, Rally
+export default //
+// Environments are Stadium, Desert, Snow, Bay, Coast, Island, Rally
 // If random order is disabled, mods array will be applied in order
 [{
   environment: 'Stadium',

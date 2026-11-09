@@ -1,7 +1,8 @@
 import { palette as p } from '../../config/PrefixesAndPalette.js'
 
 export default {
-  isEnabled: true, // Using DB client makes the plugin a bit faster due to high amount of database queries
+  isEnabled: true,
+  // Using DB client makes the plugin a bit faster due to high amount of database queries
   // If too many plugins are using DB clients the process might hang
   useDBClient: true,
   noSectorRecords: `${p.error}You have no sector records on the ongoing map.`,

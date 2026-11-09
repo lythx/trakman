@@ -42,7 +42,8 @@ export default {
     searchError: `${p.error}Failed to search for the maps.`,
     fetchError: `${p.error}Failed to fetch the map from TMX.`,
     error: `${p.error}Failed to add the map.`,
-    alreadyAdded: `${p.admin}Map ${p.highlight}#{map}${p.admin} added by #{nickname}${p.admin} is already on the server, ` + `it will be ${p.admin}queued ${p.admin}instead.`,
+    alreadyAdded: `${p.admin}Map ${p.highlight}#{map}${p.admin} added by #{nickname}${p.admin} is already on the server, ` +
+      `it will be ${p.admin}queued ${p.admin}instead.`,
     added: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has added and queued ${p.highlight}#{map}${p.admin} from TMX.`
   },
   command: {

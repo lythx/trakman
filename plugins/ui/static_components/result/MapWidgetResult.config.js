@@ -9,12 +9,13 @@ export default {
   title: 'Next',
   background: cfg.background,
   mapPadding: 0.3,
-  customTags: [/* Custom tags allow you to display special tag icon for certain authors or maps
-   If tmx name or login matches one of the authors or
-   map name matches one of the names regexes special tag will be displayed
-   map name is tested both stripped and unstripped from special characters
-   Tags are read from top to bottom
-   */
+  customTags: [
+    /* Custom tags allow you to display special tag icon for certain authors or maps
+     If tmx name or login matches one of the authors or
+     map name matches one of the names regexes special tag will be displayed
+     map name is tested both stripped and unstripped from special characters
+     Tags are read from top to bottom
+     */
     {
       authors: ['Fwo Niro'],
       icon: icons.tagRed

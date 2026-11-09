@@ -3,8 +3,10 @@ const p = tm.utils.palette
 export default {
   isEnabled: false,
   songListPath: './plugins/music/SongList.js', // Needed for updates on song add/remove
-  overrideMapMusic: true, // If song is in history it can't be requeued without force queue privileges
-  historySize: 3, // Privilege required to queue recently queued songs, queue more than one song and shuffle songs
+  overrideMapMusic: true,
+  // If song is in history it can't be requeued without force queue privileges
+  historySize: 3,
+  // Privilege required to queue recently queued songs, queue more than one song and shuffle songs
   forceQueuePrivilege: 1,
   messages: {
     addToQueue: `${p.highlight}#{nickname} ${p.vote}has added ${p.highlight}#{song}${p.vote}` + ` by ${p.highlight}#{author}${p.vote} to the song queue.`,
@@ -18,7 +20,8 @@ export default {
     remove: `${p.highlight}#{nickname} ${p.vote}has deleted song ${p.highlight}#{song}${p.vote}.`,
     removeError: `${p.error}Song named ${p.highlight}#{name} ${p.error}doesn't exist.`,
     shuffle: `${p.highlight}#{nickname} ${p.vote}has shuffled the song queue.`
-  }, // Whether add and remove from queue messages are public
+  },
+  // Whether add and remove from queue messages are public
   publicQueue: true,
   addCommand: {
     aliases: ['addsong'],
