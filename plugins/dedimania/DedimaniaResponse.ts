@@ -2,7 +2,6 @@ import xml2js from 'xml2js'
 import zlib from 'zlib'
 
 export class DedimaniaResponse {
-
   private _status: string = 'pending'
   private _data: Buffer = Buffer.from('')
   private _xml: string = ''
@@ -16,12 +15,14 @@ export class DedimaniaResponse {
     this._data = Buffer.concat([this._data, data])
     const str: string = this._data.toString()
     const split: string[] = str.split('\n')
-    const resLength: number = Number(split.find(a => a.startsWith('Content-Length'))?.split(' ')[1])
+    const resLength: number = Number(split.find((a) => a.startsWith('Content-Length'))?.split(' ')[1])
     const index: number = this._data.indexOf('\r\n\r\n')
     const content: Buffer = this._data.slice(index + 4)
     if (content.length === resLength) {
       for (const row of split) {
-        if (row.includes('Set-Cookie: PHPSESSID=')) { this._sessionId = row.substring(22).split(';')[0] }
+        if (row.includes('Set-Cookie: PHPSESSID=')) {
+          this._sessionId = row.substring(22).split(';')[0]
+        }
       }
       this._xml = zlib.gunzipSync(content).toString()
       this.generateJson()
@@ -72,8 +73,11 @@ export class DedimaniaResponse {
       }
       json = result
     })
-    if (isError !== false) { return }
-    if (json?.methodResponse?.params?.[0]?.param?.[0]?.value?.[0]?.array?.[0]?.data?.[0]?.value) { // system.multicall errors
+    if (isError !== false) {
+      return
+    }
+    if (json?.methodResponse?.params?.[0]?.param?.[0]?.value?.[0]?.array?.[0]?.data?.[0]?.value) {
+      // system.multicall errors
       for (const e of json?.methodResponse?.params?.[0]?.param?.[0]?.value?.[0]?.array[0]?.data?.[0]?.value) {
         if (e?.struct?.[0]?.member?.[0]?.name?.[0] === 'faultCode') {
           this._isError = true
@@ -98,7 +102,7 @@ export class DedimaniaResponse {
     const changeType: any = (value: any, type: string): any => {
       const arr: any[] = []
       const obj: any = {}
-      switch(type) {
+      switch (type) {
         case 'boolean':
           return value === '1'
         case 'int':
@@ -118,8 +122,11 @@ export class DedimaniaResponse {
           return obj
         case 'array':
           for (const el of value.data) {
-            if (el.value == null) { continue } // NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
-            if (el?.value?.[0] != null) { // dediman sends an array without telling you its an array
+            if (el.value == null) {
+              continue
+            } // NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
+            if (el?.value?.[0] != null) {
+              // dediman sends an array without telling you its an array
               for (const e of el.value) {
                 const t: string = Object.keys(e)[0]
                 const val: any = e[t][0]
@@ -141,11 +148,17 @@ export class DedimaniaResponse {
       return [] // some callbacks don't return params. NICE!!!!
     }
     for (const param of obj.params) {
-      for (const p of param.param) { // some callbacks return multiple values instead of an array. NICE!!!!
+      for (const p of param.param) {
+        // some callbacks return multiple values instead of an array. NICE!!!!
+        // also some return none.
+        if (p.value === undefined || p.value.length === 0) {
+          continue
+        }
         const value: any = p.value[0]
         if (Object.keys(value)[0] === 'array') {
           for (const el of value.array) {
-            if (el.data[0]?.value == null) { // some methods dont return value here too
+            if (el.data[0]?.value == null) {
+              // some methods dont return value here too
               continue
             }
             for (const val of el.data[0].value) {

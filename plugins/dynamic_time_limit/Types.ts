@@ -1,1 +1,1 @@
-export type DynamicTimeLimitMode = "author"
+export type DynamicTimeLimitMode = 'author'

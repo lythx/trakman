@@ -1,9 +1,19 @@
-import { componentIds, leftAlignedText, StaticComponent, StaticHeader } from '../../ui/UI.js'
+import { componentIds, leftAlignedText, raceConfig, StaticComponent, StaticHeader } from '../../ui/UI.js'
 import type { Song } from '../Types.js'
-import config from './MusicWidget.config.js'
+import userConfig from './MusicWidget.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 7,
+  margin: raceConfig.margin,
+  width: raceConfig.width,
+  side: true,
+  textScale: 0.9,
+  textPadding: 0.15,
+  iconWidth: 1.7,
+  hidePanel: true,
+})
 
 export default class MusicWidget extends StaticComponent {
-
   private song: Song | undefined
   private readonly header: StaticHeader
   private xml: string = ''
@@ -29,19 +39,23 @@ export default class MusicWidget extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     this.updateXML()
     return this.xml
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
     return {
       xml: this.xml,
-      login
+      login,
     }
   }
 
@@ -79,8 +93,7 @@ export default class MusicWidget extends StaticComponent {
     ${leftAlignedText(text, w, h, {
       textScale: config.textScale,
       padding: config.textPadding,
-      xOffset
+      xOffset,
     })}`
   }
-
 }

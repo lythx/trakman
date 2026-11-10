@@ -1,8 +1,19 @@
-import { centeredText, componentIds, components, DynamicComponent, StaticHeader } from '../../ui/UI.js'
-import config from './BetInfoWidget.config.js'
+import { centeredText, componentIds, components, DynamicComponent, raceConfig, StaticHeader } from '../../ui/UI.js'
+import userConfig from './BetInfoWidget.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  posX: raceConfig.rightPosition,
+  side: true,
+  placeAsLastComponent: true,
+  posY: 0,
+  margin: raceConfig.margin,
+  width: raceConfig.width,
+  prizeWidth: 5,
+  topBorder: raceConfig.topBorder,
+  marginBig: raceConfig.marginBig,
+})
 
 export default class BetInfoWidget extends DynamicComponent {
-
   readonly header: StaticHeader
   totalPrize: number = 1000
   posY!: number
@@ -11,7 +22,7 @@ export default class BetInfoWidget extends DynamicComponent {
     super(componentIds.betInfoWidget)
     this.updatePosYAndHeight()
     this.header = new StaticHeader('race', {
-      rectangleWidth: StaticHeader.racePreset.rectangleWidth - (config.prizeWidth + config.margin)
+      rectangleWidth: StaticHeader.racePreset.rectangleWidth - (config.prizeWidth + config.margin),
     })
     tm.addListener('EndMap', () => this.hide())
   }
@@ -27,7 +38,7 @@ export default class BetInfoWidget extends DynamicComponent {
     }
     const side = config.side === true ? 'right' : 'left'
     const data = components.staticHeights[tm.getGameMode()]
-    this.posY = config.topBorder - data[side].reduce((acc, cur) => acc += cur.getHeight() + config.marginBig, 0)
+    this.posY = config.topBorder - data[side].reduce((acc, cur) => acc + cur.getHeight() + config.marginBig, 0)
   }
 
   displayToPlayer(login: string): void {
@@ -37,20 +48,22 @@ export default class BetInfoWidget extends DynamicComponent {
     <quad posn="0 0 2" sizen="${w} ${h}" 
     bgcolor="${this.header.options.iconBackground}"/>
       ${centeredText('$' + config.prizeColour + this.totalPrize.toString() + 'C', w, h, {
-      textScale: this.header.options.textScale
-    })}
+        textScale: this.header.options.textScale,
+      })}
     </frame>`
-    tm.sendManialink(`<manialink id="${this.id}">
+    tm.sendManialink(
+      `<manialink id="${this.id}">
       <format textsize="1"/>
       <frame posn="${config.posX} ${this.posY} 2">
         ${this.header.constructXml(config.title, config.icon, config.side)}
         ${prizeXml}
       </frame>
-    </manialink>`, login)
+    </manialink>`,
+      login
+    )
   }
 
   hide(): void {
     tm.sendManialink(`<manialink id="${this.id}"></manialink>`)
   }
-
 }

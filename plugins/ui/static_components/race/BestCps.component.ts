@@ -3,14 +3,43 @@
  * @since 0.1
  */
 
-import { centeredText, componentIds, Grid, leftAlignedText, Paginator, rightAlignedText, StaticComponent, StaticHeader, type StaticHeaderOptions } from '../../UI.js'
-import config from './BestCps.config.js'
+import {
+  centeredText,
+  componentIds,
+  Grid,
+  leftAlignedText,
+  Paginator,
+  raceConfig,
+  rightAlignedText,
+  StaticComponent,
+  StaticHeader,
+  type StaticHeaderOptions,
+} from '../../UI.js'
+import userConfig from './BestCps.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entryHeight: 2.16,
+  entries: 6,
+  width: raceConfig.width,
+  horizontalModeWidth:
+    raceConfig.rightPosition - raceConfig.leftPosition - raceConfig.width * 2 - raceConfig.margin * 4,
+  posX: raceConfig.leftPosition + raceConfig.marginBig + raceConfig.width,
+  horizontalModePosX: raceConfig.leftPosition + raceConfig.width + raceConfig.margin,
+  posY: raceConfig.topBorder,
+  side: false,
+  margin: raceConfig.margin,
+  columnProportions: [1, 2.8, 4],
+  textScale: 0.87,
+  textPadding: 0.2,
+  horizontal: false,
+  horizontalMaxRows: 5,
+  hidePanel: true,
+})
 
 export default class BestCps extends StaticComponent {
-
   private readonly bestCps: {
-    login: string,
-    time: number,
+    login: string
+    time: number
     nickname: string
   }[] = []
   private readonly header: StaticHeader
@@ -27,23 +56,29 @@ export default class BestCps extends StaticComponent {
     this.header = new StaticHeader('race')
     this.headerBg = this.header.options.textBackground
     this.headerHeight = this.header.options.height
-    this.contentHeight = ((config.entryHeight + config.margin * 2) * config.entries) - (this.headerHeight + config.margin)
+    this.contentHeight = (config.entryHeight + config.margin * 2) * config.entries - (this.headerHeight + config.margin)
     this.cpAmount = tm.maps.current.checkpointsAmount - 1
     this.grid = this.getGrid()
     this.paginator = new Paginator(this.id, 0, 0, 0)
     this.renderOnEvent('PlayerCheckpoint', (info: tm.CheckpointInfo) => {
-      if (this.bestCps[info.index] === undefined || (this.bestCps[info.index].time > info.time && tm.getGameMode() !== 'Stunts') || (this.bestCps[info.index].time < info.time && tm.getGameMode() === 'Stunts')) {
+      if (
+        this.bestCps[info.index] === undefined ||
+        (this.bestCps[info.index].time > info.time && tm.getGameMode() !== 'Stunts') ||
+        (this.bestCps[info.index].time < info.time && tm.getGameMode() === 'Stunts')
+      ) {
         this.bestCps[info.index] = {
           login: info.player.login,
           time: info.time,
-          nickname: info.player.nickname
+          nickname: info.player.nickname,
         }
         this.paginator.setPageCount(Math.ceil(this.bestCps.length / config.entries))
         this.newestCp = info.index
         return this.display()
       }
-      const page: number = this.paginator.setPageForLogin(info.player.login,
-        Math.ceil((info.index + 1) / config.entries))
+      const page: number = this.paginator.setPageForLogin(
+        info.player.login,
+        Math.ceil((info.index + 1) / config.entries)
+      )
       return this.displayToPlayer(info.player.login, { page })
     })
     this.renderOnEvent('BeginMap', () => {
@@ -57,13 +92,17 @@ export default class BestCps extends StaticComponent {
     })
     this.renderOnEvent('PlayerDataUpdated', (info) => {
       for (const e of this.bestCps) {
-        const newNickname: string | undefined = info.find(a => a.login === e.login)?.nickname
-        if (newNickname !== undefined) { e.nickname = newNickname }
+        const newNickname: string | undefined = info.find((a) => a.login === e.login)?.nickname
+        if (newNickname !== undefined) {
+          e.nickname = newNickname
+        }
       }
       return this.display()
     })
     this.paginator.onPageChange = (login: string): void => {
-      if (this.reduxModeEnabled) { return }
+      if (this.reduxModeEnabled) {
+        return
+      }
       const obj = this.displayToPlayer(login)
       if (obj !== undefined) {
         tm.sendManialink(obj.xml, login)
@@ -77,12 +116,21 @@ export default class BestCps extends StaticComponent {
   getGrid(): Grid {
     if (config.horizontal) {
       const rows = Math.min(config.horizontalMaxRows, Math.ceil(tm.maps.current.checkpointsAmount / config.entries))
-      return new Grid(config.horizontalModeWidth, config.entryHeight * rows,
-        new Array(config.entries).fill(config.columnProportions).flat(), new Array(rows).fill(1),
-        { margin: config.margin })
+      return new Grid(
+        config.horizontalModeWidth,
+        config.entryHeight * rows,
+        new Array(config.entries).fill(config.columnProportions).flat(),
+        new Array(rows).fill(1),
+        { margin: config.margin }
+      )
     }
-    return new Grid(config.width + config.margin * 2, this.contentHeight, config.columnProportions,
-      new Array(config.entries).fill(1), { margin: config.margin })
+    return new Grid(
+      config.width + config.margin * 2,
+      this.contentHeight,
+      config.columnProportions,
+      new Array(config.entries).fill(1),
+      { margin: config.margin }
+    )
   }
 
   getHeight(): number {
@@ -90,8 +138,12 @@ export default class BestCps extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
-    if (this.reduxModeEnabled) { return this.displayToPlayer('')?.xml }
+    if (!this.isDisplayed) {
+      return
+    }
+    if (this.reduxModeEnabled) {
+      return this.displayToPlayer('')?.xml
+    }
     const arr = []
     for (const e of tm.players.list) {
       arr.push(this.displayToPlayer(e.login))
@@ -99,14 +151,21 @@ export default class BestCps extends StaticComponent {
     return arr
   }
 
-  displayToPlayer(login: string, params?: {
-    page?: number
-  }) {
-    if (!this.isDisplayed) { return }
+  displayToPlayer(
+    login: string,
+    params?: {
+      page?: number
+    }
+  ) {
+    if (!this.isDisplayed) {
+      return
+    }
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
-    if (this.reduxModeEnabled) { params = { page: 1 } }
+    if (this.reduxModeEnabled) {
+      params = { page: 1 }
+    }
     const page: number = params?.page === undefined ? this.paginator.getPageByLogin(login) : params.page
     const pageCount: number = this.paginator.pageCount
     if (config.horizontal) {
@@ -118,7 +177,7 @@ export default class BestCps extends StaticComponent {
         ${this.constructText(login, 1)}
       </frame>
       </manialink>`,
-        login
+        login,
       }
     }
     return {
@@ -128,18 +187,22 @@ export default class BestCps extends StaticComponent {
       <format textsize="1"/>
       ${this.constructHeader(page, pageCount)}
     </frame>
-    <frame posn="${config.posX - config.margin} ${config.posY - (this.headerHeight)} 1">
+    <frame posn="${config.posX - config.margin} ${config.posY - this.headerHeight} 1">
       <format textsize="1"/>
       ${this.constructText(login, page)}
     </frame>
     </manialink>`,
-      login
+      login,
     }
   }
 
   private constructHeader(page: number, pageCount: number): string {
-    if (this.bestCps.length === 0) { return '' }
-    if (this.reduxModeEnabled) { pageCount = 1 }
+    if (this.bestCps.length === 0) {
+      return ''
+    }
+    if (this.reduxModeEnabled) {
+      pageCount = 1
+    }
     let icons: (string | undefined)[] = [config.upIcon, config.downIcon]
     let iconsHover: (string | undefined)[] = [config.upIconHover, config.downIconHover]
     let ids: (number | undefined)[] = [this.paginator.ids[0], this.paginator.ids[1]]
@@ -148,7 +211,6 @@ export default class BestCps extends StaticComponent {
       ids = [undefined, this.paginator.ids[1]]
       iconsHover = [undefined, config.downIconHover]
       icons = [undefined, config.downIcon]
-
     } else if (page === pageCount) {
       icons = [config.upIcon]
       iconsHover = [config.upIconHover]
@@ -161,20 +223,26 @@ export default class BestCps extends StaticComponent {
     let buttonsXml: string = ''
     for (let i: number = 0; i < buttonAmount; i++) {
       const action: string = ids[i] === undefined ? '' : `action="${ids[i]}"`
-      const icon: string = icons[i] === undefined ? '' :
-        `<quad posn="${headerCfg.iconHorizontalPadding} ${-headerCfg.iconVerticalPadding} 4" 
+      const icon: string =
+        icons[i] === undefined
+          ? ''
+          : `<quad posn="${headerCfg.iconHorizontalPadding} ${-headerCfg.iconVerticalPadding} 4" 
       sizen="${headerCfg.iconWidth} ${headerCfg.iconHeight}" image="${icons[i]}" imagefocus="${iconsHover[i]}" ${action}/>`
-      buttonsXml += `<frame posn="${(config.width + config.margin) - (headerCfg.squareWidth + config.margin) * ((buttonAmount - i) + 1)} 0 1">
+      buttonsXml += `<frame posn="${config.width + config.margin - (headerCfg.squareWidth + config.margin) * (buttonAmount - i + 1)} 0 1">
         <quad posn="0 0 1" sizen="${headerCfg.squareWidth} ${this.headerHeight}" bgcolor="${this.headerBg}"/>
         ${icon}
       </frame>`
     }
     return `<quad posn="0 0 1" sizen="${config.width - (headerCfg.squareWidth + config.margin) * (1 + buttonAmount)} ${this.headerHeight}" bgcolor="${this.headerBg}"/>
-      ${rightAlignedText(config.title, config.width - (headerCfg.squareWidth + config.margin) * (1 + buttonAmount),
-      this.headerHeight, {
-        textScale: config.textScale,
-        yOffset: -0.1
-      })}
+      ${rightAlignedText(
+        config.title,
+        config.width - (headerCfg.squareWidth + config.margin) * (1 + buttonAmount),
+        this.headerHeight,
+        {
+          textScale: config.textScale,
+          yOffset: -0.1,
+        }
+      )}
     <frame posn="${config.width - headerCfg.squareWidth} 0 1">
     <quad posn="0 0 1" sizen="${headerCfg.squareWidth} ${this.headerHeight}" bgcolor="${this.headerBg}"/>
     <quad posn="${headerCfg.iconHorizontalPadding} ${-headerCfg.iconVerticalPadding} 4" sizen="${headerCfg.iconWidth} ${headerCfg.iconHeight}" image="${config.icon}"/> 
@@ -184,41 +252,60 @@ export default class BestCps extends StaticComponent {
   }
 
   private constructText(login: string, page: number): string {
-    if (this.bestCps.length === 0) { return '' }
-    if (this.reduxModeEnabled) { login === '' }
+    if (this.bestCps.length === 0) {
+      return ''
+    }
+    if (this.reduxModeEnabled) {
+      return ''
+    }
     // bestCps[i] can be undefined if someone was driving while controller was off (first indexes dont exist) so im just returning empty cells
     const cpIndex: number = config.entries * (page - 1)
 
     const indexCell = (i: number, j: number, w: number, h: number): string => {
       const index = config.horizontal ? i * config.entries + j / 3 : i + cpIndex
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${this.headerBg}"/>`
-      return this.bestCps[index] === undefined ? '' : bg + (centeredText((index + 1).toString(), w, h, {
-        textScale: config.textScale,
-        padding: config.textPadding
-      }))
+      return this.bestCps[index] === undefined
+        ? ''
+        : bg +
+            centeredText((index + 1).toString(), w, h, {
+              textScale: config.textScale,
+              padding: config.textPadding,
+            })
     }
 
     const timeCell = (i: number, j: number, w: number, h: number): string => {
       const index = config.horizontal ? i * config.entries + (j - 1) / 3 : i + cpIndex
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${config.background}"/>`
       const cp = this.bestCps[index]
-      if (cp === undefined) { return '' }
+      if (cp === undefined) {
+        return ''
+      }
       let format: string = cp.login === login ? `<format textcolor="${config.selfColour}"/>` : ''
-      if (index === this.newestCp) { format = `<format textcolor="${config.newestColour}"/>` }
-      return bg + format + centeredText(tm.utils.getTimeString(cp.time), w, h, {
-        textScale: config.textScale,
-        padding: config.textPadding
-      })
+      if (index === this.newestCp) {
+        format = `<format textcolor="${config.newestColour}"/>`
+      }
+      return (
+        bg +
+        format +
+        centeredText(tm.utils.getTimeString(cp.time), w, h, {
+          textScale: config.textScale,
+          padding: config.textPadding,
+        })
+      )
     }
 
     const nicknameCell = (i: number, j: number, w: number, h: number): string => {
       const index = config.horizontal ? i * config.entries + (j - 2) / 3 : i + cpIndex
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${config.background}"/>`
-      return this.bestCps[index] === undefined ? '' : bg + (this.bestCps[index] === undefined ? '' :
-        leftAlignedText(tm.utils.safeString(tm.utils.strip(this.bestCps[index].nickname, false)), w, h, {
-          textScale: config.textScale,
-          padding: config.textPadding
-        }))
+      return this.bestCps[index] === undefined
+        ? ''
+        : bg +
+            (this.bestCps[index] === undefined
+              ? ''
+              : leftAlignedText(tm.utils.safeString(tm.utils.strip(this.bestCps[index].nickname, false)), w, h, {
+                  textScale: config.textScale,
+                  padding: config.textPadding,
+                }))
     }
 
     const cpsToDisplay: number = this.cpAmount - cpIndex
@@ -228,5 +315,4 @@ export default class BestCps extends StaticComponent {
     }
     return this.grid.constructXml(arr)
   }
-
 }

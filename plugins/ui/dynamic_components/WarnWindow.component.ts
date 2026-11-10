@@ -4,62 +4,91 @@
  */
 
 import { closeButton, componentIds, PopupWindow } from '../UI.js'
-import config from './WarnWindow.config.js'
+import userConfig from './WarnWindow.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  width: 60,
+  height: 40,
+  padding: 2.5,
+  textSize: 2.7,
+  warn: {
+    aliases: ['warn'],
+    privilege: 1,
+    public: true,
+  },
+  wall: {
+    aliases: ['wall', 'adminmsg', 'mta'],
+    privilege: 2,
+  },
+})
 
 interface DisplayParams {
-  message?: string,
-  callerNickname: string,
+  message?: string
+  callerNickname: string
   mode: 'wall' | 'warn'
 }
 
 export default class WarnWindow extends PopupWindow<DisplayParams> {
-
   constructor() {
     super(componentIds.warnWindow, config.warn.icon, config.warn.title, [], config.width, config.height)
     tm.commands.add({
       aliases: config.warn.aliases,
       help: config.warn.help,
-      params: [{
-        name: 'login',
-        type: 'player'
-      }, {
-        name: 'message',
-        optional: true,
-        type: 'multiword'
-      }],
+      params: [
+        {
+          name: 'login',
+          type: 'player',
+        },
+        {
+          name: 'message',
+          optional: true,
+          type: 'multiword',
+        },
+      ],
       callback: (info, player: tm.Player, message?: string) => {
         this.displayToPlayer(player.login, {
           message,
           callerNickname: info.nickname,
-          mode: 'warn'
+          mode: 'warn',
         })
         if (config.warn.public) {
-          tm.sendMessage(tm.utils.strVar(config.warn.chatMessage, {
-            title: info.title,
-            adminName: tm.utils.strip(info.nickname),
-            name: tm.utils.strip(player.nickname)
-          }))
+          tm.sendMessage(
+            tm.utils.strVar(config.warn.chatMessage, {
+              title: info.title,
+              adminName: tm.utils.strip(info.nickname),
+              name: tm.utils.strip(player.nickname),
+            })
+          )
         }
       },
-      privilege: config.warn.privilege
+      privilege: config.warn.privilege,
     })
     tm.commands.add({
       aliases: config.wall.aliases,
       help: config.wall.help,
-      params: [{
-        name: 'message',
-        type: 'multiword'
-      }],
+      params: [
+        {
+          name: 'message',
+          type: 'multiword',
+        },
+      ],
       callback: (info, message: string) => {
         for (const e of tm.players.list) {
-          this.displayToPlayer(e.login, {
-            message,
-            callerNickname: info.nickname,
-            mode: 'wall'
-          }, undefined, undefined, config.wall.title, config.wall.icon)
+          this.displayToPlayer(
+            e.login,
+            {
+              message,
+              callerNickname: info.nickname,
+              mode: 'wall',
+            },
+            undefined,
+            undefined,
+            config.wall.title,
+            config.wall.icon
+          )
         }
       },
-      privilege: config.wall.privilege
+      privilege: config.wall.privilege,
     })
   }
 
@@ -67,13 +96,16 @@ export default class WarnWindow extends PopupWindow<DisplayParams> {
     const p = config.padding
     const w = this.contentWidth - p * 4
     const h = this.contentHeight - p * 4
-    const text = params.mode === 'warn' ? tm.utils.strVar(config.warn.message, {
-      name: tm.utils.strip(params.callerNickname, false),
-      message: params.message ?? config.warn.defaultMessage
-    }) : tm.utils.strVar(config.wall.message, {
-      name: tm.utils.strip(params.callerNickname, false),
-      message: params.message ?? ''
-    })
+    const text =
+      params.mode === 'warn'
+        ? tm.utils.strVar(config.warn.message, {
+            name: tm.utils.strip(params.callerNickname, false),
+            message: params.message ?? config.warn.defaultMessage,
+          })
+        : tm.utils.strVar(config.wall.message, {
+            name: tm.utils.strip(params.callerNickname, false),
+            message: params.message ?? '',
+          })
     return `<format textsize="${config.textSize}"/>
     <quad posn="${p} ${-p} 2" sizen="${w + p * 2} ${h + p * 2}" bgcolor="${config.textBackground}"/>
     <frame posn="${p * 2} ${-p * 2} 1">
@@ -85,5 +117,4 @@ export default class WarnWindow extends PopupWindow<DisplayParams> {
   protected constructFooter(): string {
     return closeButton(this.closeId, this.windowWidth, this.footerHeight)
   }
-
-} 
+}

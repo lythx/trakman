@@ -1,15 +1,14 @@
-import { Events } from "../Events.js"
-import { VoteRepository } from "../database/VoteRepository.js"
-import { MapService } from "./MapService.js"
-import { Logger } from "../Logger.js"
+import { Events } from '../Events.js'
+import { VoteRepository } from '../database/VoteRepository.js'
+import { MapService } from './MapService.js'
+import { Logger } from '../Logger.js'
 import { Utils } from '../Utils.js'
-import { GameService } from "./GameService.js"
+import { GameService } from './GameService.js'
 
 export abstract class VoteService {
-
   private static readonly repo: VoteRepository = new VoteRepository()
   private static _votes: {
-    uid: string,
+    uid: string
     votes: tm.Vote[]
   }[] = []
   private static _currentVotes: tm.Vote[] = []
@@ -24,7 +23,7 @@ export abstract class VoteService {
       const uid: string = maps[i].id
       this._votes.push({
         uid,
-        votes: res.filter(a => a.mapId === uid)
+        votes: res.filter((a) => a.mapId === uid),
       })
     }
     this._currentVotes = this._votes[0].votes
@@ -38,7 +37,7 @@ export abstract class VoteService {
    */
   static async nextMap(): Promise<void> {
     await this.updatePrefetch()
-    this._currentVotes = this._votes.find(a => a.uid === MapService.current.id)?.votes ?? []
+    this._currentVotes = this._votes.find((a) => a.uid === MapService.current.id)?.votes ?? []
   }
 
   /**
@@ -46,36 +45,52 @@ export abstract class VoteService {
    * @param player Player object
    * @param vote Vote value
    */
-  static add(player: {
-    login: string,
-    nickname?: string
-  }, vote: -3 | -2 | -1 | 1 | 2 | 3): void
+  static add(
+    player: {
+      login: string
+      nickname?: string
+    },
+    vote: -3 | -2 | -1 | 1 | 2 | 3
+  ): void
   /**
    * Adds multiple votes on the current map to runtime memory and database
    * @param votes Vote objects
    */
-  static add(votes: {
-    login: string,
-    vote: -3 | -2 | -1 | 1 | 2 | 3
-  }[]): void
-  static add(arg: {
-    login: string,
-    nickname?: string
-  } | {
-    login: string,
-    vote: -3 | -2 | -1 | 1 | 2 | 3
-  }[], vote?: -3 | -2 | -1 | 1 | 2 | 3): void {
-    if (GameService.state === 'transition') { return }
+  static add(
+    votes: {
+      login: string
+      vote: -3 | -2 | -1 | 1 | 2 | 3
+    }[]
+  ): void
+  static add(
+    arg:
+      | {
+          login: string
+          nickname?: string
+        }
+      | {
+          login: string
+          vote: -3 | -2 | -1 | 1 | 2 | 3
+        }[],
+    vote?: -3 | -2 | -1 | 1 | 2 | 3
+  ): void {
+    if (GameService.state === 'transition') {
+      return
+    }
     const date: Date = new Date()
     const map = { ...MapService.current }
-    const voteArr = this._votes.find(a => a.uid === map.id)?.votes
-    if (voteArr === undefined) { return }
+    const voteArr = this._votes.find((a) => a.uid === map.id)?.votes
+    if (voteArr === undefined) {
+      return
+    }
     if (Array.isArray(arg)) {
       const updated: tm.Vote[] = []
       const added: tm.Vote[] = []
       for (const e of arg) {
-        const v = voteArr.find(a => a.login === e.login)
-        if (v?.vote === vote) { return }
+        const v = voteArr.find((a) => a.login === e.login)
+        if (v?.vote === vote) {
+          return
+        }
         if (v !== undefined) {
           v.vote = e.vote
           v.date = date
@@ -85,7 +100,7 @@ export abstract class VoteService {
             login: e.login,
             mapId: map.id,
             date,
-            vote: e.vote
+            vote: e.vote,
           }
           voteArr.push(obj)
           updated.push(obj)
@@ -98,13 +113,15 @@ export abstract class VoteService {
       return
     } else if (vote !== undefined) {
       const player = arg
-      const v = voteArr.find(a => a.login === player.login)
+      const v = voteArr.find((a) => a.login === player.login)
       if (v?.vote === vote) {
         return // Return if same vote already exists
       }
       Logger.trace(
         `${Utils.strip(player?.nickname ?? player.login)} (${player.login}) has voted ${vote} for map ${Utils.strip(
-          map.name)} (${map.id})`)
+          map.name
+        )} (${map.id})`
+      )
       if (v !== undefined) {
         v.date = date
         v.vote = vote
@@ -117,7 +134,7 @@ export abstract class VoteService {
         login: player.login,
         mapId: map.id,
         date,
-        vote
+        vote,
       }
       voteArr.push(obj)
       void this.repo.add(obj)
@@ -128,17 +145,17 @@ export abstract class VoteService {
 
   private static async updatePrefetch(): Promise<void> {
     const arr: {
-      uid: string,
+      uid: string
       votes: tm.Vote[]
     }[] = []
     const mapsToFetch: string[] = []
-    const ids: string[] = [...MapService.history, MapService.current, ...MapService.queue].map(a => a.id)
+    const ids: string[] = [...MapService.history, MapService.current, ...MapService.queue].map((a) => a.id)
     for (let i = 0; i < ids.length; i++) {
-      const v = this._votes.find(a => a.uid === ids[i])
+      const v = this._votes.find((a) => a.uid === ids[i])
       if (v === undefined) {
         arr[i] = {
           uid: ids[i],
-          votes: []
+          votes: [],
         }
         mapsToFetch.push(ids[i])
       } else {
@@ -147,8 +164,10 @@ export abstract class VoteService {
     }
     const res = await this.repo.get(...mapsToFetch)
     for (const e of mapsToFetch) {
-      const entry = arr.find(a => a.uid === e)
-      if (entry !== undefined) { entry.votes = res.filter(a => a.mapId === e) }
+      const entry = arr.find((a) => a.uid === e)
+      if (entry !== undefined) {
+        entry.votes = res.filter((a) => a.mapId === e)
+      }
     }
     this._votes = arr
     Events.emit('VotesPrefetch', res)
@@ -159,7 +178,7 @@ export abstract class VoteService {
     MapService.setVoteData({
       uid,
       count,
-      ratio: this.calculateVoteRatio(arr)
+      ratio: this.calculateVoteRatio(arr),
     })
   }
 
@@ -170,10 +189,10 @@ export abstract class VoteService {
       '-1': 40,
       '1': 60,
       '2': 80,
-      '3': 100
+      '3': 100,
     }
     const count = votes.length
-    const sum = votes.map(a => values[a.vote.toString() as keyof typeof values]).reduce((acc, cur) => acc += cur, 0)
+    const sum = votes.map((a) => values[a.vote.toString() as keyof typeof values]).reduce((acc, cur) => acc + cur, 0)
     return count === 0 ? 0 : sum / count
   }
 
@@ -189,14 +208,20 @@ export abstract class VoteService {
    * @returns Array of objects containing map UID and vote objects array.
    * If some map is not in the database it won't be in the returned array
    */
-  static async fetch(mapIds: string[]): Promise<{
-    uid: string,
-    votes: tm.Vote[]
-  }[]>
-  static async fetch(mapIds: string | string[]): Promise<tm.Vote[] | undefined | {
-    uid: string,
-    votes: tm.Vote[]
-  }[]> {
+  static async fetch(mapIds: string[]): Promise<
+    {
+      uid: string
+      votes: tm.Vote[]
+    }[]
+  >
+  static async fetch(mapIds: string | string[]): Promise<
+    | tm.Vote[]
+    | undefined
+    | {
+        uid: string
+        votes: tm.Vote[]
+      }[]
+  > {
     return await this.repo.get(mapIds as any)
   }
 
@@ -215,17 +240,20 @@ export abstract class VoteService {
    * If some map is not in the memory it won't be in the returned array.
    */
   static get(uids: string[]): {
-    uid: string,
+    uid: string
     votes: tm.Vote[]
   }[]
-  static get(uids: string | string[]): tm.Vote[] | undefined | {
-    uid: string,
-    votes: tm.Vote[]
-  }[] {
+  static get(uids: string | string[]):
+    | tm.Vote[]
+    | undefined
+    | {
+        uid: string
+        votes: tm.Vote[]
+      }[] {
     if (typeof uids === 'string') {
-      return this._votes.find(a => a.uid === uids)?.votes
+      return this._votes.find((a) => a.uid === uids)?.votes
     }
-    return this._votes.filter(a => uids.includes(a.uid))
+    return this._votes.filter((a) => uids.includes(a.uid))
   }
 
   /**
@@ -247,10 +275,9 @@ export abstract class VoteService {
    * queue and the current map are stored.
    */
   static get votes(): Readonly<{
-    uid: string,
+    uid: string
     readonly votes: Readonly<tm.Vote[]>
   }>[] {
     return [...this._votes]
   }
-
 }

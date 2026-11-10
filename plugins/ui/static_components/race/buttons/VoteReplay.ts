@@ -1,14 +1,70 @@
-import type { ButtonData } from "./ButtonData.js"
-import { UiButton } from "./UiButton.js"
-import config from "./ButtonsWidget.config.js"
-import { VoteWindow } from "../../../UI.js"
+import type { ButtonData } from './ButtonData.js'
+import { UiButton } from './UiButton.js'
+import userConfig from './ButtonsWidget.config.js'
+import { VoteWindow } from '../../../UI.js'
 import messages from './Messages.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  voteReplay: {
+    texts: [
+      {
+        0: ' VOTE ',
+        1: 'TO $AF4RES',
+        equal: false,
+      },
+      {
+        0: '$AF4RES$z$s LIMIT',
+        1: 'REACHED',
+        equal: true,
+      },
+      {
+        0: 'MAP IS',
+        1: '$AF4REPLAYED',
+        equal: true,
+      },
+      {
+        0: '$E22DISABLED',
+        1: 'DUE TO SKIP',
+        equal: true,
+      },
+      {
+        0: 'VOTE TO',
+        1: '$AF4EXTEND',
+        equal: true,
+      },
+      {
+        0: 'LIMIT',
+        1: '$AF4REACHED',
+        equal: true,
+      },
+    ],
+    timeExtension: 1000 * 60 * 5,
+    extensionsLimit: 2,
+    replayLimit: 5,
+    triesLimit: 3,
+    timeout: 30,
+    time: 30,
+    minimumRemainingTime: 30000,
+    goal: 0.5,
+    width: 1.8,
+    height: 1.8,
+    padding: 0.2,
+    actionId: 2,
+    command: {
+      aliases: ['r', 'res', 'replay'],
+      privilege: 0,
+    },
+    extendCommand: {
+      aliases: ['ext', 'extend'],
+      privilege: 0,
+    },
+  },
+})
 
 const cfg = config.voteReplay
 const msg = messages.voteReplay
 
 export class VoteReplay extends UiButton {
-
   buttonData!: ButtonData
   replayCount = 0
   triesCount = 0
@@ -25,26 +81,26 @@ export class VoteReplay extends UiButton {
     tm.commands.add({
       aliases: cfg.command.aliases,
       help: cfg.command.help,
-      callback: info => {
+      callback: (info) => {
         if (!tm.timer.isDynamic) {
           this.handleClick(info.login, info.nickname)
         } else {
-          tm.sendMessage(msg.cantReplay, info.login)
+          tm.sendMessage(tm.utils.strVar(msg.cantReplay, { command: cfg.extendCommand.aliases[0] }), info.login)
         }
       },
-      privilege: cfg.command.privilege
+      privilege: cfg.command.privilege,
     })
     tm.commands.add({
       aliases: cfg.extendCommand.aliases,
       help: cfg.extendCommand.help,
-      callback: info => {
+      callback: (info) => {
         if (tm.timer.isDynamic) {
           this.handleClick(info.login, info.nickname)
         } else {
-          tm.sendMessage(msg.cantExtend, info.login)
+          tm.sendMessage(tm.utils.strVar(msg.cantExtend, { command: cfg.command.aliases[0] }), info.login)
         }
       },
-      privilege: cfg.extendCommand.privilege
+      privilege: cfg.extendCommand.privilege,
     })
     tm.addListener('ManialinkClick', (info) => {
       if (info.actionId === cfg.actionId + this.parentId) {
@@ -57,7 +113,9 @@ export class VoteReplay extends UiButton {
   }
 
   private async handleClick(login: string, nickname: string): Promise<void> {
-    if (this.isReplay || this.isSkip) { return }
+    if (this.isReplay || this.isSkip) {
+      return
+    }
     const action = tm.timer.isDynamic ? msg.extendStr : msg.replayStr
     const autopass = tm.players.count === 1
     if (!autopass && tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) {
@@ -86,7 +144,7 @@ export class VoteReplay extends UiButton {
     }
     const startMsg: string = tm.utils.strVar(msg.start, {
       action,
-      nickname: tm.utils.strip(nickname, true)
+      nickname: tm.utils.strip(nickname, true),
     })
     const header = tm.timer.isDynamic ? cfg.extendHeader : cfg.resHeader
     const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal, header, startMsg, cfg.time, cfg.voteIcon)
@@ -118,11 +176,13 @@ export class VoteReplay extends UiButton {
       if (result.caller === undefined) {
         tm.sendMessage(tm.utils.strVar(msg.success, { action }))
       } else {
-        tm.sendMessage(tm.utils.strVar(msg.forcePass, {
-          title: result.caller.title,
-          nickname: tm.utils.strip(result.caller.nickname, true),
-          action
-        }))
+        tm.sendMessage(
+          tm.utils.strVar(msg.forcePass, {
+            title: result.caller.title,
+            nickname: tm.utils.strip(result.caller.nickname, true),
+            action,
+          })
+        )
       }
       this.replayOrExtendTime()
     } else {
@@ -131,11 +191,13 @@ export class VoteReplay extends UiButton {
       if (result.caller === undefined) {
         tm.sendMessage(tm.utils.strVar(msg.cancelled, { action }))
       } else {
-        tm.sendMessage(tm.utils.strVar(msg.cancelledBy, {
-          title: result.caller.title,
-          nickname: tm.utils.strip(result.caller.nickname, true),
-          action
-        }))
+        tm.sendMessage(
+          tm.utils.strVar(msg.cancelledBy, {
+            title: result.caller.title,
+            nickname: tm.utils.strip(result.caller.nickname, true),
+            action,
+          })
+        )
       }
     }
   }
@@ -166,7 +228,7 @@ export class VoteReplay extends UiButton {
         iconHeight: cfg.height,
         padding: cfg.padding,
         equalTexts: cfg.texts[1].equal,
-        actionId: cfg.actionId + this.parentId
+        actionId: cfg.actionId + this.parentId,
       }
     } else {
       this.displayDefaultButtonText()
@@ -189,7 +251,7 @@ export class VoteReplay extends UiButton {
         iconHeight: cfg.height,
         padding: cfg.padding,
         equalTexts: cfg.texts[4].equal,
-        actionId: cfg.actionId + this.parentId
+        actionId: cfg.actionId + this.parentId,
       }
     } else {
       this.buttonData = {
@@ -200,7 +262,7 @@ export class VoteReplay extends UiButton {
         iconHeight: cfg.height,
         padding: cfg.padding,
         equalTexts: cfg.texts[0].equal,
-        actionId: cfg.actionId + this.parentId
+        actionId: cfg.actionId + this.parentId,
       }
     }
   }
@@ -236,5 +298,4 @@ export class VoteReplay extends UiButton {
       this.emitUpdate()
     }
   }
-
 }

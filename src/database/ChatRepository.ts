@@ -5,13 +5,9 @@ import { Logger } from '../Logger.js'
 const playerRepo = new PlayerRepository()
 
 export class ChatRepository extends Repository {
-
   private lastMessageTimestamp: Date = new Date(0)
 
-  async get(options?: {
-    limit?: number,
-    date?: Date
-  }): Promise<tm.Message[]> {
+  async get(options?: { limit?: number; date?: Date }): Promise<tm.Message[]> {
     let i = 1
     let limitStr = ''
     let dateStr = ''
@@ -29,14 +25,19 @@ export class ChatRepository extends Repository {
     ORDER BY date DESC 
     ${dateStr}
     ${limitStr}`
-    if (params.length === 0) { return await this.query(query) }
+    if (params.length === 0) {
+      return await this.query(query)
+    }
     return await this.query(query, ...params)
   }
 
-  async getByLogin(login: string, options?: {
-    limit?: number,
-    date?: Date
-  }): Promise<tm.Message[]> {
+  async getByLogin(
+    login: string,
+    options?: {
+      limit?: number
+      date?: Date
+    }
+  ): Promise<tm.Message[]> {
     let i = 2
     let limitStr = ''
     let dateStr = ''
@@ -54,7 +55,9 @@ export class ChatRepository extends Repository {
     ORDER BY date DESC 
     WHERE login=$1${dateStr}
     ${limitStr}`
-    if (params.length === 0) { return await this.query(query, login) }
+    if (params.length === 0) {
+      return await this.query(query, login)
+    }
     return await this.query(query, login, ...params)
   }
 
@@ -73,5 +76,4 @@ export class ChatRepository extends Repository {
     // Slice multibyte characters
     await this.query(query, id, text.slice(0, 150), date)
   }
-
 }

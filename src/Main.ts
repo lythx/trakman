@@ -16,14 +16,18 @@ import { fixRankCoherence } from './FixRankCoherence.js'
 import 'dotenv/config'
 import * as readline from 'node:readline/promises'
 import { stdin as input, stdout as output } from 'node:process'
-import config from '../config/Config.js'
+import config from './ControllerConfig.js'
 import './Trakman.js'
 
 await Logger.initialize()
 Logger.info('Starting the controller...')
 Logger.trace('Establishing connection with the dedicated server...')
-if (process.env.SERVER_IP === undefined) { await Logger.fatal('SERVER_IP is undefined. Check your .env file') }
-if (process.env.SERVER_PORT === undefined) { await Logger.fatal('SERVER_PORT is undefined. Check your .env file') }
+if (process.env.SERVER_IP === undefined) {
+  await Logger.fatal('SERVER_IP is undefined. Check your .env file')
+}
+if (process.env.SERVER_PORT === undefined) {
+  await Logger.fatal('SERVER_PORT is undefined. Check your .env file')
+}
 await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
 Logger.trace('Connection with the dedicated server established')
 Logger.trace('Authenticating...')
@@ -33,8 +37,10 @@ if (process.env.SUPER_ADMIN_NAME === undefined) {
 if (process.env.SUPER_ADMIN_PASSWORD === undefined) {
   await Logger.fatal('SUPER_ADMIN_PASSWORD is undefined. Check your .env file')
 }
-const authenticationStatus: any | Error = await Client.call('Authenticate',
-  [{ string: process.env.SUPER_ADMIN_NAME }, { string: process.env.SUPER_ADMIN_PASSWORD }])
+const authenticationStatus: any | Error = await Client.call('Authenticate', [
+  { string: process.env.SUPER_ADMIN_NAME },
+  { string: process.env.SUPER_ADMIN_PASSWORD },
+])
 if (authenticationStatus instanceof Error) {
   await Logger.fatal('Authentication failed. Server responded with an error:', authenticationStatus.message)
 }
@@ -93,7 +99,7 @@ let failedHealthChecks = 0
 
 setInterval(async () => {
   Logger.debug('Checking if the dedicated server is alive...')
-  let status = await Client.call('GetStatus')
+  const status = await Client.call('GetStatus')
   if (status instanceof Error) {
     failedHealthChecks++
     Logger.warn('Server did not respond to healthcheck')
@@ -112,12 +118,12 @@ setInterval(async () => {
 Logger.info('Press Enter to execute a command as the server (include slashes)')
 const rl = readline.createInterface({
   input,
-  output
+  output,
 })
 while (running) {
-  await rl.question("")
+  await rl.question('')
   Logger.disableConsole()
-  const command = await rl.question("Run command as server: ")
+  const command = await rl.question('Run command as server: ')
   Logger.enableConsole()
   ChatService.serverCommand(command)
 }

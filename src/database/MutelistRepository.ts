@@ -15,13 +15,12 @@ interface TableEntry {
 const playerRepo = new PlayerRepository()
 
 export class MutelistRepository extends Repository {
-
   async get(): Promise<tm.MutelistEntry[]> {
     const query: string = `SELECT mutelist.login, player.nickname, date, caller.login AS caller_login, 
     caller.nickname AS caller_nickname, reason, expires FROM mutelist
     JOIN players AS caller ON caller.id=mutelist.caller_id
     LEFT JOIN players AS player ON player.login=mutelist.login`
-    return (await this.query(query)).map(a => this.constructMutelistObject(a))
+    return (await this.query(query)).map((a) => this.constructMutelistObject(a))
   }
 
   async add(login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
@@ -58,8 +57,7 @@ export class MutelistRepository extends Repository {
       callerLogin: entry.caller_login,
       callerNickname: entry.caller_nickname,
       reason: entry.reason ?? undefined,
-      expireDate: entry.expires ?? undefined
+      expireDate: entry.expires ?? undefined,
     }
   }
-
 }

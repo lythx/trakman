@@ -1,13 +1,22 @@
-import type { ButtonData } from "./ButtonData.js"
-import { UiButton } from "./UiButton.js"
-import config from "./ButtonsWidget.config.js"
-import { horizontallyCenteredText } from '../../../UI.js'
+import type { ButtonData } from './ButtonData.js'
+import { UiButton } from './UiButton.js'
+import userConfig from './ButtonsWidget.config.js'
+import { horizontallyCenteredText, raceConfig } from '../../../UI.js'
 import buttonConfig from '../../../../ui/utils/StaticButton.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  margin: raceConfig.margin,
+  medalButton: {
+    width: 3,
+    height: 3,
+    padding: 0.3,
+    textYOffset: 3.6,
+  },
+})
 
 const cfg = config.medalButton
 
 export class MedalButton extends UiButton {
-
   buttonData: ButtonData
 
   constructor() {
@@ -15,14 +24,14 @@ export class MedalButton extends UiButton {
     // Texts in `ButtonData` are irrelevant because we use per-player rendering so
     // button xml is constructed in `renderForPlayer`
     this.buttonData = {
-      icon: "",
-      text1: "",
-      text2: "",
+      icon: '',
+      text1: '',
+      text2: '',
       iconWidth: cfg.width,
       iconHeight: cfg.height,
       padding: cfg.padding,
       equalTexts: false,
-      perPlayer: true
+      perPlayer: true,
     }
 
     tm.addListener(['BeginMap', 'PlayerDataUpdated', 'LocalRecord'], (): void => {
@@ -39,36 +48,41 @@ export class MedalButton extends UiButton {
     const topPadding = this.buttonData.padding
 
     type MedalInfo = {
-      limit: number,
-      text: string,
+      limit: number
+      text: string
       icon: string
     }
 
-    const thresholds: MedalInfo[] = [{
-      limit: map.authorTime ?? Infinity,
-      text: cfg.textAuthorMedal,
-      icon: "MedalNadeo"
-    }, {
-      limit: map.goldTime ?? Infinity,
-      text: cfg.textGoldMedal,
-      icon: "MedalGold"
-    }, {
-      limit: map.silverTime ?? Infinity,
-      text: cfg.textSilverMedal,
-      icon: "MedalSilver"
-    }, {
-      limit: map.bronzeTime ?? Infinity,
-      text: cfg.textBronzeMedal,
-      icon: "MedalBronze"
-    }]
+    const thresholds: MedalInfo[] = [
+      {
+        limit: map.authorTime ?? Infinity,
+        text: cfg.textAuthorMedal,
+        icon: 'MedalNadeo',
+      },
+      {
+        limit: map.goldTime ?? Infinity,
+        text: cfg.textGoldMedal,
+        icon: 'MedalGold',
+      },
+      {
+        limit: map.silverTime ?? Infinity,
+        text: cfg.textSilverMedal,
+        icon: 'MedalSilver',
+      },
+      {
+        limit: map.bronzeTime ?? Infinity,
+        text: cfg.textBronzeMedal,
+        icon: 'MedalBronze',
+      },
+    ]
 
     let medalText = cfg.textNoMedal
-    let iconSub = "MedalSlot"
+    let iconSub = 'MedalSlot'
 
     if (record > 0) {
-      const hit = thresholds.find(t => record <= t.limit)
+      const hit = thresholds.find((t) => record <= t.limit)
       if (hit) {
-        medalText = hit.text;
+        medalText = hit.text
         iconSub = hit.icon
       }
     }
@@ -76,14 +90,12 @@ export class MedalButton extends UiButton {
     const t1: string = horizontallyCenteredText(medalText, width, height, {
       yOffset: cfg.textYOffset,
       textScale: buttonConfig.textScale,
-      padding: buttonConfig.padding
+      padding: buttonConfig.padding,
     })
 
     return `<quad posn="0 0 1" sizen="${width} ${height}" bgcolor="${buttonConfig.background}"/>
-  <quad posn="${(width - (cfg.width)) / 2} ${-(topPadding)} 5" 
+  <quad posn="${(width - cfg.width) / 2} ${-topPadding} 5" 
   sizen="${cfg.width} ${cfg.height}" style="MedalsBig" substyle="${iconSub}"/>
   ${t1}`
-
   }
-
 }

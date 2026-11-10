@@ -1,6 +1,12 @@
-import fetch from "node-fetch"
-import type { UltimaniaRecord } from "./UltimaniaTypes"
-import config from './Config.js'
+import fetch from 'node-fetch'
+import type { UltimaniaRecord } from './UltimaniaTypes.js'
+import userConfig from './Config.js'
+
+export const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  syncName: true,
+  host: 'http://ultimania5.askuri.de/api/v5',
+})
 
 async function fetchRecords(mapId: string): Promise<UltimaniaRecord[] | Error> {
   const res = await fetch(`${config.host}/maps/${mapId}/records`).catch((err: Error) => err)
@@ -13,12 +19,12 @@ async function fetchRecords(mapId: string): Promise<UltimaniaRecord[] | Error> {
     tm.log.error(err.message)
     return err
   }
-  const data = await res.json() as any
+  const data = (await res.json()) as any
   return data.map((a: any) => ({
     login: a.player_login,
     nickname: a.player.nick,
     score: a.score,
-    date: new Date(Number(a.updated_at) * 1000)
+    date: new Date(Number(a.updated_at) * 1000),
   }))
 }
 
@@ -26,14 +32,14 @@ async function sendRecord(mapId: string, record: UltimaniaRecord) {
   const body = JSON.stringify({
     player_login: record.login,
     map_uid: mapId,
-    score: record.score
+    score: record.score,
   })
   const res = await fetch(`${config.host}/records`, {
     method: 'PUT',
     headers: {
-      'Content-Type': `application/json`
+      'Content-Type': `application/json`,
     },
-    body
+    body,
   }).catch((err: Error) => err)
   if (res instanceof Error) {
     tm.log.error(`Failed to send ultimania record`, res.message)
@@ -47,20 +53,17 @@ async function sendRecord(mapId: string, record: UltimaniaRecord) {
   return true
 }
 
-async function updatePlayer(player: {
-  login: string,
-  nickname: string
-}) {
+async function updatePlayer(player: { login: string; nickname: string }) {
   const body = JSON.stringify({
     login: player.login,
-    nick: player.nickname
+    nick: player.nickname,
   })
   const res = await fetch(`${config.host}/players`, {
     method: 'PUT',
     headers: {
-      'Content-Type': `application/json`
+      'Content-Type': `application/json`,
     },
-    body
+    body,
   }).catch((err: Error) => err)
   if (res instanceof Error) {
     tm.log.error(`Failed to update ultimania player`, res.message)
@@ -75,5 +78,3 @@ async function updatePlayer(player: {
 }
 
 export { fetchRecords, updatePlayer, sendRecord }
-
-

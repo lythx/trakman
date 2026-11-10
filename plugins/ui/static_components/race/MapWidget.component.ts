@@ -3,14 +3,36 @@
  * @since 0.1
  */
 
-import { componentIds, Grid, StaticComponent, StaticHeader, type StaticHeaderOptions } from '../../UI.js'
+import { componentIds, Grid, raceConfig, StaticComponent, StaticHeader, type StaticHeaderOptions } from '../../UI.js'
 import flags from '../../config/FlagIcons.js'
+import icons from '../../config/Icons.js'
 import { tmx } from '../../../tmx/Tmx.js'
 import { webservices } from '../../../webservices/Webservices.js'
-import config from './MapWidget.config.js'
+import userConfig from './MapWidget.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 9.13,
+  margin: raceConfig.margin,
+  width: raceConfig.width,
+  mapPadding: 0.3,
+  customTags: [] as typeof userConfig.customTags,
+  icons: {
+    header: icons.ongoingMap,
+    tags: {
+      normal: icons.tag,
+      nadeo: icons.tagGreen,
+      classic: icons.tagYellow,
+    },
+    author: icons.personBuilder,
+    authorTime: icons.clockAuthor,
+    buildDate: icons.tools,
+    goldScore: icons.clockAuthor,
+    authorScore: icons.clockAuthor,
+  },
+  textScale: 1,
+})
 
 export default class MapWidget extends StaticComponent {
-
   private readonly rows: number = 4
   private readonly header: StaticHeader
   private readonly grid: Grid
@@ -32,16 +54,20 @@ export default class MapWidget extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     this.updateXML()
     return this.xml
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     return {
       xml: this.xml,
-      login
+      login,
     }
   }
 
@@ -68,39 +94,45 @@ export default class MapWidget extends StaticComponent {
         timeOrScoreIcon = ic.goldScore
       }
     }
-    const infos: [string, string][] = [[config.title, ic.header],
+    const infos: [string, string][] = [
+      [config.title, ic.header],
       [tm.utils.safeString(tm.utils.decodeURI(map.name)), this.getTag(map, TMXMap ?? undefined)],
-      [tm.utils.safeString(author), authorIcon], [timeOrScore, timeOrScoreIcon],
-      [date === undefined ? config.noDateText : tm.utils.formatDate(date), ic.buildDate]]
+      [tm.utils.safeString(author), authorIcon],
+      [timeOrScore, timeOrScoreIcon],
+      [date === undefined ? config.noDateText : tm.utils.formatDate(date), ic.buildDate],
+    ]
     const headerCfg: StaticHeaderOptions = this.header.options
     const cell = (i: number, j: number, w: number, h: number): string => {
       if (i === 3) {
         return `
         <frame posn="0 0 1">
           ${this.header.constructXml(infos[i][0], infos[i][1], this.side, {
-          rectangleWidth: (headerCfg.rectangleWidth / 2) - (headerCfg.margin + (headerCfg.squareWidth / 2)),
-          textScale: config.textScale,
-          centerText: true,
-          textBackground: config.background
-        })}
+            rectangleWidth: headerCfg.rectangleWidth / 2 - (headerCfg.margin + headerCfg.squareWidth / 2),
+            textScale: config.textScale,
+            centerText: true,
+            textBackground: config.background,
+          })}
         </frame>
-        <frame posn="${(headerCfg.rectangleWidth / 2) - (headerCfg.margin + (headerCfg.squareWidth / 2)) + headerCfg.squareWidth + (headerCfg.margin * 2)} 0 1">
+        <frame posn="${headerCfg.rectangleWidth / 2 - (headerCfg.margin + headerCfg.squareWidth / 2) + headerCfg.squareWidth + headerCfg.margin * 2} 0 1">
           ${this.header.constructXml(infos[i + 1][0], infos[i + 1][1], this.side, {
-          rectangleWidth: (headerCfg.rectangleWidth / 2) - (headerCfg.margin + (headerCfg.squareWidth / 2)),
-          textScale: config.textScale,
-          centerText: true,
-          textBackground: config.background
-        })}
+            rectangleWidth: headerCfg.rectangleWidth / 2 - (headerCfg.margin + headerCfg.squareWidth / 2),
+            textScale: config.textScale,
+            centerText: true,
+            textBackground: config.background,
+          })}
         </frame>`
       }
       return `
       <frame posn="0 0 1">
-        ${i === 0 ? this.header.constructXml(infos[i][0], infos[i][1], this.side) :
-        this.header.constructXml(tm.utils.strip(infos[i][0], false), infos[i][1], this.side, {
-          textScale: config.textScale,
-          textBackground: config.background,
-          horizontalPadding: config.mapPadding
-        })}
+        ${
+          i === 0
+            ? this.header.constructXml(infos[i][0], infos[i][1], this.side)
+            : this.header.constructXml(tm.utils.strip(infos[i][0], false), infos[i][1], this.side, {
+                textScale: config.textScale,
+                textBackground: config.background,
+                horizontalPadding: config.mapPadding,
+              })
+        }
       </frame>`
     }
     const arr: any[] = new Array(this.rows).fill(cell)
@@ -115,9 +147,15 @@ export default class MapWidget extends StaticComponent {
 
   private getTag(map: tm.Map, TMXMap?: tm.TMXMap): string {
     for (const e of config.customTags) {
-      if (e?.authors?.some(a => a === map.author || a === TMXMap?.author) || e?.names?.some(
-        a => a.test(map.name) || a.test(tm.utils.strip(map.name)) || (TMXMap !== undefined ?
-          (a.test(TMXMap.name) || a.test(tm.utils.strip(TMXMap.name))) : false))) {
+      if (
+        e?.authors?.some((a) => a === map.author || a === TMXMap?.author) ||
+        e?.names?.some(
+          (a) =>
+            a.test(map.name) ||
+            a.test(tm.utils.strip(map.name)) ||
+            (TMXMap !== undefined ? a.test(TMXMap.name) || a.test(tm.utils.strip(TMXMap.name)) : false)
+        )
+      ) {
         return e.icon
       }
     }
@@ -129,5 +167,4 @@ export default class MapWidget extends StaticComponent {
     }
     return config.icons.tags.normal
   }
-
 }

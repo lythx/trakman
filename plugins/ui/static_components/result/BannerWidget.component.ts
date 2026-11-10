@@ -5,10 +5,27 @@
 
 import { donations } from '../../../donations/Donations.js'
 import { addManialinkListener, centeredText, componentIds, components, StaticComponent } from '../../UI.js'
-import config from './BannerWidget.config.js'
+import userConfig from './BannerWidget.config.js'
+import cfg from '../../config/ResultUi.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 5,
+  entryHeight: 2.15,
+  image: 'https://trakman.ptrk.eu/icons/CrazyTrakman.png',
+  imageLink: tm.config.controller.repo,
+  width: cfg.width,
+  donateAmounts: [50, 100, 200, 500, 1000, 5000],
+  textScale: 0.9,
+  donateText: 'Donate',
+  buttonHeight: 3,
+  margin: cfg.margin,
+  leftBorder: cfg.leftPosition,
+  rightBorder: cfg.rightPosition,
+  topBorder: cfg.topBorder,
+  marginBig: cfg.marginBig,
+})
 
 export default class BannerWidget extends StaticComponent {
-
   private xml: string = ''
 
   constructor() {
@@ -30,7 +47,8 @@ export default class BannerWidget extends StaticComponent {
       <format textsize="1" textcolor="FFFF"/> 
       <quad posn="0 0 2" sizen="${w} ${h}" bgcolor="${config.background}"/>
       <quad posn="${m} ${-m} 3" sizen="${w - m * 2} ${h - (bh + m * 3)}" image="${config.image}" url="${tm.utils.fixProtocol(
-      config.imageLink)}"/>
+        config.imageLink
+      )}"/>
       <frame posn="0 ${-(h - (bh + m * 2))} 1">
         ${this.constructDonateButtons(w, m)}
       </frame>
@@ -43,7 +61,7 @@ export default class BannerWidget extends StaticComponent {
   }
 
   getWidth(): number {
-    return (config.rightBorder - config.leftBorder) - (config.width * 5 + config.marginBig * 5 + config.margin)
+    return config.rightBorder - config.leftBorder - (config.width * 5 + config.marginBig * 5 + config.margin)
   }
 
   getPosX(): number {
@@ -51,15 +69,19 @@ export default class BannerWidget extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     return this.xml
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     return {
       xml: this.xml,
-      login
+      login,
     }
   }
 
@@ -67,20 +89,19 @@ export default class BannerWidget extends StaticComponent {
     let ret = ''
     let x = margin
     const lgt = config.donateAmounts.length + 1
-    const w = ((width - margin) / lgt) - margin
-    const arr = [config.donateText, ...config.donateAmounts.map(a => String(a) + 'C')]
+    const w = (width - margin) / lgt - margin
+    const arr = [config.donateText, ...config.donateAmounts.map((a) => String(a) + 'C')]
     for (let i = 0; i < lgt; i++) {
       const action = i === 0 ? '' : `action="${this.id + i}"`
       const bg = i === 0 ? config.mainTextBackground : config.donateBackground
       ret += `<quad posn="${x} ${-margin} 3" sizen="${w} ${config.buttonHeight}" bgcolor="${bg}" ${action}/>
             ${centeredText(arr[i], w, config.buttonHeight, {
-        xOffset: x,
-        yOffset: margin,
-        textScale: config.textScale
-      })}`
+              xOffset: x,
+              yOffset: margin,
+              textScale: config.textScale,
+            })}`
       x += w + margin
     }
     return ret
   }
-
 }

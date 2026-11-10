@@ -1,6 +1,12 @@
-import config from './Config.js'
+import userConfig from './Config.js'
 import type { TMXMapChangedInfo } from './TmxTypes.js'
 import './ui/TMXWindow.component.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  queueCount: 4,
+  historyCount: 4,
+})
 
 // fill with empty strings at start to avoid undefined error on startup
 const history: (tm.TMXMap | string)[] = []
@@ -13,25 +19,28 @@ const queueListeners: ((queue: (tm.TMXMap | null)[]) => void)[] = []
 const mapListeners: ((info: TMXMapChangedInfo) => void)[] = []
 
 const emitQueueChangeEvent = () => {
-  for (const e of queueListeners) { e(queue.map(a => typeof a === 'string' ? null : a)) }
+  for (const e of queueListeners) {
+    e(queue.map((a) => (typeof a === 'string' ? null : a)))
+  }
 }
 
 const emitMapChangeEvent = () => {
   for (const e of mapListeners) {
     e({
-      history: history.map(a => typeof a === 'string' ? null : a),
+      history: history.map((a) => (typeof a === 'string' ? null : a)),
       current: typeof current === 'string' ? null : current,
-      queue: queue.map(a => typeof a === 'string' ? null : a)
+      queue: queue.map((a) => (typeof a === 'string' ? null : a)),
     })
   }
 }
 
-const getUid = (map: tm.TMXMap | string): string => typeof map === 'string' ? map : map.id
+const getUid = (map: tm.TMXMap | string): string => (typeof map === 'string' ? map : map.id)
 
 const initialize = async (): Promise<void> => {
   if (queueSize > tm.jukebox.queueCount) {
     await tm.log.fatal(
-      `jukeboxQueueSize (${tm.jukebox.queueCount}) can't be lower than tmx queueSize (${queueSize}). Change your tmx config`)
+      `jukeboxQueueSize (${tm.jukebox.queueCount}) can't be lower than tmx queueSize (${queueSize}). Change your tmx config`
+    )
   }
   const res: tm.TMXMap | Error = await tm.tmx.fetchMapInfo(tm.maps.current.id)
   current = res instanceof Error ? tm.maps.current.id : res
@@ -53,11 +62,13 @@ const nextMap = async (): Promise<void> => {
 
 const update = async (updateCurrent?: true): Promise<void> => {
   const fetchedMaps = [...queue, current, ...history]
-  const newQueueUids = tm.jukebox.queue.slice(0, queueSize).map(a => a.id)
+  const newQueueUids = tm.jukebox.queue.slice(0, queueSize).map((a) => a.id)
   const curId = tm.maps.current.id
   if (updateCurrent) {
-    const entry = fetchedMaps.find(a => getUid(a) === curId)
-    if (entry !== undefined) { current = entry } else {
+    const entry = fetchedMaps.find((a) => getUid(a) === curId)
+    if (entry !== undefined) {
+      current = entry
+    } else {
       const res = await tm.tmx.fetchMapInfo(curId)
       current = res instanceof Error ? curId : res
     }
@@ -65,7 +76,7 @@ const update = async (updateCurrent?: true): Promise<void> => {
   }
   const newQueue: typeof queue = []
   for (const e of newQueueUids) {
-    const entry = fetchedMaps.find(a => getUid(a) === e)
+    const entry = fetchedMaps.find((a) => getUid(a) === e)
     if (entry !== undefined) {
       newQueue.push(entry)
     } else {
@@ -83,8 +94,10 @@ if (config.isEnabled) {
     void initialize()
   })
   tm.addListener('JukeboxChanged', () => void update())
-  tm.addListener('BeginMap', info => {
-    if (!info.isRestart) { void nextMap() }
+  tm.addListener('BeginMap', (info) => {
+    if (!info.isRestart) {
+      void nextMap()
+    }
   })
 }
 
@@ -102,9 +115,9 @@ function getFromHistory(uid: string): Readonly<tm.TMXMap> | undefined
 function getFromHistory(uids: string[]): Readonly<tm.TMXMap>[]
 function getFromHistory(uids: string | string[]): Readonly<tm.TMXMap> | undefined | Readonly<tm.TMXMap>[] {
   if (typeof uids === 'string') {
-    return history.find(a => !(typeof a === 'string') && a.id === uids) as any
+    return history.find((a) => !(typeof a === 'string') && a.id === uids) as any
   }
-  return history.filter(a => !(typeof a === 'string') && uids.includes(a.id)) as any
+  return history.filter((a) => !(typeof a === 'string') && uids.includes(a.id)) as any
 }
 
 /**
@@ -121,9 +134,9 @@ function getFromQueue(uid: string): Readonly<tm.TMXMap> | undefined
 function getFromQueue(uids: string[]): Readonly<tm.TMXMap>[]
 function getFromQueue(uids: string | string[]): Readonly<tm.TMXMap> | undefined | Readonly<tm.TMXMap>[] {
   if (typeof uids === 'string') {
-    return queue.find(a => !(typeof a === 'string') && a.id === uids) as any
+    return queue.find((a) => !(typeof a === 'string') && a.id === uids) as any
   }
-  return queue.filter(a => !(typeof a === 'string') && uids.includes(a.id)) as any
+  return queue.filter((a) => !(typeof a === 'string') && uids.includes(a.id)) as any
 }
 
 /**
@@ -133,12 +146,11 @@ function getFromQueue(uids: string | string[]): Readonly<tm.TMXMap> | undefined 
  * @since 0.1
  */
 export const tmx = {
-
   /**
    * Adds a callback function to execute on TMX map queue change
    * @param callback Function to execute on event. It takes new map queue as a parameter
    */
-  onQueueChange(callback: ((queue: (tm.TMXMap | null)[]) => void)) {
+  onQueueChange(callback: (queue: (tm.TMXMap | null)[]) => void) {
     queueListeners.push(callback)
   },
 
@@ -146,7 +158,7 @@ export const tmx = {
    * Adds a callback function to execute on TMX current map change
    * @param callback Function to execute on event. It takes new current map as a parameter
    */
-  onMapChange(callback: ((info: TMXMapChangedInfo) => void)) {
+  onMapChange(callback: (info: TMXMapChangedInfo) => void) {
     mapListeners.push(callback)
   },
 
@@ -165,7 +177,7 @@ export const tmx = {
    * TMX info for map history
    */
   get history(): (Readonly<tm.TMXMap> | null)[] {
-    return history.map(a => typeof a === 'string' ? null : a)
+    return history.map((a) => (typeof a === 'string' ? null : a))
   },
 
   /**
@@ -179,7 +191,7 @@ export const tmx = {
    * TMX info for map queue
    */
   get queue(): (Readonly<tm.TMXMap> | null)[] {
-    return queue.map(a => typeof a === 'string' ? null : a)
+    return queue.map((a) => (typeof a === 'string' ? null : a))
   },
 
   /**
@@ -199,8 +211,7 @@ export const tmx = {
   /**
    * Plugin status
    */
-  isEnabled: config.isEnabled
-
+  isEnabled: config.isEnabled,
 }
 
 export type { TMXMapChangedInfo }

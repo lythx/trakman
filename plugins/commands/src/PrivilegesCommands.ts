@@ -1,50 +1,86 @@
-import config from '../config/PrivilegesCommands.config.js'
+import userConfig from '../config/PrivilegesCommands.config.js'
 import { actions } from '../../actions/Actions.js'
 
-const commands: tm.Command[] = [{
-  aliases: config.masteradmin.aliases,
-  help: config.masteradmin.help,
-  params: [{
-    name: 'player',
-    type: 'offlinePlayer'
-  }],
-  callback: async (info: tm.MessageInfo, player: tm.OfflinePlayer): Promise<void> => {
-    await actions.setPlayerPrivilege(player.login, info, 3)
+const config = tm.utils.withDefaults(userConfig, {
+  masteradmin: {
+    public: true,
+    privilege: 4,
+    aliases: ['mad', 'masteradmin', 'addmasteradmin'],
   },
-  privilege: config.masteradmin.privilege
-}, {
-  aliases: config.admin.aliases,
-  help: config.admin.help,
-  params: [{
-    name: 'player',
-    type: 'offlinePlayer'
-  }],
-  callback: async (info: tm.MessageInfo, player: tm.OfflinePlayer): Promise<void> => {
-    await actions.setPlayerPrivilege(player.login, info, 2)
+  admin: {
+    public: true,
+    privilege: 3,
+    aliases: ['ad', 'admin', 'addadmin'],
   },
-  privilege: 3
-}, {
-  aliases: config.operator.aliases,
-  help: config.operator.help,
-  params: [{
-    name: 'player',
-    type: 'offlinePlayer'
-  }],
-  callback: async (info: tm.MessageInfo, player: tm.OfflinePlayer): Promise<void> => {
-    await actions.setPlayerPrivilege(player.login, info, 1)
+  operator: {
+    public: true,
+    privilege: 2,
+    aliases: ['op', 'operator', 'addop'],
   },
-  privilege: 2
-}, {
-  aliases: config.user.aliases,
-  help: config.user.help,
-  params: [{
-    name: 'player',
-    type: 'offlinePlayer'
-  }],
-  callback: async (info: tm.MessageInfo, player: tm.OfflinePlayer): Promise<void> => {
-    await actions.setPlayerPrivilege(player.login, info, 0)
+  user: {
+    public: true,
+    privilege: 2,
+    aliases: ['rp', 'user', 'removeprivilege'],
   },
-  privilege: 2
-}]
+})
+
+const commands: tm.Command[] = [
+  {
+    aliases: config.masteradmin.aliases,
+    help: config.masteradmin.help,
+    params: [
+      {
+        name: 'player',
+        type: 'offlinePlayer',
+      },
+    ],
+    callback: async (info: tm.MessageInfo, player: tm.OfflinePlayer): Promise<void> => {
+      await actions.setPlayerPrivilege(player.login, info, 3)
+    },
+    privilege: config.masteradmin.privilege,
+  },
+  {
+    aliases: config.admin.aliases,
+    help: config.admin.help,
+    params: [
+      {
+        name: 'player',
+        type: 'offlinePlayer',
+      },
+    ],
+    callback: async (info: tm.MessageInfo, player: tm.OfflinePlayer): Promise<void> => {
+      await actions.setPlayerPrivilege(player.login, info, 2)
+    },
+    privilege: 3,
+  },
+  {
+    aliases: config.operator.aliases,
+    help: config.operator.help,
+    params: [
+      {
+        name: 'player',
+        type: 'offlinePlayer',
+      },
+    ],
+    callback: async (info: tm.MessageInfo, player: tm.OfflinePlayer): Promise<void> => {
+      await actions.setPlayerPrivilege(player.login, info, 1)
+    },
+    privilege: 2,
+  },
+  {
+    aliases: config.user.aliases,
+    help: config.user.help,
+    params: [
+      {
+        name: 'player',
+        type: 'offlinePlayer',
+      },
+    ],
+    callback: async (info: tm.MessageInfo, player: tm.OfflinePlayer): Promise<void> => {
+      await actions.setPlayerPrivilege(player.login, info, 0)
+    },
+    privilege: 2,
+  },
+]
 
 tm.commands.add(...commands)

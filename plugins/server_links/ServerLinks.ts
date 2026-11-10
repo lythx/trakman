@@ -1,8 +1,20 @@
-import config from './Config.js'
+import userConfig from './Config.js'
 import fs from 'fs/promises'
 import UiComponent from './ui/ServerLinks.component.js'
 import http from 'http'
 import fetch from 'node-fetch'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  useHttpServer: false,
+  httpAddress: '127.0.0.1',
+  httpPort: 7309,
+  refreshTimeout: 10,
+  updateLimit: 30,
+  dataFilePath: './plugins/server_links/temp/data.txt',
+  servers: [] as { name: string; path?: string; url?: string }[],
+  noDataText: '--',
+})
 
 export interface Server {
   name: string
@@ -45,10 +57,12 @@ if (config.isEnabled) {
 }
 
 async function updateDataFile() {
-  const res: {
-    LadderServerLimitMin: number,
-    LadderServerLimitMax: number
-  } | Error = await tm.client.call('GetLadderServerLimits')
+  const res:
+    | {
+        LadderServerLimitMin: number
+        LadderServerLimitMax: number
+      }
+    | Error = await tm.client.call('GetLadderServerLimits')
   if (res instanceof Error) {
     tm.log.error(`Error when getting server ladder limits`, res.message)
     return
@@ -63,18 +77,20 @@ async function updateDataFile() {
     maxLadderLimit: res.LadderServerLimitMax,
     maxPlayerCount: tm.config.server.currentMaxPlayers,
     currentMap: tm.maps.current.name,
-    currentMapAuthor: tm.maps.current.author
+    currentMapAuthor: tm.maps.current.author,
   }
   try {
     await fs.writeFile(config.dataFilePath, JSON.stringify(serverData))
-  } catch { }
+  } catch (err) {
+    tm.log.error(`Could not write server data file`, err)
+  }
 }
 
 async function refreshOtherServersData() {
   for (const e of servers) {
     let file: string
     if (e.path !== undefined && e.path.length !== 0) {
-      const rawFile = await fs.readFile(e.path).catch(err => err)
+      const rawFile = await fs.readFile(e.path).catch((err) => err)
       if (rawFile instanceof Error) {
         continue
       }
@@ -95,7 +111,7 @@ async function refreshOtherServersData() {
       continue
     }
     const infoObj = constructInfoObject(newInfo, e.name)
-    const index = serverInfos.findIndex(a => a.login === infoObj?.login)
+    const index = serverInfos.findIndex((a) => a.login === infoObj?.login)
     if (infoObj !== undefined && Date.now() - infoObj.lastUpdate < config.updateLimit * 1000) {
       serverInfos[index === -1 ? serverInfos.length : index] = infoObj
     } else if (index !== -1) {
@@ -106,7 +122,13 @@ async function refreshOtherServersData() {
 }
 
 function constructInfoObject(info: Partial<ServerInfo>, name: string): ServerInfo | undefined {
-  if (info.login === undefined || info.lastUpdate === undefined || Date.now() - info.lastUpdate > config.updateLimit * 1000) { return }
+  if (
+    info.login === undefined ||
+    info.lastUpdate === undefined ||
+    Date.now() - info.lastUpdate > config.updateLimit * 1000
+  ) {
+    return
+  }
   return {
     login: info.login,
     lastUpdate: info.lastUpdate,
@@ -118,23 +140,20 @@ function constructInfoObject(info: Partial<ServerInfo>, name: string): ServerInf
     maxLadderLimit: info.maxLadderLimit ?? 0,
     maxPlayerCount: info.maxPlayerCount ?? 0,
     currentMap: info.currentMap ?? config.noDataText,
-    currentMapAuthor: info.currentMapAuthor ?? config.noDataText
+    currentMapAuthor: info.currentMapAuthor ?? config.noDataText,
   }
-
 }
 
 function startHttpServer() {
-
   const server = http.createServer((req, res) => {
-    res.statusCode = 200;
-    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-    res.end(JSON.stringify(serverData));
-  });
+    res.statusCode = 200
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+    res.end(JSON.stringify(serverData))
+  })
 
   server.listen(config.httpPort, config.httpAddress, () => {
-    tm.log.info(`Server links server running at http://${config.httpAddress}:${config.httpPort}`);
-  });
-
+    tm.log.info(`Server links server running at http://${config.httpAddress}:${config.httpPort}`)
+  })
 }
 
 /**
@@ -177,5 +196,5 @@ export const serverLinks = {
   /**
    * HTTP server port for remote links
    */
-  httpPort: config.httpPort
+  httpPort: config.httpPort,
 }

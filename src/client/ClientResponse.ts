@@ -2,7 +2,6 @@ import { Logger } from '../Logger.js'
 import xml2js from 'xml2js'
 
 export class ClientResponse {
-
   private _status: 'pending' | 'overloaded' | 'completed' = 'pending'
   private readonly _targetLength: number
   private readonly _id: number
@@ -53,7 +52,7 @@ export class ClientResponse {
     return this._id
   }
 
-  get status(): "pending" | "overloaded" | "completed" {
+  get status(): 'pending' | 'overloaded' | 'completed' {
     return this._status
   }
 
@@ -137,7 +136,7 @@ export class ClientResponse {
     const parseType = (value: any, type: string): any => {
       const arr: any[] = []
       const obj: any = {}
-      switch(type) {
+      switch (type) {
         case 'boolean':
           return value === '1'
         case 'int':
@@ -157,7 +156,9 @@ export class ClientResponse {
           return obj
         case 'array':
           for (const el of value.data) {
-            if (el.value === undefined) { continue } // NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
+            if (el.value === undefined) {
+              continue
+            } // NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
             for (const e of el.value) {
               const t: string = Object.keys(e)[0]
               const val: any = e[t][0]
@@ -192,7 +193,8 @@ export class ClientResponse {
         const type = Object.keys(element)[0]
         return parseType(element[type][0], type)
       } else {
-        for (const p of param.param) { // some callbacks return multiple values instead of an array. NICE!!!!
+        for (const p of param.param) {
+          // some callbacks return multiple values instead of an array. NICE!!!!
           const element: any = p.value[0]
           const type = Object.keys(element)[0]
           arr.push(parseType(element[type][0], type))
@@ -201,5 +203,4 @@ export class ClientResponse {
     }
     return arr
   }
-
 }

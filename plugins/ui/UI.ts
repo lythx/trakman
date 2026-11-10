@@ -37,14 +37,14 @@ import './Imports.js'
 let customUi: CustomUi
 
 const currentModIndex = {
-  'Stadium': 0,
-  'Desert': 0,
-  'Snow': 0,
-  'Bay': 0,
-  'Coast': 0,
-  'Island': 0,
-  'Rally': 0,
-  ...tm.config.controller.customEnvironments.reduce((acc, env) => ({ ...acc, [env]: 0 }), {})
+  Stadium: 0,
+  Desert: 0,
+  Snow: 0,
+  Bay: 0,
+  Coast: 0,
+  Island: 0,
+  Rally: 0,
+  ...tm.config.controller.customEnvironments.reduce((acc, env) => ({ ...acc, [env]: 0 }), {}),
 }
 
 const loadMod = (): void => {
@@ -52,39 +52,49 @@ const loadMod = (): void => {
     struct: {
       Env: {
         string: string
-      },
+      }
       Url: {
         string: string
       }
     }
   }[] = []
   for (const obj of modConfig) {
-    if (obj.modLinks.length === 0) { continue }
+    if (obj.modLinks.length === 0) {
+      continue
+    }
     mods.push({
       struct: {
-        Env: { string: (tm.utils.environmentToNadeoEnvironment(obj.environment as tm.Environment) as string) },
+        Env: { string: tm.utils.environmentToNadeoEnvironment(obj.environment as tm.Environment) as string },
         Url: {
-          string: obj.randomOrder ? tm.utils.fixProtocol(obj.modLinks[~~(Math.random() * obj.modLinks.length)]) :
-            tm.utils.fixProtocol(
-              obj.modLinks[currentModIndex[obj.environment as keyof typeof currentModIndex] % obj.modLinks.length])
-        }
-      }
+          string: obj.randomOrder
+            ? tm.utils.fixProtocol(obj.modLinks[~~(Math.random() * obj.modLinks.length)])
+            : tm.utils.fixProtocol(
+                obj.modLinks[currentModIndex[obj.environment as keyof typeof currentModIndex] % obj.modLinks.length]
+              ),
+        },
+      },
     })
   }
-  tm.client.callNoRes('SetForcedMods', [{
-    boolean: true
-  }, {
-    array: mods
-  }])
+  tm.client.callNoRes('SetForcedMods', [
+    {
+      boolean: true,
+    },
+    {
+      array: mods,
+    },
+  ])
 }
 
-const iconArr = Object.values(icons.preloadedIcons).map(a => `<quad posn="500 500 0" sizen="10 10" image="${a}"/>`)
+const iconArr = Object.values(icons.preloadedIcons).map((a) => `<quad posn="500 500 0" sizen="10 10" image="${a}"/>`)
 
 const preloadIcons = (login?: string): void => {
-  tm.sendManialink(`
+  tm.sendManialink(
+    `
   <manialink id="preloadIcons">
     ${iconArr}
-  </manialink>`, login)
+  </manialink>`,
+    login
+  )
 }
 
 const loadListeners: Function[] = []
@@ -97,52 +107,63 @@ let staticUpdateNeeded = false
 tm.client.addProxy(['SetGameMode'], () => {
   staticUpdateNeeded = true
 })
-const events: tm.Listener[] = [{
-  event: 'Startup',
-  callback: async (): Promise<void> => {
-    await tm.client.call('SendHideManialinkPage')
-    preloadIcons()
-    loadMod()
-    initalizeKeyListeners()
-    customUi = new CustomUi()
-    customUi.display()
-    StaticComponent.refreshStaticLayouts()
-    for (const c of Object.values(staticComponents)) {
-      c.updateIsDisplayed()
-      c.updatePosition()
-      const ret = c.display()
-      StaticComponent.sendMultipleManialinks(ret)
-    }
-    StaticComponent.refreshStaticLayouts()
-    new Buttons()
-    new TestWindow()
-    for (const e of loadListeners) { e() }
-    StaticComponent.onComponentCreated(() => {
+const events: tm.Listener[] = [
+  {
+    event: 'Startup',
+    callback: async (): Promise<void> => {
+      await tm.client.call('SendHideManialinkPage')
+      preloadIcons()
+      loadMod()
+      initalizeKeyListeners()
+      customUi = new CustomUi()
+      customUi.display()
       StaticComponent.refreshStaticLayouts()
-    })
-  }
-}, {
-  event: 'BeginMap',
-  callback: async (): Promise<void> => {
-    if (staticUpdateNeeded) {
-      staticUpdateNeeded = false
-      for (const e of staticComponents) { e.updatePosition() }
-    }
-  }
-}, {
-  event: 'EndMap',
-  callback: async (): Promise<void> => {
-    currentModIndex[tm.maps.current.environment as keyof typeof currentModIndex]++
-    loadMod()
-  }
-}, {
-  event: 'PlayerJoin',
-  callback: (info: tm.JoinInfo): void => {
-    preloadIcons(info.login)
-  }
-}]
+      for (const c of Object.values(staticComponents)) {
+        c.updateIsDisplayed()
+        c.updatePosition()
+        const ret = c.display()
+        StaticComponent.sendMultipleManialinks(ret)
+      }
+      StaticComponent.refreshStaticLayouts()
+      new Buttons()
+      new TestWindow()
+      for (const e of loadListeners) {
+        e()
+      }
+      StaticComponent.onComponentCreated(() => {
+        StaticComponent.refreshStaticLayouts()
+      })
+    },
+  },
+  {
+    event: 'BeginMap',
+    callback: async (): Promise<void> => {
+      if (staticUpdateNeeded) {
+        staticUpdateNeeded = false
+        for (const e of staticComponents) {
+          e.updatePosition()
+        }
+      }
+    },
+  },
+  {
+    event: 'EndMap',
+    callback: async (): Promise<void> => {
+      currentModIndex[tm.maps.current.environment as keyof typeof currentModIndex]++
+      loadMod()
+    },
+  },
+  {
+    event: 'PlayerJoin',
+    callback: (info: tm.JoinInfo): void => {
+      preloadIcons(info.login)
+    },
+  },
+]
 
-for (const event of events) { tm.addListener(event.event, event.callback, true) }
+for (const event of events) {
+  tm.addListener(event.event, event.callback, true)
+}
 
 /**
  * Manialink UI components.
@@ -150,13 +171,12 @@ for (const event of events) { tm.addListener(event.event, event.callback, true) 
  * @since 0.1
  */
 const components = {
-
   /**
    * Finds a static component based on given class name
    * @param className Component class name
    */
   findStatic(className: string): StaticComponent | undefined {
-    return staticComponents.find(a => a.constructor.name === className)
+    return staticComponents.find((a) => a.constructor.name === className)
   },
 
   /**
@@ -164,7 +184,7 @@ const components = {
    * @param className Component class name
    */
   findDynamic(className: string): DynamicComponent | undefined {
-    return dynamicComponents.find(a => a.constructor.name === className)
+    return dynamicComponents.find((a) => a.constructor.name === className)
   },
 
   /**
@@ -184,10 +204,9 @@ const components = {
   /**
    * Heights of static components used for static UI positioning
    */
-  get staticHeights(): typeof StaticComponent['components'] {
+  get staticHeights(): (typeof StaticComponent)['components'] {
     return StaticComponent.components
-  }
-
+  },
 }
 
 /**
@@ -199,6 +218,39 @@ const addLoadListener = (callback: Function): void => {
 }
 
 export {
-  Paginator, Grid, Navbar, VoteWindow, RecordList, type GridCellFunction, type GridCellObject, List, StaticHeader, PopupWindow, StaticComponent, DynamicComponent, type StaticHeaderOptions, type RLImage, type RLRecord, components, componentIds, icons, raceConfig, resultConfig, flagIcons, utilIds, addKeyListener, removeKeyListener, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText, staticButton, fullScreenListener, centeredText, addLoadListener, leftAlignedText, addManialinkListener, removeManialinkListener
+  Paginator,
+  Grid,
+  Navbar,
+  VoteWindow,
+  RecordList,
+  type GridCellFunction,
+  type GridCellObject,
+  List,
+  StaticHeader,
+  PopupWindow,
+  StaticComponent,
+  DynamicComponent,
+  type StaticHeaderOptions,
+  type RLImage,
+  type RLRecord,
+  components,
+  componentIds,
+  icons,
+  raceConfig,
+  resultConfig,
+  flagIcons,
+  utilIds,
+  addKeyListener,
+  removeKeyListener,
+  rightAlignedText,
+  getCpTypes,
+  closeButton,
+  horizontallyCenteredText,
+  staticButton,
+  fullScreenListener,
+  centeredText,
+  addLoadListener,
+  leftAlignedText,
+  addManialinkListener,
+  removeManialinkListener,
 }
-

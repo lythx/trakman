@@ -5,7 +5,6 @@ import fetch from 'node-fetch'
 type Tag = 'warn' | 'fatal' | 'debug' | 'error' | 'info' | 'trace'
 
 export abstract class Logger {
-
   private static logLevel: number = 3
   private static readonly consoleColours = {
     black: '\u001b[30m',
@@ -15,17 +14,17 @@ export abstract class Logger {
     blue: '\u001b[34m',
     magenta: '\u001b[35m',
     cyan: '\u001b[36m',
-    white: '\u001b[37m'
+    white: '\u001b[37m',
   } as const
   private static readonly discordColours = {
     black: 0x000000,
-    red: 0xFF0000,
-    green: 0x00FF00,
-    yellow: 0xFFFF00,
-    blue: 0x0000FF,
-    magenta: 0xFF00FF,
-    cyan: 0x00FFFF,
-    white: 0xFFFFFF
+    red: 0xff0000,
+    green: 0x00ff00,
+    yellow: 0xffff00,
+    blue: 0x0000ff,
+    magenta: 0xff00ff,
+    cyan: 0x00ffff,
+    white: 0xffffff,
   }
   private static readonly separator: string = '---------------------------------------------'
   private static readonly logDir: string = './logs'
@@ -34,38 +33,38 @@ export abstract class Logger {
       level: 1,
       colour: this.consoleColours.red,
       files: [`${this.logDir}/fatal.log`, `${this.logDir}/error.log`, `${this.logDir}/combined.log`],
-      discordColour: this.discordColours.red
+      discordColour: this.discordColours.red,
     },
     error: {
       level: 1,
       colour: this.consoleColours.red,
       files: [`${this.logDir}/error.log`, `${this.logDir}/combined.log`],
-      discordColour: this.discordColours.red
+      discordColour: this.discordColours.red,
     },
     warn: {
       level: 2,
       colour: this.consoleColours.yellow,
       files: [`${this.logDir}/warn.log`, `${this.logDir}/combined.log`],
-      discordColour: this.discordColours.yellow
+      discordColour: this.discordColours.yellow,
     },
     info: {
       level: 3,
       colour: this.consoleColours.green,
       files: [`${this.logDir}/info.log`, `${this.logDir}/combined.log`],
-      discordColour: this.discordColours.green
+      discordColour: this.discordColours.green,
     },
     trace: {
       level: 4,
       colour: this.consoleColours.magenta,
       files: [`${this.logDir}/trace.log`, `${this.logDir}/combined.log`],
-      discordColour: this.discordColours.magenta
+      discordColour: this.discordColours.magenta,
     },
     debug: {
       level: 5,
       colour: this.consoleColours.cyan,
       files: [`${this.logDir}/debug.log`, `${this.logDir}/combined.log`],
-      discordColour: this.discordColours.cyan
-    }
+      discordColour: this.discordColours.cyan,
+    },
   }
   private static readonly users: string[] = process.env.DISCORD_TAGGED_USERS?.split(',') ?? []
   private static readonly thumbs: string[] = process.env.DISCORD_EMBED_IMAGES?.split(',') ?? []
@@ -84,35 +83,50 @@ export abstract class Logger {
     const envLogLevel = Number(process.env.LOG_LEVEL)
     if (isNaN(envLogLevel)) {
       this.warn(
-        `LOG_LEVEL is undefined or not a number, default value (${this.logLevel})` + ` will be used. Check your .env file to change it`)
+        `LOG_LEVEL is undefined or not a number, default value (${this.logLevel})` +
+          ` will be used. Check your .env file to change it`
+      )
     } else if (envLogLevel < 0 || envLogLevel > 5) {
       this.warn(
-        `LOG_LEVEL needs to be >=0 and <=5, received ${envLogLevel}.` + ` Default value (${this.logLevel}) will be used. Check your .env file to change it`)
+        `LOG_LEVEL needs to be >=0 and <=5, received ${envLogLevel}.` +
+          ` Default value (${this.logLevel}) will be used. Check your .env file to change it`
+      )
     } else {
       this.logLevel = envLogLevel
     }
     await fs.mkdir(this.logDir).catch((err: Error): void => {
-      if (!err.message.startsWith('EEXIST') && err.name !== "EEXIST") { // ignore dir exists error
+      if (!err.message.startsWith('EEXIST') && err.name !== 'EEXIST') {
+        // ignore dir exists error
         throw new Error(`Error while creating log directory\n${err.message}\n\n${err.stack}`)
       }
     })
     process.on('uncaughtException', (err: Error): void => {
-      void this.fatal('Uncaught exception occurred: ', err.message,
-        ...(err.stack === undefined ? '' : err.stack.split('\n'))) // indent fix
+      void this.fatal(
+        'Uncaught exception occurred: ',
+        err.message,
+        ...(err.stack === undefined ? '' : err.stack.split('\n'))
+      ) // indent fix
     })
     process.on('unhandledRejection', (err: Error): void => {
-      void this.fatal('Unhandled rejection occurred: ', err.message,
-        ...(err.stack === undefined ? '' : err.stack.split('\n')))
+      void this.fatal(
+        'Unhandled rejection occurred: ',
+        err.message,
+        ...(err.stack === undefined ? '' : err.stack.split('\n'))
+      )
     })
     if (this.useDiscord) {
       const envDcLog = Number(process.env.DISCORD_LOG_LEVEL)
       const envDcWebhook = process.env.DISCORD_WEBHOOK_URL
       if (isNaN(envDcLog)) {
         this.warn(
-          `DISCORD_LOG_LEVEL is undefined or not a number, ` + `default value (${this.discordLogLevel}) will be used. Check your .env file to change it`)
+          `DISCORD_LOG_LEVEL is undefined or not a number, ` +
+            `default value (${this.discordLogLevel}) will be used. Check your .env file to change it`
+        )
       } else if (envDcLog < 0 || envDcLog > 5) {
         this.warn(
-          `DISCORD_LOG_LEVEL needs to be >=0 and <=5, received ${envDcLog}. ` + `Default value (${this.discordLogLevel}) will be used. Check your .env file to change it`)
+          `DISCORD_LOG_LEVEL needs to be >=0 and <=5, received ${envDcLog}. ` +
+            `Default value (${this.discordLogLevel}) will be used. Check your .env file to change it`
+        )
       } else {
         this.discordLogLevel = envDcLog
       }
@@ -128,7 +142,9 @@ export abstract class Logger {
    * @param lines Message lines
    */
   static async fatal(...lines: any[]): Promise<void> {
-    if (this.crashed) { return }
+    if (this.crashed) {
+      return
+    }
     this.crashed = true
     // In case discord message hangs the process it exits after 10 seconds anyway
     setTimeout(() => process.exit(1), 10000)
@@ -141,7 +157,9 @@ export abstract class Logger {
    * @param lines Message lines
    */
   static error(...lines: any[]): void {
-    if (this.crashed) { return }
+    if (this.crashed) {
+      return
+    }
     void this.writeLog('error', this.getLocation(), this.getDateString(), lines)
   }
 
@@ -150,7 +168,9 @@ export abstract class Logger {
    * @param lines Message lines
    */
   static warn(...lines: any[]): void {
-    if (this.crashed) { return }
+    if (this.crashed) {
+      return
+    }
     void this.writeLog('warn', this.getLocation(), this.getDateString(), lines)
   }
 
@@ -159,7 +179,9 @@ export abstract class Logger {
    * @param lines Message lines
    */
   static info(...lines: any[]): void {
-    if (this.crashed) { return }
+    if (this.crashed) {
+      return
+    }
     void this.writeLog('info', this.getLocation(), this.getDateString(), lines)
   }
 
@@ -168,7 +190,9 @@ export abstract class Logger {
    * @param lines Message lines
    */
   static debug(...lines: any[]): void {
-    if (this.crashed) { return }
+    if (this.crashed) {
+      return
+    }
     void this.writeLog('debug', this.getLocation(), this.getDateString(), lines)
   }
 
@@ -177,7 +201,9 @@ export abstract class Logger {
    * @param lines Message lines
    */
   static trace(...lines: any[]): void {
-    if (this.crashed) { return }
+    if (this.crashed) {
+      return
+    }
     void this.writeLog('trace', this.getLocation(), this.getDateString(), lines)
   }
 
@@ -191,7 +217,7 @@ export abstract class Logger {
       this.consoleQueue.push(message)
     }
     if (this.consoleQueue.length > 1000) {
-      this.warn("Command input mode has been on for too long, re-enabling console logging")
+      this.warn('Command input mode has been on for too long, re-enabling console logging')
     }
     if (force || this.consoleOn || this.consoleQueue.length > 1000) {
       this.consoleOn = true
@@ -215,11 +241,13 @@ export abstract class Logger {
   private static getDateString(): string {
     const d = new Date()
     const ret = d.toUTCString()
-    return ret.substring(5, ret.length - 4) + `.${String(d.getMilliseconds()).padStart(3, "0")}`
+    return ret.substring(5, ret.length - 4) + `.${String(d.getMilliseconds()).padStart(3, '0')}`
   }
 
   private static async writeLog(tag: Tag, location: string, date: string, lines: any[], force = false): Promise<void> {
-    if (lines.length === 0 || this.logTypes[tag].level > this.logLevel) { return }
+    if (lines.length === 0 || this.logTypes[tag].level > this.logLevel) {
+      return
+    }
     if (!this.consoleDisabled) {
       this.consoleLog(this.getConsoleString(tag, lines, location, date), force)
     }
@@ -234,27 +262,31 @@ export abstract class Logger {
     }
     if (this.useDiscord && this.logTypes[tag].level <= this.discordLogLevel) {
       const message = JSON.stringify({
-        content: tag === 'fatal' ? this.users.join(' ') : (this.isFirstLog ? this.separator : undefined),
-        embeds: [{
-          author: {
-            name: this.embedTitle,
-            url: this.embedTitleUrl,
-            icon_url: this.embedTitleIconUrl
+        content: tag === 'fatal' ? this.users.join(' ') : this.isFirstLog ? this.separator : undefined,
+        embeds: [
+          {
+            author: {
+              name: this.embedTitle,
+              url: this.embedTitleUrl,
+              icon_url: this.embedTitleIconUrl,
+            },
+            title: `${tag.toUpperCase()} on server ${tm.utils.strip(tm.config.server.name, true)}`,
+            timestamp: new Date(),
+            color: this.logTypes[tag].discordColour,
+            thumbnail: {
+              url: this.thumbs.length === 0 ? undefined : this.thumbs[~~(Math.random() * this.thumbs.length)],
+            },
+            footer: {
+              text: `📅`,
+            },
+            fields: [
+              {
+                name: `➡️ ${location}`,
+                value: `⚠️ ${str}`,
+              },
+            ],
           },
-          title: `${tag.toUpperCase()} on server ${tm.utils.strip(tm.config.server.name, true)}`,
-          timestamp: new Date(),
-          color: this.logTypes[tag].discordColour,
-          thumbnail: {
-            url: this.thumbs.length === 0 ? undefined : this.thumbs[~~(Math.random() * this.thumbs.length)]
-          },
-          footer: {
-            text: `📅`
-          },
-          fields: [{
-            name: `➡️ ${location}`,
-            value: `⚠️ ${str}`
-          }]
-        }]
+        ],
       })
       await this.sendDiscordMessage(message)
       this.isFirstLog = false
@@ -265,8 +297,8 @@ export abstract class Logger {
     const response: Response | Error = await fetch(process.env.DISCORD_WEBHOOK_URL!, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: message
-    }).catch(e => e)
+      body: message,
+    }).catch((e) => e)
     if (response instanceof Error) {
       this.error('Could not send message to Discord.', response)
       return
@@ -299,10 +331,12 @@ export abstract class Logger {
     if (stack === undefined) {
       return ''
     }
-    let s: string[] = stack.split('\n')[3].split(' ').filter(a => a !== '')
+    let s: string[] = stack
+      .split('\n')[3]
+      .split(' ')
+      .filter((a) => a !== '')
     s = s[s.length - 1].split('/')
     const str: string = s[s.length - 1]
     return str.split(':').slice(0, 2).join(':')
   }
-
 }

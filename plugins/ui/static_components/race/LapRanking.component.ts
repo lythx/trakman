@@ -3,12 +3,21 @@
  * @since 0.1
  */
 
-import { componentIds, RecordList, StaticComponent, StaticHeader } from '../../UI.js'
+import { componentIds, raceConfig, RecordList, StaticComponent, StaticHeader } from '../../UI.js'
 
-import config from './LapRanking.config.js'
+import userConfig from './LapRanking.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 7,
+  entryHeight: 2.15,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  topCount: 3,
+  displayNoRecordEntry: true,
+  hidePanel: true,
+})
 
 export default class LapRanking extends StaticComponent {
-
   private readonly header: StaticHeader
   private recordList!: RecordList
 
@@ -18,13 +27,19 @@ export default class LapRanking extends StaticComponent {
     this.getRecordList()
     this.renderOnEvent('LapRecord', () => this.display())
     this.renderOnEvent('PlayerJoin', (info: tm.JoinInfo) => {
-      if (tm.records.getLap(info.login) !== undefined) { return this.display() }
+      if (tm.records.getLap(info.login) !== undefined) {
+        return this.display()
+      }
     })
     this.renderOnEvent('PlayerLeave', (info: tm.LeaveInfo) => {
-      if (tm.records.getLap(info.login) !== undefined) { return this.display() }
+      if (tm.records.getLap(info.login) !== undefined) {
+        return this.display()
+      }
     })
     this.renderOnEvent('PlayerDataUpdated', (info) => {
-      if (tm.records.lap.some(a => info.some(b => b.login === a.login))) { return this.display() }
+      if (tm.records.lap.some((a) => info.some((b) => b.login === a.login))) {
+        return this.display()
+      }
     })
     this.renderOnEvent('LocalRecordsRemoved', () => this.display())
     this.onPanelHide((player) => {
@@ -37,8 +52,12 @@ export default class LapRanking extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
-    if (this.reduxModeEnabled) { return this.displayToPlayer('')?.xml }
+    if (!this.isDisplayed) {
+      return
+    }
+    if (this.reduxModeEnabled) {
+      return this.displayToPlayer('')?.xml
+    }
     const arr = []
     for (const player of tm.players.list) {
       arr.push(this.displayToPlayer(player.login))
@@ -47,14 +66,24 @@ export default class LapRanking extends StaticComponent {
   }
 
   private getRecordList() {
-    let entries = config.entries
-    let height = this.getHeight()
+    const entries = config.entries
+    const height = this.getHeight()
     this.recordList?.destroy?.()
-    this.recordList = new RecordList('race', this.id, config.width,
-      height - (this.header.options.height + config.margin), entries, this.side, config.topCount,
-      tm.records.maxLocalsAmount, config.displayNoRecordEntry)
+    this.recordList = new RecordList(
+      'race',
+      this.id,
+      config.width,
+      height - (this.header.options.height + config.margin),
+      entries,
+      this.side,
+      config.topCount,
+      tm.records.maxLocalsAmount,
+      config.displayNoRecordEntry
+    )
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
-      if (this.reduxModeEnabled) { return }
+      if (this.reduxModeEnabled) {
+        return
+      }
       const obj = this.displayToPlayer(info.login)
       if (obj !== undefined) {
         tm.sendManialink(obj.xml, obj.login)
@@ -68,7 +97,9 @@ export default class LapRanking extends StaticComponent {
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
@@ -76,23 +107,26 @@ export default class LapRanking extends StaticComponent {
       xml: `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
-        ${this.header.constructXml(config.title, config.icon, this.side,
-        { actionId:/*TODO MAKE WINDOW FOR THIS */ componentIds.localCps })}
+        ${this.header.constructXml(config.title, config.icon, this.side, {
+          actionId: /*TODO MAKE WINDOW FOR THIS */ componentIds.localCps,
+        })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
-          ${this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, tm.records.lap
-      .map(a => ({
-        name: a.nickname,
-        time: a.time,
-        date: a.date,
-        checkpoints: a.checkpoints,
-        login: a.login
-      }))
-      .slice(0, tm.records.maxLocalsAmount))}
+          ${this.recordList.constructXml(
+            this.reduxModeEnabled ? undefined : login,
+            tm.records.lap
+              .map((a) => ({
+                name: a.nickname,
+                time: a.time,
+                date: a.date,
+                checkpoints: a.checkpoints,
+                login: a.login,
+              }))
+              .slice(0, tm.records.maxLocalsAmount)
+          )}
         </frame>
       </frame>
     </manialink>`,
-      login
+      login,
     }
   }
-
 }

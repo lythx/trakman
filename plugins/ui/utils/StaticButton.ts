@@ -1,19 +1,31 @@
 import { horizontallyCenteredText } from './TextUtils.js'
-import config from './StaticButton.config.js'
+import userConfig from './StaticButton.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  yOffsetBig: 2.2,
+  yOffset: 2.4,
+  yOffsetBottom: 3.65,
+  textScale: 0.36,
+  textScaleBig: 0.5,
+  padding: 0.6,
+  iconWidth: 1.8,
+  iconHeight: 1.8,
+  topPadding: 0.2,
+})
 
 interface StaticButtonOptions {
-  equalTexts?: boolean,
-  actionId?: number,
-  link?: string,
-  manialink?: string,
-  iconWidth?: number,
-  iconHeight?: number,
-  topPadding?: number,
-  addPlayerId?: boolean,
-  background?: string,
-  text1Scale?: number,
-  text2Scale?: number,
-  text1PositionOffset?: number,
+  equalTexts?: boolean
+  actionId?: number
+  link?: string
+  manialink?: string
+  iconWidth?: number
+  iconHeight?: number
+  topPadding?: number
+  addPlayerId?: boolean
+  background?: string
+  text1Scale?: number
+  text2Scale?: number
+  text1PositionOffset?: number
   text2PositionOffset?: number
 }
 
@@ -27,28 +39,36 @@ interface StaticButtonOptions {
  * @param options Optional parameters
  * @returns Button XML string
  */
-export default function(iconUrl: string, text1: string, text2: string, width: number, height: number,
-  options?: StaticButtonOptions): string {
-  const t1: string = options?.equalTexts ? horizontallyCenteredText(text1, width, height, {
-    yOffset: config.yOffset + (options?.text1PositionOffset ?? 0),
-    textScale: options?.text1Scale ?? config.textScale,
-    padding: config.padding
-  }) : horizontallyCenteredText(text1, width, height, {
-    yOffset: config.yOffsetBig + (options?.text1PositionOffset ?? 0),
-    textScale: options?.text1Scale ?? config.textScaleBig,
-    padding: config.padding
-  })
+export default function (
+  iconUrl: string,
+  text1: string,
+  text2: string,
+  width: number,
+  height: number,
+  options?: StaticButtonOptions
+): string {
+  const t1: string = options?.equalTexts
+    ? horizontallyCenteredText(text1, width, height, {
+        yOffset: config.yOffset + (options?.text1PositionOffset ?? 0),
+        textScale: options?.text1Scale ?? config.textScale,
+        padding: config.padding,
+      })
+    : horizontallyCenteredText(text1, width, height, {
+        yOffset: config.yOffsetBig + (options?.text1PositionOffset ?? 0),
+        textScale: options?.text1Scale ?? config.textScaleBig,
+        padding: config.padding,
+      })
   const actionId: string = options?.actionId === undefined ? '' : `action="${options.actionId}"`
   const link: string = options?.link === undefined ? '' : `url="${options.link}"`
   const manialink: string = options?.manialink === undefined ? '' : `manialink="${options.manialink}"`
   const addPlayerId: string = options?.addPlayerId === true ? 'addplayerid="1"' : ''
   return `<quad posn="0 0 1" sizen="${width} ${height}" bgcolor="${options?.background ?? config.background}" ${actionId} ${link} ${manialink} ${addPlayerId}/>
   <quad posn="${(width - (options?.iconWidth ?? config.iconWidth)) / 2} ${-(options?.topPadding ?? config.topPadding)} 5" 
-  sizen="${(options?.iconWidth ?? config.iconWidth)} ${(options?.iconHeight ?? config.iconHeight)}" image="${iconUrl}"/>
+  sizen="${options?.iconWidth ?? config.iconWidth} ${options?.iconHeight ?? config.iconHeight}" image="${iconUrl}"/>
   ${t1}
   ${horizontallyCenteredText(text2, width, height, {
     yOffset: config.yOffsetBottom + (options?.text2PositionOffset ?? 0),
     textScale: options?.text2Scale ?? config.textScale,
-    padding: config.padding
+    padding: config.padding,
   })}`
 }

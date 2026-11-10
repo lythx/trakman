@@ -2,11 +2,34 @@
  * @author lythx
  * @since 1.2
  */
-import { centeredText, componentIds, Grid, type GridCellFunction, StaticComponent, StaticHeader } from '../../UI.js'
-import config from './TeamScore.config.js'
+import {
+  centeredText,
+  componentIds,
+  Grid,
+  type GridCellFunction,
+  raceConfig,
+  StaticComponent,
+  StaticHeader,
+} from '../../UI.js'
+import userConfig from './TeamScore.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 5.5,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  text: {
+    specialFont: true,
+    textScale: 0.5,
+  },
+  colours: {
+    left: tm.utils.palette.purple + '8',
+    middle: raceConfig.background,
+    right: tm.utils.palette.red + '8',
+  },
+  hidePanel: true,
+})
 
 export default class TeamScore extends StaticComponent {
-
   private readonly header: StaticHeader
   private readonly grid: Grid
   private xml: string = ''
@@ -14,8 +37,13 @@ export default class TeamScore extends StaticComponent {
   constructor(private maxScore = tm.rounds.teamsPointsLimit) {
     super(componentIds.teamScore)
     this.header = new StaticHeader('race')
-    this.grid = new Grid(config.width + config.margin * 2, config.height + config.margin - this.header.options.height,
-      new Array(3).fill(1), [1], { margin: config.margin })
+    this.grid = new Grid(
+      config.width + config.margin * 2,
+      config.height + config.margin - this.header.options.height,
+      new Array(3).fill(1),
+      [1],
+      { margin: config.margin }
+    )
     tm.addListener('BeginMap', () => {
       this.maxScore = tm.rounds.teamsPointsLimit
     })
@@ -32,19 +60,23 @@ export default class TeamScore extends StaticComponent {
   }
 
   display(): string | void {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     this.constructXml()
     return this.xml
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
     return {
       xml: this.xml,
-      login
+      login,
     }
   }
 
@@ -60,7 +92,7 @@ export default class TeamScore extends StaticComponent {
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1"/>
         ${this.header.constructXml(config.title, config.icon, this.side)}
-        <frame posn="${-config.margin} ${-(this.header.options.height)} 1">
+        <frame posn="${-config.margin} ${-this.header.options.height} 1">
           ${this.grid.constructXml([cell, cell, cell])}
         </frame>
       </frame>
@@ -70,5 +102,4 @@ export default class TeamScore extends StaticComponent {
   protected onPositionChange(): void {
     this.display()
   }
-
 }

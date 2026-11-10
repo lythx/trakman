@@ -1,10 +1,10 @@
-import { Client } from "./client/Client.js"
-import { Logger } from "./Logger.js"
+import { Client } from './client/Client.js'
+import { Logger } from './Logger.js'
 import { GameService } from './services/GameService.js'
 
 const eventListeners: {
-  event: keyof tm.Events,
-  callback: ((params: any) => void | Promise<void>)
+  event: keyof tm.Events
+  callback: (params: any) => void | Promise<void>
 }[] = []
 let controllerReady: boolean = false
 
@@ -35,22 +35,26 @@ const initialize = async (): Promise<void> => {
  * @param callback Function to execute on event
  * @param prepend If set to true puts the listener on the beginning of the array (it will get executed before other listeners)
  */
-const addListener = <T extends keyof tm.Events>(event: T | (keyof tm.Events)[],
-  callback: ((params: T extends keyof tm.Events ? tm.Events[T] : any) => void | Promise<void>),
-  prepend?: true): void => {
+const addListener = <T extends keyof tm.Events>(
+  event: T | (keyof tm.Events)[],
+  callback: (params: T extends keyof tm.Events ? tm.Events[T] : any) => void | Promise<void>,
+  prepend?: true
+): void => {
   const arr: {
-    event: keyof tm.Events,
-    callback: ((params: any) => void)
+    event: keyof tm.Events
+    callback: (params: any) => void
   }[] = []
   if (Array.isArray(event)) {
-    arr.push(...event.map(a => ({
-      event: a,
-      callback
-    })))
+    arr.push(
+      ...event.map((a) => ({
+        event: a,
+        callback,
+      }))
+    )
   } else {
     arr.push({
       event: event,
-      callback: callback
+      callback: callback,
     })
   }
   prepend === true ? eventListeners.unshift(...arr) : eventListeners.push(...arr)
@@ -61,10 +65,10 @@ const addListener = <T extends keyof tm.Events>(event: T | (keyof tm.Events)[],
  * @param callback Callback function of the listener to remove
  */
 const removeListener = (callback: Function): void => {
-  let index: number = eventListeners.findIndex(a => a.callback === callback)
+  let index: number = eventListeners.findIndex((a) => a.callback === callback)
   while (index !== -1) {
     eventListeners.splice(index, 1)
-    index = eventListeners.findIndex(a => a.callback === callback)
+    index = eventListeners.findIndex((a) => a.callback === callback)
   }
 }
 
@@ -74,8 +78,10 @@ const removeListener = (callback: Function): void => {
  * @param event  Event name or array of event names to listen to
  * @param callback  Function to execute when the event fires
  */
-const once = <T extends keyof tm.Events>(event: T | (keyof tm.Events)[],
-  callback: ((params: T extends keyof tm.Events ? tm.Events[T] : any) => void | Promise<void>)): void => {
+const once = <T extends keyof tm.Events>(
+  event: T | (keyof tm.Events)[],
+  callback: (params: T extends keyof tm.Events ? tm.Events[T] : any) => void | Promise<void>
+): void => {
   const onceCallback = async (params: any) => {
     removeListener(onceCallback)
     await callback(params)
@@ -90,13 +96,15 @@ const once = <T extends keyof tm.Events>(event: T | (keyof tm.Events)[],
  * @param params callback params
  */
 const emit = <T extends keyof tm.Events>(event: T, params: tm.Events[T]): void => {
-  if (!controllerReady) { return }
-  const matchingEvents = eventListeners.filter(a => a.event === event || a.event === '*')
+  if (!controllerReady) {
+    return
+  }
+  const matchingEvents = eventListeners.filter((a) => a.event === event || a.event === '*')
   for (const listener of matchingEvents) {
     if (listener.event === '*') {
       listener.callback({
         event,
-        params
+        params,
       })
     } else {
       listener.callback(params)
@@ -109,5 +117,5 @@ export const Events = {
   addListener,
   removeListener,
   once,
-  emit
+  emit,
 }

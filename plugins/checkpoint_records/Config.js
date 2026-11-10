@@ -1,7 +1,8 @@
 import { palette as p } from '../../config/PrefixesAndPalette.js'
 
 export default {
-  isEnabled: true, // Using DB client makes the plugin a bit faster due to high amount of database queries
+  isEnabled: true,
+  // Using DB client makes the plugin a bit faster due to high amount of database queries
   // Program can run only run limited amount of clients, the process will hang otherwise
   useDBClient: true,
   noCpRecords: `${p.error}You have no checkpoint records on the ongoing map.`,

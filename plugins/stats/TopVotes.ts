@@ -1,32 +1,45 @@
-import config from './Config.js'
+import userConfig from './Config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  votesCount: 100000,
+})
 
 let onlineList: {
-  readonly login: string,
-  nickname: string,
+  readonly login: string
+  nickname: string
   count: number
 }[] = []
 let initialVotes: tm.Vote[] = []
 let topList: {
-  readonly login: string,
-  nickname: string,
+  readonly login: string
+  nickname: string
   count: number
 }[] = []
-const updateListeners: ((changes: readonly Readonly<{
-  login: string,
-  nickname: string,
-  count: number
-}>[]) => void)[] = []
-const nicknameChangeListeners: ((changes: readonly Readonly<{
-  login: string,
-  nickname: string
-}>[]) => void)[] = []
+const updateListeners: ((
+  changes: readonly Readonly<{
+    login: string
+    nickname: string
+    count: number
+  }>[]
+) => void)[] = []
+const nicknameChangeListeners: ((
+  changes: readonly Readonly<{
+    login: string
+    nickname: string
+  }>[]
+) => void)[] = []
 
 const addToOnlineList = async (login: string, nickname: string) => {
   const id: number | undefined = await tm.db.getPlayerId(login)
-  const res: {
-    count: number
-  }[] | Error = await tm.db.query(`SELECT count(*)::int FROM votes
-      WHERE player_id=$1`, id)
+  const res:
+    | {
+        count: number
+      }[]
+    | Error = await tm.db.query(
+    `SELECT count(*)::int FROM votes
+      WHERE player_id=$1`,
+    id
+  )
   if (res instanceof Error) {
     tm.log.error(`Failed to fetch vote count for player ${login}`, res.message, res.stack)
     return
@@ -34,7 +47,7 @@ const addToOnlineList = async (login: string, nickname: string) => {
   onlineList.push({
     login,
     nickname,
-    count: res[0].count
+    count: res[0].count,
   })
 }
 
@@ -49,28 +62,32 @@ const initialize = async () => {
     await tm.log.fatal('Failed to fetch top votes', res.message, res.stack)
     return
   }
-  topList.push(...res.filter(a => a.count !== 0))
+  topList.push(...res.filter((a) => a.count !== 0))
   for (const e of tm.players.list) {
     await addToOnlineList(e.login, e.nickname)
   }
-  for (const e of updateListeners) { e(topList) }
-  for (const e of nicknameChangeListeners) { e(topList) }
+  for (const e of updateListeners) {
+    e(topList)
+  }
+  for (const e of nicknameChangeListeners) {
+    e(topList)
+  }
 }
 
 tm.addListener('PlayerDataUpdated', (info) => {
   const changedObjects: {
-    login: string,
+    login: string
     nickname: string
   }[] = []
   for (const e of topList) {
-    const newNickname = info.find(a => a.login === e.login)?.nickname
+    const newNickname = info.find((a) => a.login === e.login)?.nickname
     if (newNickname !== undefined) {
       e.nickname = newNickname
       changedObjects.push(e)
     }
   }
   for (const e of onlineList) {
-    const newNickname = info.find(a => a.login === e.login)?.nickname
+    const newNickname = info.find((a) => a.login === e.login)?.nickname
     if (newNickname !== undefined) {
       e.nickname = newNickname
       changedObjects.push(e)
@@ -89,13 +106,17 @@ tm.addListener('BeginMap', (): void => {
 })
 
 const handleVote = (vote: tm.Vote) => {
-  if (!initialVotes.some(a => a.login === vote.login)) {
+  if (!initialVotes.some((a) => a.login === vote.login)) {
     initialVotes.push(vote)
-    const obj = onlineList.find(a => a.login === vote.login)
-    if (obj === undefined) { return }
+    const obj = onlineList.find((a) => a.login === vote.login)
+    if (obj === undefined) {
+      return
+    }
     obj.count++
-    if (topList.length !== 0 && topList.length >= config.votesCount && obj.count <= topList[topList.length - 1].count) { return }
-    const entry = topList.find(a => a.login === obj.login)
+    if (topList.length !== 0 && topList.length >= config.votesCount && obj.count <= topList[topList.length - 1].count) {
+      return
+    }
+    const entry = topList.find((a) => a.login === obj.login)
     if (entry !== undefined) {
       entry.count = obj.count
       topList.sort((a, b) => b.count - a.count)
@@ -116,7 +137,9 @@ tm.addListener('Startup', async (): Promise<void> => {
 })
 
 tm.addListener('KarmaVote', (info): void => {
-  for (const e of info) { handleVote(e) }
+  for (const e of info) {
+    handleVote(e)
+  }
 })
 
 tm.addListener('PlayerJoin', (info): void => {
@@ -124,7 +147,7 @@ tm.addListener('PlayerJoin', (info): void => {
 })
 
 tm.addListener('PlayerLeave', (info): void => {
-  onlineList = onlineList.filter(a => a.login !== info.login)
+  onlineList = onlineList.filter((a) => a.login !== info.login)
 })
 
 tm.addListener(['MapAdded', 'MapRemoved'], () => {
@@ -139,13 +162,12 @@ tm.addListener(['MapAdded', 'MapRemoved'], () => {
  * @since 0.3
  */
 export const topVotes = {
-
   /**
    * List of players sorted by their votes count
    */
   get list(): readonly Readonly<{
-    login: string,
-    nickname: string,
+    login: string
+    nickname: string
     count: number
   }>[] {
     return topList
@@ -155,11 +177,15 @@ export const topVotes = {
    * Add a callback function to execute on top votes list update
    * @param callback Function to execute on event. It takes an array of updated objects as a parameter
    */
-  onUpdate(callback: (changes: readonly Readonly<{
-    login: string,
-    nickname: string,
-    count: number
-  }>[]) => void): void {
+  onUpdate(
+    callback: (
+      changes: readonly Readonly<{
+        login: string
+        nickname: string
+        count: number
+      }>[]
+    ) => void
+  ): void {
     updateListeners.push(callback)
   },
 
@@ -167,11 +193,14 @@ export const topVotes = {
    * Add a callback function to execute on player nickname change
    * @param callback Function to execute on event. It takes an array of objects containing login and nickname as a parameter
    */
-  onNicknameChange(callback: (changes: readonly Readonly<{
-    login: string,
-    nickname: string
-  }>[]) => void): void {
+  onNicknameChange(
+    callback: (
+      changes: readonly Readonly<{
+        login: string
+        nickname: string
+      }>[]
+    ) => void
+  ): void {
     nicknameChangeListeners.push(callback)
-  }
-
+  },
 }

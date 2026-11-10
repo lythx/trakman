@@ -1,6 +1,6 @@
 let listeners: {
-  callback: ((info: tm.ManialinkClickInfo, actionIdOffset: number) => void),
-  actionId: number,
+  callback: (info: tm.ManialinkClickInfo, actionIdOffset: number) => void
+  actionId: number
   range?: number
 }[] = []
 
@@ -16,21 +16,29 @@ function addManialinkListener(actionId: number, callback: (info: tm.ManialinkCli
  * @param range Range of Action IDs (inludes starting Action ID)
  * @param callback Callback function, it takes ManialinkClickInfo and id offset as a parameter
  */
-function addManialinkListener(actionId: number, range: number,
-  callback: (info: tm.ManialinkClickInfo, actionIdOffset: number) => void): void
-function addManialinkListener(actionId: number, rangeOrCallback: ((info: tm.ManialinkClickInfo) => void) | number,
-  callback?: (info: tm.ManialinkClickInfo, actionIdOffset: number) => void): void {
+function addManialinkListener(
+  actionId: number,
+  range: number,
+  callback: (info: tm.ManialinkClickInfo, actionIdOffset: number) => void
+): void
+function addManialinkListener(
+  actionId: number,
+  rangeOrCallback: ((info: tm.ManialinkClickInfo) => void) | number,
+  callback?: (info: tm.ManialinkClickInfo, actionIdOffset: number) => void
+): void {
   if (typeof rangeOrCallback === 'number') {
-    if (rangeOrCallback < 1) { throw new Error('Manialink listener range must be > 0') }
+    if (rangeOrCallback < 1) {
+      throw new Error('Manialink listener range must be > 0')
+    }
     listeners.push({
       actionId,
       range: rangeOrCallback,
-      callback: callback as any
+      callback: callback as any,
     })
   } else {
     listeners.push({
       actionId,
-      callback: rangeOrCallback
+      callback: rangeOrCallback,
     })
   }
 }
@@ -40,7 +48,7 @@ function addManialinkListener(actionId: number, rangeOrCallback: ((info: tm.Mani
  * @param callback Reference to function to remove
  */
 const removeManialinkListener = (callback: (info: tm.ManialinkClickInfo) => void) => {
-  listeners = listeners.filter(a => callback !== a.callback)
+  listeners = listeners.filter((a) => callback !== a.callback)
 }
 
 tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {

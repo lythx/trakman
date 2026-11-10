@@ -16,7 +16,7 @@ export default {
     colour: '$' + p.yellow
   }, {
     amount: 200,
-    colour: ['$03A', '$319', '$519', '$709', '$81A']
-  } // Gradient
+    colour: ['$03A', '$319', '$519', '$709', '$81A'] // Gradient
+  }
   ]
 }

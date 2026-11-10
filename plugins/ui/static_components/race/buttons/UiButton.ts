@@ -1,7 +1,6 @@
-import type { ButtonData } from "./ButtonData.js"
+import type { ButtonData } from './ButtonData.js'
 
 export abstract class UiButton {
-
   abstract buttonData: ButtonData
   private static readonly replayListeners: ((buttonName: string) => void)[] = []
   private static readonly updateListeners: ((buttonData: ButtonData) => void)[] = []
@@ -44,5 +43,4 @@ export abstract class UiButton {
   public renderForPlayer(login: string, i: number, j: number, w: number, h: number): string {
     return ``
   }
-
 }
