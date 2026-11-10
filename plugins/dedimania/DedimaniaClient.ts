@@ -9,6 +9,7 @@ export class DedimaniaClient {
   private receivingResponse: boolean = false
   private sessionId: string = ''
   private _connected: boolean = false
+  private _host: string = 'dedimania.net'
   private password: string | undefined
 
   async connect(
@@ -27,6 +28,7 @@ export class DedimaniaClient {
         error: new Error(`DEDIMANIA_PASSWORD is undefined. Check your .env file to use the plugin.`),
       }
     }
+    this._host = host
     this.password = process.env.DEDIMANIA_PASSWORD
     this.disconnect()
     this.socket.connect(port, host)
@@ -40,7 +42,7 @@ export class DedimaniaClient {
         isAuthenticationError: false,
       }
     }
-    const request: DedimaniaRequest = new DedimaniaRequest('dedimania.Authenticate', [
+    const request: DedimaniaRequest = new DedimaniaRequest(this._host, 'dedimania.Authenticate', [
       {
         struct: {
           Game: { string: 'TMF' },
@@ -121,7 +123,7 @@ export class DedimaniaClient {
       return new Error('Not connected to dedimania')
     }
     this.receivingResponse = true
-    const request: DedimaniaRequest = new DedimaniaRequest(method, params, this.sessionId)
+    const request: DedimaniaRequest = new DedimaniaRequest(this._host, method, params, this.sessionId)
     this.socket.write(request.buffer)
     this.response = new DedimaniaResponse()
     const startDate: number = Date.now()
