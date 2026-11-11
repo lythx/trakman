@@ -16,4 +16,5 @@ export default {
   modifiedLapsMessage:
     `${p.dedimessage}Dedimania records will be sent in ${p.highlight}Time Attack` +
     ` ${p.dedimessage}instead of ${p.highlight}Rounds ${p.dedimessage}mode due to modified lap amount.`,
+  sendLocals: false,
 }

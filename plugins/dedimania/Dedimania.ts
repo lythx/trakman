@@ -12,6 +12,7 @@ const config = tm.utils.withDefaults(userConfig, {
   host: 'dedimania.net',
   reconnectTimeout: [15, 30, 60, 120, 240],
   updateInterval: 240,
+  sendLocals: false,
 })
 
 let currentDedis: DediRecord[] = []
@@ -521,6 +522,20 @@ if (config.isEnabled) {
       if (tm.getGameMode() !== 'Stunts') {
         tm.log.trace('Connecting to Dedimania...')
         void initialize()
+      }
+      if (config.sendLocals) {
+        fetchListeners.push(() => {
+          let i = 0
+          for (const local of tm.records.local) {
+            if (currentDedis.find((a) => a.login === local.login && a.time === local.time) !== undefined) {
+              continue
+            }
+            if (++i > config.dediCount) {
+              break
+            }
+            addRecord({ login: local.login, nickname: local.nickname } as any, local.time, local.checkpoints)
+          }
+        })
       }
     },
     true
