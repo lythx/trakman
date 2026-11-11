@@ -5,7 +5,6 @@ export class DedimaniaRequest {
   private xmlBuffer: Buffer
   private _buffer: Buffer = Buffer.from(
     'POST /Dedimania HTTP/1.1\n' +
-      'Host: dedimania.net\n' +
       'User-Agent: XMLaccess\n' +
       'Cache-Control: no-cache\n' +
       'Accept-Encoding: gzip\n' +
@@ -15,11 +14,13 @@ export class DedimaniaRequest {
 
   /**
    * Prepares XML string for a dedimania request.
+   * @param host dedimania host
    * @param method dedimania method
    * @param params parameters
    * @param sessionKey dedimania session key
    */
-  constructor(method: string, params: tm.CallParams[], sessionKey?: string) {
+  constructor(host: string, method: string, params: tm.CallParams[], sessionKey?: string) {
+    this._buffer = Buffer.concat([this._buffer, Buffer.from(`Host: ${host}\n`)])
     let xml: string = `<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>${method}</methodName><params>`
     for (const param of params) {
       const str: string | Error = this.handleParamType(param)
@@ -35,16 +36,14 @@ export class DedimaniaRequest {
     if (this.sessionKey === undefined) {
       this._buffer = Buffer.concat([
         this._buffer,
-        Buffer.from(
-          `Content-length: ${gzip.length}\r\nKeep-Alive: timeout=600, max=2000\r\nConnection: Keep-Alive\r\n\r\n`
-        ),
+        Buffer.from(`Content-length: ${gzip.length}\nKeep-Alive: timeout=600, max=2000\nConnection: Keep-Alive\n\n`),
         gzip,
       ])
     } else {
       this._buffer = Buffer.concat([
         this._buffer,
         Buffer.from(
-          `Content-length: ${gzip.length}\r\nKeep-Alive: timeout=600, max=2000\r\nConnection: Keep-Alive\r\nCookie: PHPSESSID=${this.sessionKey}\r\n\r\n`
+          `Content-length: ${gzip.length}\nKeep-Alive: timeout=600, max=2000\nConnection: Keep-Alive\nCookie: PHPSESSID=${this.sessionKey}\n\n`
         ),
         gzip,
       ])

@@ -73,7 +73,7 @@ export class DedimaniaResponse {
       }
       json = result
     })
-    if (isError !== false) {
+    if (isError) {
       return
     }
     if (json?.methodResponse?.params?.[0]?.param?.[0]?.value?.[0]?.array?.[0]?.data?.[0]?.value) {

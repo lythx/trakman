@@ -10,7 +10,7 @@ const config = tm.utils.withDefaults(userConfig, {
   syncName: true,
   port: 8002,
   host: 'dedimania.net',
-  reconnectTimeout: 120,
+  reconnectTimeout: [15, 30, 60, 120, 240],
   updateInterval: 240,
 })
 
@@ -19,6 +19,8 @@ let newDedis: DediRecord[] = []
 let isFailedAuthentication = false
 let uploadLaps = false
 let leaderboard: DediLeaderboard
+let reconnectAttempts: number = 0
+let waiting: boolean = false
 const client: DedimaniaClient = new DedimaniaClient()
 // 0 is Rounds, 1 is TimeAttack, Stunts mode records do not get sent
 const recordModeEnum: { [mode in DediLeaderboard]: number } = {
@@ -72,7 +74,10 @@ const initialize = async (): Promise<void> => {
       tm.log.error('Failed to connect to dedimania', status.error.message)
       isFailedAuthentication = true
     } else {
-      tm.log.error(`${status.error.message}.`, `Attempting to reconnect every ${config.reconnectTimeout} seconds...`)
+      tm.log.error(
+        `${status.error.message}.`,
+        `Next reconnect attempt in ${config.reconnectTimeout[Math.min(reconnectAttempts, config.reconnectTimeout.length - 1)]} seconds...`
+      )
       void reinitialize()
     }
     return
@@ -92,24 +97,14 @@ const initialize = async (): Promise<void> => {
 }
 
 const reinitialize = async (): Promise<void> => {
-  let status:
-    | true
-    | {
-        error: Error
-        isAuthenticationError: boolean
-      }
+  let status: boolean
   do {
-    await new Promise((resolve) => setTimeout(resolve, 60000))
+    status = await tryReconnect()
     updateRecordMode()
     if (leaderboard === 'Disabled') {
       return
     }
-    status = await client.connect(config.host, config.port)
-    if (status !== true && status.isAuthenticationError) {
-      tm.log.error('Failed to connect to dedimania', status.error.message)
-      return
-    }
-  } while (status !== true)
+  } while (!status)
   tm.log.info('Initialized dedimania after an error')
   updateServerPlayers()
   const current: Readonly<tm.CurrentMap> = tm.maps.current
@@ -124,6 +119,29 @@ const reinitialize = async (): Promise<void> => {
   )
 }
 
+const tryReconnect = async (): Promise<boolean> => {
+  if (waiting || client.connected) {
+    // someone else is already on it, or managed it before us
+    return false
+  }
+  waiting = true
+  await new Promise((resolve) =>
+    setTimeout(
+      resolve,
+      config.reconnectTimeout[Math.min(reconnectAttempts++, config.reconnectTimeout.length - 1)] * 1000
+    )
+  )
+  const status = await client.connect(config.host, config.port)
+  waiting = false
+  if (status !== true && status.isAuthenticationError) {
+    tm.log.error('Failed to connect to dedimania', status.error.message)
+    return false
+  }
+  tm.log.trace('Reconnected to dedimania successfully')
+  reconnectAttempts = 0
+  return true
+}
+
 const getRecords = async (id: string, name: string, environment: string, author: string): Promise<void> => {
   if (isFailedAuthentication || tm.getGameMode() === 'Stunts') {
     return
@@ -132,23 +150,13 @@ const getRecords = async (id: string, name: string, environment: string, author:
   newDedis.length = 0
   if (!client.connected) {
     emitFetchEvent(currentDedis)
-    let status:
-      | true
-      | {
-          error: Error
-          isAuthenticationError: boolean
-        }
+    let status: boolean
     do {
-      await new Promise((resolve) => setTimeout(resolve, config.reconnectTimeout * 1000))
-      status = await client.connect('dedimania.net', config.port)
-      if (status !== true && status.isAuthenticationError) {
-        tm.log.error('Failed to connect to dedimania', status.error.message)
-        return
-      }
-      if (id !== tm.maps.current.id) {
-        return
-      }
-    } while (status !== true)
+      status = await tryReconnect()
+    } while (!status)
+  }
+  if (id !== tm.maps.current.id) {
+    return
   }
   const cfg: tm.ServerInfo = tm.config.server
   const nextIds: string[] = tm.jukebox.queue.slice(0, 5).map((a) => a.id)
@@ -184,6 +192,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
       `Failed to fetch dedimania records for map ${tm.utils.strip(name)} (${id}), received error:`,
       rawDedis.message
     )
+    tryReconnect()
     return
   } else if (rawDedis?.[0]?.Records === undefined) {
     tm.log.error(`Failed to fetch dedimania records for map ${tm.utils.strip(name)} (${id}), received empty response`)
@@ -210,7 +219,14 @@ const sendRecords = async (
   author: string,
   checkpointsAmount: number
 ): Promise<void> => {
-  if (!client.connected || newDedis.length === 0) {
+  if (newDedis.length === 0) {
+    return
+  }
+  if (!client.connected) {
+    let status: boolean
+    do {
+      status = await tryReconnect()
+    } while (!status)
     return
   }
   const recordsArray: any = []
@@ -236,6 +252,7 @@ const sendRecords = async (
   ])
   if (status instanceof Error) {
     tm.log.error(`Failed to send dedimania records for map ${tm.utils.strip(name)} (${mapId})`, status.message)
+    tryReconnect()
   }
 }
 
@@ -361,6 +378,7 @@ const updateServerPlayers = (): void => {
     ])
     if (status instanceof Error) {
       tm.log.error('Failed to update dedimania status', status.message)
+      tryReconnect()
     }
   }, config.updateInterval * 1000)
 }
@@ -394,6 +412,7 @@ const playerJoin = async (player: {
       `Failed to update dedimania player information for ${tm.utils.strip(player.nickname)} (${player.login})`,
       status.message
     )
+    tryReconnect()
   }
 }
 
@@ -414,6 +433,7 @@ const playerLeave = async (player: { login: string; nickname: string }): Promise
       `Failed to update player information for ${tm.utils.strip(player.nickname)} (${player.login})`,
       status.message
     )
+    tryReconnect()
   }
 }
 
