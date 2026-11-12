@@ -177,7 +177,7 @@ export default {
       1: '$AF4REACHED',
       equal: true
     }],
-    timeExtension: 1000 * 60 * 5, // 5 minutes
+    timeExtension: tm.config.controller.defaultTimeAttackTimeLimit,
     extensionsLimit: 2, // 0 to disable limit
     resHeader: `${tm.utils.palette.highlight}Vote to $${tm.utils.palette.green}REPLAY${tm.utils.palette.highlight} the ongoing map`,
     extendHeader: `${tm.utils.palette.highlight}Vote to $${tm.utils.palette.green}EXTEND${tm.utils.palette.highlight} the time on the ongoing map`,
