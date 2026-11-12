@@ -1,4 +1,9 @@
-import config from './Config.js'
+import userConfig from './Config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  waitTime: 5,
+})
 
 /**
  * Skips the lengthy endscreen by forcing everyone into specmode
@@ -11,19 +16,19 @@ const specs: tm.Player[] = []
 if (config.isEnabled) {
   tm.addListener(`BeginMap`, (): void => {
     for (const p of tm.players.list) {
-      if (specs.find(a => a.login === p.login)) {
+      if (specs.find((a) => a.login === p.login)) {
         continue
       }
-      tm.client.callNoRes('system.multicall',
-        [{
+      tm.client.callNoRes('system.multicall', [
+        {
           method: 'ForceSpectator',
-          params: [{ string: p.login }, { int: 2 }]
+          params: [{ string: p.login }, { int: 2 }],
         },
         {
           method: 'ForceSpectator',
-          params: [{ string: p.login }, { int: 0 }]
-        }]
-      )
+          params: [{ string: p.login }, { int: 0 }],
+        },
+      ])
     }
     specs.length = 0
   })
@@ -40,16 +45,16 @@ if (config.isEnabled) {
           specs.push(p)
           continue
         }
-        tm.client.callNoRes('system.multicall',
-          [{
+        tm.client.callNoRes('system.multicall', [
+          {
             method: 'ForceSpectator',
-            params: [{ string: p.login }, { int: 1 }]
+            params: [{ string: p.login }, { int: 1 }],
           },
           {
             method: 'ForceSpectator',
-            params: [{ string: p.login }, { int: 0 }]
-          }]
-        )
+            params: [{ string: p.login }, { int: 0 }],
+          },
+        ])
       }
     }, config.waitTime * 1000)
   })

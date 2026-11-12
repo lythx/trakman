@@ -3,12 +3,55 @@
  * @since 0.1
  */
 
-import { componentIds, StaticHeader, Grid, type GridCellFunction, addManialinkListener, StaticComponent } from '../../UI.js'
-import config from './AdminPanel.config.js'
+import {
+  addManialinkListener,
+  componentIds,
+  Grid,
+  type GridCellFunction,
+  icons,
+  raceConfig,
+  StaticComponent,
+  StaticHeader,
+} from '../../UI.js'
+import userConfig from './AdminPanel.config.js'
 import { actions } from '../../../actions/Actions.js'
 
-export default class AdminPanel extends StaticComponent {
+const p = tm.utils.palette
 
+const config = tm.utils.withDefaults(userConfig, {
+  height: 5,
+  width: raceConfig.width,
+  privilege: 1,
+  margin: raceConfig.margin,
+  public: true,
+  hidePanel: true,
+  icons: {
+    players: icons.playerList,
+    restart: icons.restart,
+    previous: icons.pageLeft,
+    requeue: icons.requeue,
+    skip: icons.pageRight,
+    endRound: icons.pageLast,
+    jukebox: icons.mapList,
+  },
+  iconsHover: {
+    players: icons.playerListHover,
+    restart: icons.restartHover,
+    previous: icons.pageLeftHover,
+    requeue: icons.requeueHover,
+    skip: icons.pageRightHover,
+    endRound: icons.pageLastHover,
+    jukebox: icons.mapListHover,
+  },
+  messages: {
+    skip: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has skipped the ongoing map.`,
+    previous: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has requeued the previous map.`,
+    restart: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has restarted the ongoing map.`,
+    endRound: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has forced the ongoing round to end.`,
+  },
+})
+
+export default class AdminPanel extends StaticComponent {
   private readonly header: StaticHeader
   private xml: string = ''
   private readonly actions = {
@@ -18,54 +61,70 @@ export default class AdminPanel extends StaticComponent {
     players: 40,
     restart: 50,
     endRound: 60,
-    jukebox: 70
+    jukebox: 70,
   }
   private readonly grid: Grid
 
   constructor() {
     super(componentIds.admin)
     this.header = new StaticHeader('race')
-    this.grid = new Grid(config.width + config.margin * 2, config.height - this.header.options.height, new Array(6).fill(1), [1], { margin: config.margin })
+    this.grid = new Grid(
+      config.width + config.margin * 2,
+      config.height - this.header.options.height,
+      new Array(6).fill(1),
+      [1],
+      { margin: config.margin }
+    )
     this.renderOnEvent('PrivilegeChanged', (info) => {
       return this.displayToPlayer(info.login)
     })
-    addManialinkListener(this.id + this.actions.skip, async info => {
-      tm.sendMessage(tm.utils.strVar(config.messages.skip, {
-        title: info.title,
-        adminName: tm.utils.strip(info.nickname)
-      }), config.public ? undefined : info.login)
+    addManialinkListener(this.id + this.actions.skip, async (info) => {
+      tm.sendMessage(
+        tm.utils.strVar(config.messages.skip, {
+          title: info.title,
+          adminName: tm.utils.strip(info.nickname),
+        }),
+        config.public ? undefined : info.login
+      )
       actions.skipMap()
     })
-    addManialinkListener(this.id + this.actions.requeue, async info => {
+    addManialinkListener(this.id + this.actions.requeue, async (info) => {
       await actions.requeueMap(info.login, info.nickname, info.title)
     })
-    addManialinkListener(this.id + this.actions.previous, async info => {
-      tm.sendMessage(tm.utils.strVar(config.messages.previous, {
-        title: info.title,
-        adminName: tm.utils.strip(info.nickname)
-      }), config.public ? undefined : info.login)
+    addManialinkListener(this.id + this.actions.previous, async (info) => {
+      tm.sendMessage(
+        tm.utils.strVar(config.messages.previous, {
+          title: info.title,
+          adminName: tm.utils.strip(info.nickname),
+        }),
+        config.public ? undefined : info.login
+      )
       await tm.jukebox.add(tm.jukebox.history[0].id, info)
     })
-    addManialinkListener(this.id + this.actions.players, info => {
+    addManialinkListener(this.id + this.actions.players, (info) => {
       tm.openManialink(componentIds.playerList, info.login)
     })
-    addManialinkListener(this.id + this.actions.jukebox, info => {
+    addManialinkListener(this.id + this.actions.jukebox, (info) => {
       tm.openManialink(componentIds.jukebox, info.login)
     })
-    addManialinkListener(this.id + this.actions.restart, info => {
-      tm.sendMessage(tm.utils.strVar(config.messages.restart, {
-        title: info.title,
-        adminName: tm.utils.strip(info.nickname)
-      }), config.public ? undefined : info.login)
+    addManialinkListener(this.id + this.actions.restart, (info) => {
+      tm.sendMessage(
+        tm.utils.strVar(config.messages.restart, {
+          title: info.title,
+          adminName: tm.utils.strip(info.nickname),
+        }),
+        config.public ? undefined : info.login
+      )
       tm.client.callNoRes(`RestartChallenge`)
     })
-    addManialinkListener(this.id + this.actions.endRound, info => {
-      tm.sendMessage(tm.utils.strVar(config.messages.endRound,
-        {
+    addManialinkListener(this.id + this.actions.endRound, (info) => {
+      tm.sendMessage(
+        tm.utils.strVar(config.messages.endRound, {
           title: info.title,
-          adminName: tm.utils.strip(info.nickname)
+          adminName: tm.utils.strip(info.nickname),
         }),
-        config.public ? undefined : info.login)
+        config.public ? undefined : info.login
+      )
       tm.client.callNoRes('ForceEndRound')
     })
     this.onPanelHide((player) => {
@@ -87,21 +146,30 @@ export default class AdminPanel extends StaticComponent {
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
     const privilege: number = tm.players.get(login)?.privilege ?? 0
     if (privilege >= config.privilege) {
-      return { xml: this.xml, login }
+      return {
+        xml: this.xml,
+        login,
+      }
     } else {
-      return { xml: `<manialink id="${this.id}"></manialink>`, login }
+      return {
+        xml: `<manialink id="${this.id}"></manialink>`,
+        login,
+      }
     }
   }
 
   private constructButton(width: number, height: number, icon: string, hoverIcon: string, actionId?: number): string {
     const actionIdStr: string = actionId === undefined ? '' : ` action="${actionId + this.id}"`
-    const cover: string = actionId !== undefined ? '' : `<quad posn="0 0 5" sizen="${width} ${height}" bgcolor="${config.disabledColour}"/>`
+    const cover: string =
+      actionId !== undefined ? '' : `<quad posn="0 0 5" sizen="${width} ${height}" bgcolor="${config.disabledColour}"/>`
     return `${cover}
     <quad posn="0 0 1" sizen="${width} ${height}" bgcolor="${config.background}"/>
     <quad posn="${config.margin} -${config.margin} 2" 
@@ -125,7 +193,8 @@ export default class AdminPanel extends StaticComponent {
     const skipButton: GridCellFunction = (i, j, w, h): string =>
       this.constructButton(w, h, config.icons.skip, config.iconsHover.skip, this.actions.skip)
     const endRoundButton: GridCellFunction = (i, j, w, h): string => {
-      if ([1, 4].includes(tm.config.game.gameMode)) { // Stunts and TA have no rounds
+      if ([1, 4].includes(tm.config.game.gameMode)) {
+        // Stunts and TA have no rounds
         return this.constructButton(w, h, config.icons.jukebox, config.iconsHover.jukebox, this.actions.jukebox)
       }
       return this.constructButton(w, h, config.icons.endRound, config.iconsHover.endRound, this.actions.endRound)
@@ -136,10 +205,16 @@ export default class AdminPanel extends StaticComponent {
         <format textsize="1" textcolor="FFFF"/> 
         ${this.header.constructXml(config.title, config.icon, this.side)}
         <frame posn="${-config.margin} ${-this.header.options.height - config.margin / 2} 1">
-          ${this.grid.constructXml([playersButton, restartButton, previousButton, replayButton, skipButton, endRoundButton])}
+          ${this.grid.constructXml([
+            playersButton,
+            restartButton,
+            previousButton,
+            replayButton,
+            skipButton,
+            endRoundButton,
+          ])}
         </frame>
       </frame>
     </manialink>`
   }
-
 }

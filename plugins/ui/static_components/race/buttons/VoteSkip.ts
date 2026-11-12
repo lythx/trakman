@@ -1,20 +1,66 @@
-import type { ButtonData } from "./ButtonData.js"
-import { UiButton } from "./UiButton.js"
-import config from "./ButtonsWidget.config.js"
-import { VoteWindow } from "../../../UI.js"
-import messages from "./Messages.config.js"
+import type { ButtonData } from './ButtonData.js'
+import { UiButton } from './UiButton.js'
+import userConfig from './ButtonsWidget.config.js'
+import { VoteWindow } from '../../../UI.js'
+import messages from './Messages.config.js'
 import { actions } from '../../../../actions/Actions.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  voteSkip: {
+    texts: [
+      {
+        0: ' VOTE ',
+        1: 'TO $E22SKIP',
+        equal: false,
+      },
+      {
+        0: 'SKIP IN',
+        1: '$E22#{seconds} $FFFSECS',
+        equal: true,
+      },
+      {
+        0: '$E22DISABLED',
+        1: 'DUE TO RES',
+        equal: true,
+      },
+      {
+        0: 'MAP IS',
+        1: '$E22SKIPPED',
+        equal: true,
+      },
+      {
+        0: '$E22DISABLED',
+        1: 'DUE TO EXT',
+        equal: true,
+      },
+    ],
+    triesLimit: 3,
+    timeout: 30,
+    time: 30,
+    minimumRemainingTime: 30000,
+    goal: 0.51,
+    width: 1.8,
+    height: 1.8,
+    padding: 0.2,
+    countdown: 5,
+    actionId: 1,
+    command: {
+      aliases: ['s', 'skip'],
+      privilege: 0,
+    },
+  },
+})
 
 const cfg = config.voteSkip
 const msg = messages.voteSkip
 
 export class VoteSkip extends UiButton {
-
   buttonData: ButtonData
   triesCount = 0
   failedVoteTimestamp = 0
   isLastMapReplay = false
   isReplay = false
+  isExtended = false
   isSkip = false
   parentId: number
 
@@ -29,15 +75,15 @@ export class VoteSkip extends UiButton {
       iconHeight: cfg.height,
       padding: cfg.padding,
       actionId: cfg.actionId + this.parentId,
-      equalTexts: cfg.texts[0].equal
+      equalTexts: cfg.texts[0].equal,
     }
     tm.commands.add({
       aliases: cfg.command.aliases,
       help: cfg.command.help,
-      callback: info => {
+      callback: (info) => {
         this.handleClick(info.login, info.nickname)
       },
-      privilege: cfg.command.privilege
+      privilege: cfg.command.privilege,
     })
     tm.addListener('ManialinkClick', (info) => {
       if (info.actionId === cfg.actionId + this.parentId) {
@@ -50,8 +96,17 @@ export class VoteSkip extends UiButton {
   }
 
   private async handleClick(login: string, nickname: string): Promise<void> {
-    if (this.isLastMapReplay || this.isReplay
-      || this.isSkip || tm.getState() === 'result') { return }
+    if (this.isLastMapReplay || this.isReplay) {
+      tm.sendMessage(msg.disabledReplay, login)
+      return
+    }
+    if (this.isExtended) {
+      tm.sendMessage(msg.disabledExtend, login)
+      return
+    }
+    if (this.isSkip || tm.getState() === 'result') {
+      return
+    }
     const autopass = tm.players.count === 1
     if (!autopass && tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) {
       tm.sendMessage(msg.tooLate, login)
@@ -84,10 +139,12 @@ export class VoteSkip extends UiButton {
       if (result.caller === undefined) {
         tm.sendMessage(msg.success)
       } else {
-        tm.sendMessage(tm.utils.strVar(msg.forcePass, {
-          title: result.caller.title,
-          nickname: tm.utils.strip(result.caller.nickname, true)
-        }))
+        tm.sendMessage(
+          tm.utils.strVar(msg.forcePass, {
+            title: result.caller.title,
+            nickname: tm.utils.strip(result.caller.nickname, true),
+          })
+        )
       }
     } else {
       this.failedVoteTimestamp = Date.now()
@@ -95,10 +152,12 @@ export class VoteSkip extends UiButton {
       if (result.caller === undefined) {
         tm.sendMessage(msg.cancelled)
       } else {
-        tm.sendMessage(tm.utils.strVar(msg.cancelledBy, {
-          title: result.caller.title,
-          nickname: tm.utils.strip(result.caller.nickname, true)
-        }))
+        tm.sendMessage(
+          tm.utils.strVar(msg.cancelledBy, {
+            title: result.caller.title,
+            nickname: tm.utils.strip(result.caller.nickname, true),
+          })
+        )
       }
     }
   }
@@ -113,7 +172,7 @@ export class VoteSkip extends UiButton {
         iconHeight: cfg.height,
         padding: cfg.padding,
         actionId: cfg.actionId + this.parentId,
-        equalTexts: cfg.texts[0].equal
+        equalTexts: cfg.texts[0].equal,
       }
       this.isLastMapReplay = false
     } else {
@@ -124,7 +183,7 @@ export class VoteSkip extends UiButton {
         iconWidth: cfg.width,
         iconHeight: cfg.height,
         padding: cfg.padding,
-        equalTexts: cfg.texts[2].equal
+        equalTexts: cfg.texts[2].equal,
       }
       this.isLastMapReplay = true
     }
@@ -132,6 +191,7 @@ export class VoteSkip extends UiButton {
     this.failedVoteTimestamp = 0
     this.isSkip = false
     this.isReplay = false
+    this.isExtended = false
     this.emitUpdate()
   }
 
@@ -163,21 +223,29 @@ export class VoteSkip extends UiButton {
   }
 
   private handleReplay(): void {
-    if (this.isReplay) { return }
+    if (this.isReplay) {
+      return
+    }
     const plus = tm.timer.isDynamic ? 2 : 0
     if (!tm.timer.isDynamic) {
       this.isReplay = true
+    } else {
+      this.isExtended = true
     }
-    if (this.isSkip || this.isLastMapReplay) { return }
-    this.buttonData.text1 = cfg.texts[2+plus][0]
-    this.buttonData.text2 = cfg.texts[2+plus][1]
-    this.buttonData.equalTexts = cfg.texts[2+plus].equal
+    if (this.isSkip || this.isLastMapReplay) {
+      return
+    }
+    this.buttonData.text1 = cfg.texts[2 + plus][0]
+    this.buttonData.text2 = cfg.texts[2 + plus][1]
+    this.buttonData.equalTexts = cfg.texts[2 + plus].equal
     this.buttonData.actionId = undefined
     this.emitUpdate()
   }
 
   private handleSkipNoCountdown(): void {
-    if (this.isSkip) { return }
+    if (this.isSkip) {
+      return
+    }
     this.isSkip = true
     this.buttonData.text1 = cfg.texts[3][0]
     this.buttonData.text2 = cfg.texts[3][1]
@@ -185,5 +253,4 @@ export class VoteSkip extends UiButton {
     this.buttonData.actionId = undefined
     this.emitUpdate()
   }
-
 }

@@ -3,11 +3,11 @@ export default {
   reduxModeDisablePlayerAmount: 18,
   margin: 0.15,
   marginBig: 0.27,
-  format: "$s",
+  format: '$s',
   textScale: 0.7,
   padding: 0.2,
   yOffset: -0.1,
-  background: "0006",
+  background: '0006',
   width: 14.65,
   topBorder: 47.85,
   rightPosition: 49.13,
@@ -15,110 +15,134 @@ export default {
   // Put component class names here, if you want a margin between
   // components then put a number
   rightSideOrder: [
-    "MapWidget",
-    "PreviousAndBest",
+    'MapWidget',
+    'PreviousAndBest',
     // 3.5, <- example margin
-    "TMXRanking",
-    "TimerWidget",
-    "LocalRanking",
-    "LiveRanking",
-    "DonationPanel"
+    'TMXRanking',
+    'TimerWidget',
+    'LocalRanking',
+    'LiveRanking',
+    'DonationPanel'
   ],
   leftSideOrder: [
-    "ButtonsWidget",
-    "RankWidget",
-    "KarmaWidget",
-    "DediRanking",
-    "AdminPanel"
+    'ButtonsWidget',
+    'RankWidget',
+    'KarmaWidget',
+    'DediRanking',
+    'AdminPanel'
   ],
-  otherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+  otherComponents: [
+    'BestCps',
+    'BestFinishes',
+    'CpCounter'
+  ],
   roundsRightSideOrder: [
-    "MapWidget",
-    "PreviousAndBest",
-    "TMXRanking",
-    "TimerWidget",
-    "RoundScore",
-    "RoundsPointsRanking",
-    "DonationPanel"
+    'MapWidget',
+    'PreviousAndBest',
+    'TMXRanking',
+    'TimerWidget',
+    'RoundScore',
+    'RoundsPointsRanking',
+    'DonationPanel'
   ],
   roundsLeftSideOrder: [
-    "ButtonsWidget",
-    "RankWidget",
-    "KarmaWidget",
-    "DediRanking",
-    "LocalRanking",
-    "AdminPanel"
+    'ButtonsWidget',
+    'RankWidget',
+    'KarmaWidget',
+    'DediRanking',
+    'LocalRanking',
+    'AdminPanel'
   ],
-  roundsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+  roundsOtherComponents: [
+    'BestCps',
+    'BestFinishes',
+    'CpCounter'
+  ],
   cupRightSideOrder: [
-    "MapWidget",
-    "PreviousAndBest",
-    "TMXRanking",
-    "TimerWidget",
-    "RoundScore",
-    "RoundsPointsRanking",
-    "DonationPanel"
+    'MapWidget',
+    'PreviousAndBest',
+    'TMXRanking',
+    'TimerWidget',
+    'RoundScore',
+    'RoundsPointsRanking',
+    'DonationPanel'
   ],
   cupLeftSideOrder: [
-    "ButtonsWidget",
-    "RankWidget",
-    "KarmaWidget",
-    "DediRanking",
-    "LocalRanking",
-    "AdminPanel"
+    'ButtonsWidget',
+    'RankWidget',
+    'KarmaWidget',
+    'DediRanking',
+    'LocalRanking',
+    'AdminPanel'
   ],
-  cupOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+  cupOtherComponents: [
+    'BestCps',
+    'BestFinishes',
+    'CpCounter'
+  ],
   teamsRightSideOrder: [
-    "MapWidget",
-    "PreviousAndBest",
-    "TMXRanking",
-    "TimerWidget",
-    "RoundScore",
-    "LocalRanking",
-    "TeamScore",
-    "DonationPanel"
+    'MapWidget',
+    'PreviousAndBest',
+    'TMXRanking',
+    'TimerWidget',
+    'RoundScore',
+    'LocalRanking',
+    'TeamScore',
+    'DonationPanel'
   ],
   teamsLeftSideOrder: [
-    "ButtonsWidget",
-    "RankWidget",
-    "KarmaWidget",
-    "DediRanking",
-    "AdminPanel"
+    'ButtonsWidget',
+    'RankWidget',
+    'KarmaWidget',
+    'DediRanking',
+    'AdminPanel'
   ],
-  teamsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+  teamsOtherComponents: [
+    'BestCps',
+    'BestFinishes',
+    'CpCounter'
+  ],
   lapsRightSideOrder: [
-    "MapWidget",
-    "PreviousAndBest",
-    "TMXRanking",
-    "TimerWidget",
-    "LiveRanking",
-    "LocalRanking",
-    "DonationPanel"
+    'MapWidget',
+    'PreviousAndBest',
+    'TMXRanking',
+    'TimerWidget',
+    'LiveRanking',
+    'LocalRanking',
+    'DonationPanel'
   ],
   lapsLeftSideOrder: [
-    "ButtonsWidget",
-    "RankWidget",
-    "KarmaWidget",
-    "DediRanking",
-    "LapRanking",
-    "AdminPanel"
+    'ButtonsWidget',
+    'RankWidget',
+    'KarmaWidget',
+    'DediRanking',
+    'LapRanking',
+    'AdminPanel'
   ],
-  lapsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+  lapsOtherComponents: [
+    'BestCps',
+    'BestFinishes',
+    'CpCounter'
+  ],
   stuntsRightSideOrder: [
-    "MapWidget",
-    "PreviousAndBest",
-    "DonationPanel",
-    "TimerWidget",
-    "LocalRanking",
-    "LiveRanking",
+    'MapWidget',
+    'PreviousAndBest',
+    'DonationPanel',
+    'TimerWidget',
+    'LocalRanking',
+    'LiveRanking'
   ],
   stuntsLeftSideOrder: [
-    "ButtonsWidget",
-    "RankWidget",
-    "KarmaWidget",
-    "TMXRanking",
-    "UltiRanking",
-    "AdminPanel"
+    'ButtonsWidget',
+    'RankWidget',
+    'KarmaWidget',
+    'TMXRanking',
+    'UltiRanking',
+    'AdminPanel'
   ],
-  stuntsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter']
+  stuntsOtherComponents: [
+    'BestCps',
+    'BestFinishes',
+    'CpCounter'
+  ]
 }

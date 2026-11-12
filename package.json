@@ -1,20 +1,31 @@
 {
+  "name": "trakman",
+  "version": "1.6.2",
+  "private": "true",
+  "license": "MIT",
+  "homepage": "http://github.com/lythx/trakman",
   "dependencies": {
     "@leeoniya/ufuzzy": "^1.0.18",
     "dotenv": "^16.5.0",
     "node-fetch": "^3.3.2",
     "pg": "^8.16.0",
     "pg-copy-streams": "^6.0.6",
-    "pm2": "^6.0.6",
-    "typescript": "^5.8.3",
+    "pm2": "^7.0.0",
+    "typescript": "^6.0.3",
     "xml2js": "^0.5.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^18.19.110",
     "@types/pg": "^8.15.4",
     "@types/pg-copy-streams": "^1.2.5",
     "@types/xml2js": "^0.4.14",
-    "ts-node": "^10.9.2"
+    "eslint": "^10.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "pretty-quick": "^4.2.2",
+    "simple-git-hooks": "^2.14.0",
+    "ts-node": "^10.9.2",
+    "typescript-eslint": "^8.72.1"
   },
   "scripts": {
     "build": "tsc",

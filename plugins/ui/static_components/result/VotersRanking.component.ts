@@ -3,12 +3,20 @@
  * @since 0.4
  */
 
-import { componentIds, List, StaticHeader, StaticComponent } from '../../UI.js'
+import { componentIds, List, StaticComponent, StaticHeader } from '../../UI.js'
 import { stats } from '../../../stats/Stats.js'
-import config from './VotersRanking.config.js'
+import userConfig from './VotersRanking.config.js'
+import cfg from '../../config/ResultUi.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 5,
+  entryHeight: 2.15,
+  width: cfg.width,
+  margin: cfg.margin,
+  columnProportions: [1, 1.9, 5.1],
+})
 
 export default class VotersRanking extends StaticComponent {
-
   private readonly header: StaticHeader
   private readonly list: List
   private xml: string = ''
@@ -16,15 +24,27 @@ export default class VotersRanking extends StaticComponent {
   constructor() {
     super(componentIds.votersRanking)
     this.header = new StaticHeader('result')
-    this.list = new List(config.entries, config.width, this.getHeight() - (this.header.options.height + config.margin),
-      config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
+    this.list = new List(
+      config.entries,
+      config.width,
+      this.getHeight() - (this.header.options.height + config.margin),
+      config.columnProportions,
+      {
+        background: config.background,
+        headerBg: this.header.options.textBackground,
+      }
+    )
     stats.votes.onUpdate((): void => {
       const xml = this.display()
-      if (xml !== undefined) { tm.sendManialink(xml) }
+      if (xml !== undefined) {
+        tm.sendManialink(xml)
+      }
     })
     stats.votes.onNicknameChange((): void => {
       const xml = this.display()
-      if (xml !== undefined) { tm.sendManialink(xml) }
+      if (xml !== undefined) {
+        tm.sendManialink(xml)
+      }
     })
   }
 
@@ -33,14 +53,21 @@ export default class VotersRanking extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     this.constructXml()
     return this.xml
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
-    return { xml: this.xml, login }
+    if (!this.isDisplayed) {
+      return
+    }
+    return {
+      xml: this.xml,
+      login,
+    }
   }
 
   constructXml(): void {
@@ -50,10 +77,12 @@ export default class VotersRanking extends StaticComponent {
       <frame posn="${this.positionX} ${this.positionY} 2">
       ${this.header.constructXml(config.title, config.icon, this.side)}
       <frame posn="0 ${-this.header.options.height - config.margin} 2">
-        ${this.list.constructXml(votes.map(a => a.count.toString()), votes.map(a => tm.utils.safeString(tm.utils.strip(a.nickname, false))))}
+        ${this.list.constructXml(
+          votes.map((a) => a.count.toString()),
+          votes.map((a) => tm.utils.safeString(tm.utils.strip(a.nickname, false)))
+        )}
       </frame>
       </frame>
     </manialink>`
   }
-
 }

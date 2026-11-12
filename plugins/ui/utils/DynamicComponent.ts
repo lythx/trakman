@@ -2,7 +2,6 @@
  * Abstract class for dynamic manialink components.
  */
 export default abstract class DynamicComponent {
-
   /**
    * Component manialink ID
    */
@@ -36,11 +35,10 @@ export default abstract class DynamicComponent {
   }
 
   /**
-   *  Add a callback function to execute when new component object gets created 
+   *  Add a callback function to execute when new component object gets created
    * @param callback Function to execute on event
    */
   static onComponentCreated(callback: (component: DynamicComponent) => void) {
     this.componentCreateListeners.push(callback)
   }
-
 }

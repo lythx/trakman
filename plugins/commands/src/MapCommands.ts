@@ -1,16 +1,60 @@
-import config from '../config/MapCommands.config.js'
+import userConfig from '../config/MapCommands.config.js'
 import fetch from 'node-fetch'
 import { actions } from '../../actions/Actions.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  add: {
+    privilege: tm.config.controller.privileges.addMap,
+    aliases: ['add', 'am', 'addmap'],
+  },
+  addlocal: {
+    public: true,
+    privilege: 3,
+    aliases: ['addlocal', 'al'],
+  },
+  addrandom: {
+    public: true,
+    privilege: tm.config.controller.privileges.addMap,
+    aliases: ['ar', 'addr', 'addrandom'],
+  },
+  remove: {
+    privilege: tm.config.controller.privileges.removeMap,
+    aliases: ['et', 'rt', 'erase', 'erasethis'],
+  },
+  addfromurl: {
+    public: true,
+    privilege: tm.config.controller.privileges.addMap,
+    aliases: ['afu', 'addfromurl'],
+  },
+  addallfromdb: {
+    privilege: 4,
+    aliases: ['aadb', 'addallfromdb'],
+  },
+  publicadd: {
+    public: true,
+    privilege: 0,
+    aliases: ['add', 'am', 'addmap'],
+  },
+})
 
 const commands: tm.Command[] = [
   {
     aliases: config.add.aliases,
     help: config.add.help,
-    params: [{ name: 'id', type: 'int' }, { name: 'tmxSite', optional: true }],
+    params: [
+      {
+        name: 'id',
+        type: 'int',
+      },
+      {
+        name: 'tmxSite',
+        optional: true,
+      },
+    ],
     callback: async (info: tm.MessageInfo, id: number, tmxSite?: string): Promise<void> => {
       await actions.addMap(info.login, info.nickname, info.title, id, tmxSite)
     },
-    privilege: config.add.privilege
+    privilege: config.add.privilege,
   },
   {
     aliases: config.addlocal.aliases,
@@ -22,26 +66,43 @@ const commands: tm.Command[] = [
         tm.sendMessage(config.addlocal.addError, info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.addlocal.added, {
-        title: info.title,
-        map: tm.utils.strip(map.name, true),
-        nickname: tm.utils.strip(info.nickname, true)
-      }), config.addlocal.public ? undefined : info.login)
+      tm.sendMessage(
+        tm.utils.strVar(config.addlocal.added, {
+          title: info.title,
+          map: tm.utils.strip(map.name, true),
+          nickname: tm.utils.strip(info.nickname, true),
+        }),
+        config.addlocal.public ? undefined : info.login
+      )
     },
-    privilege: config.addlocal.privilege
+    privilege: config.addlocal.privilege,
   },
   {
     aliases: config.addrandom.aliases,
     help: config.addrandom.help,
-    params: [{ name: 'tmxSite', optional: true }],
+    params: [
+      {
+        name: 'tmxSite',
+        optional: true,
+      },
+    ],
     callback: async (info: tm.MessageInfo, tmxSite?: string): Promise<void> => {
-      let obj: { map?: tm.Map; wasAlreadyAdded: boolean; } | Error
+      let obj:
+        | {
+            map?: tm.Map
+            wasAlreadyAdded: boolean
+          }
+        | Error
       let iteration = 0
       do {
         const tmxSites: tm.TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
-        const site: tm.TMXSite | undefined = tmxSites.find(a => a === tmxSite?.toUpperCase())
-        const file: { name: string, content: Buffer } | Error =
-          await tm.tmx.fetchRandomMapFile(site).catch((err: Error) => err)
+        const site: tm.TMXSite | undefined = tmxSites.find((a) => a === tmxSite?.toUpperCase())
+        const file:
+          | {
+              name: string
+              content: Buffer
+            }
+          | Error = await tm.tmx.fetchRandomMapFile(site).catch((err: Error) => err)
         if (file instanceof Error) {
           tm.sendMessage(config.addrandom.fetchError, info.login)
           return
@@ -57,14 +118,17 @@ const commands: tm.Command[] = [
         tm.sendMessage(config.addrandom.addError, info.login)
         return
       } else {
-        tm.sendMessage(tm.utils.strVar(config.addrandom.added, {
-          title: info.title,
-          map: tm.utils.strip(obj.map.name, true),
-          nickname: tm.utils.strip(info.nickname, true)
-        }), config.addrandom.public ? undefined : info.login)
+        tm.sendMessage(
+          tm.utils.strVar(config.addrandom.added, {
+            title: info.title,
+            map: tm.utils.strip(obj.map.name, true),
+            nickname: tm.utils.strip(info.nickname, true),
+          }),
+          config.addrandom.public ? undefined : info.login
+        )
       }
     },
-    privilege: config.addrandom.privilege
+    privilege: config.addrandom.privilege,
   },
   {
     aliases: config.remove.aliases,
@@ -72,12 +136,18 @@ const commands: tm.Command[] = [
     callback: async (info): Promise<void> => {
       await actions.removeMap(info.login, info.nickname, info.title)
     },
-    privilege: config.remove.privilege
+    privilege: config.remove.privilege,
   },
   {
     aliases: config.addfromurl.aliases,
     help: config.addfromurl.help,
-    params: [{ name: 'url' }, { name: 'filename', optional: true }],
+    params: [
+      { name: 'url' },
+      {
+        name: 'filename',
+        optional: true,
+      },
+    ],
     callback: async (info: tm.MessageInfo, url: string, filename?: string): Promise<void> => {
       const file = await fetch(url).catch((err: Error) => err)
       if (file instanceof Error || !file.ok) {
@@ -92,19 +162,25 @@ const commands: tm.Command[] = [
         tm.sendMessage(config.addfromurl.addError, info.login)
         return
       } else if (obj.wasAlreadyAdded) {
-        tm.sendMessage(tm.utils.strVar(config.addfromurl.alreadyAdded, {
-          map: tm.utils.strip(tm.utils.decodeURI(obj.map.name), true),
-          nickname: tm.utils.strip(info.nickname, true)
-        }), config.addfromurl.public ? undefined : info.login)
+        tm.sendMessage(
+          tm.utils.strVar(config.addfromurl.alreadyAdded, {
+            map: tm.utils.strip(tm.utils.decodeURI(obj.map.name), true),
+            nickname: tm.utils.strip(info.nickname, true),
+          }),
+          config.addfromurl.public ? undefined : info.login
+        )
       } else {
-        tm.sendMessage(tm.utils.strVar(config.addfromurl.added, {
-          title: info.title,
-          map: tm.utils.strip(tm.utils.decodeURI(obj.map.name), true),
-          nickname: tm.utils.strip(info.nickname, true)
-        }), config.addfromurl.public ? undefined : info.login)
+        tm.sendMessage(
+          tm.utils.strVar(config.addfromurl.added, {
+            title: info.title,
+            map: tm.utils.strip(tm.utils.decodeURI(obj.map.name), true),
+            nickname: tm.utils.strip(info.nickname, true),
+          }),
+          config.addfromurl.public ? undefined : info.login
+        )
       }
     },
-    privilege: config.addfromurl.privilege
+    privilege: config.addfromurl.privilege,
   },
   {
     aliases: config.addallfromdb.aliases,
@@ -116,29 +192,47 @@ const commands: tm.Command[] = [
         return
       }
       for (const map of res) {
-        if (tm.maps.list.some(a => a.id === map.id)) { continue }
+        if (tm.maps.list.some((a) => a.id === map.id)) {
+          continue
+        }
         tm.maps.add(map.filename)
       }
     },
-    privilege: config.addallfromdb.privilege
+    privilege: config.addallfromdb.privilege,
   },
   {
     aliases: config.publicadd.aliases,
     help: config.publicadd.help,
-    params: [{ name: 'id', type: 'int' }, { name: 'tmxSite', optional: true }],
+    params: [
+      {
+        name: 'id',
+        type: 'int',
+      },
+      {
+        name: 'tmxSite',
+        optional: true,
+      },
+    ],
     callback: async (info: tm.MessageInfo, id: number, tmxSite?: string): Promise<void> => {
       if (!tm.config.controller.allowPublicAdd) {
         tm.sendMessage(config.publicadd.notAvailable, info.login)
         return
       }
       const tmxSites: tm.TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
-      const site: tm.TMXSite | undefined = tmxSites.find(a => a === tmxSite?.toUpperCase())
-      let file: { name: string, content: Buffer } | Error = await tm.tmx.fetchMapFile(id, site).catch((err: Error) => err)
+      const site: tm.TMXSite | undefined = tmxSites.find((a) => a === tmxSite?.toUpperCase())
+      let file:
+        | {
+            name: string
+            content: Buffer
+          }
+        | Error = await tm.tmx.fetchMapFile(id, site).catch((err: Error) => err)
       if (file instanceof Error) {
-        const remainingSites: tm.TMXSite[] = tmxSites.filter(a => a !== tmxSite)
+        const remainingSites: tm.TMXSite[] = tmxSites.filter((a) => a !== tmxSite)
         for (const e of remainingSites) {
           file = await tm.tmx.fetchMapFile(id, e).catch((err: Error) => err)
-          if (!(file instanceof Error)) { break }
+          if (!(file instanceof Error)) {
+            break
+          }
         }
       }
       if (file instanceof Error) {
@@ -146,7 +240,12 @@ const commands: tm.Command[] = [
         return
       }
       if (tm.config.controller.voteOnPublicAdd) {
-        const voteResult: boolean = await actions.publicAdd(info.login, info.nickname, info.title, file.name.slice(0, -14))
+        const voteResult: boolean = await actions.publicAdd(
+          info.login,
+          info.nickname,
+          info.title,
+          file.name.slice(0, -14)
+        )
         if (!voteResult) {
           return
         }
@@ -157,20 +256,26 @@ const commands: tm.Command[] = [
         tm.sendMessage(config.publicadd.addError, info.login)
         return
       } else if (obj.wasAlreadyAdded) {
-        tm.sendMessage(tm.utils.strVar(config.publicadd.alreadyAdded, {
-          map: tm.utils.strip(tm.utils.decodeURI(obj.map.name), true),
-          nickname: tm.utils.strip(info.nickname, true)
-        }), config.publicadd.public ? undefined : info.login)
+        tm.sendMessage(
+          tm.utils.strVar(config.publicadd.alreadyAdded, {
+            map: tm.utils.strip(tm.utils.decodeURI(obj.map.name), true),
+            nickname: tm.utils.strip(info.nickname, true),
+          }),
+          config.publicadd.public ? undefined : info.login
+        )
       } else {
-        tm.sendMessage(tm.utils.strVar(config.publicadd.added, {
-          title: info.title,
-          map: tm.utils.strip(tm.utils.decodeURI(obj.map.name), true),
-          nickname: tm.utils.strip(info.nickname, true)
-        }), config.publicadd.public ? undefined : info.login)
+        tm.sendMessage(
+          tm.utils.strVar(config.publicadd.added, {
+            title: info.title,
+            map: tm.utils.strip(tm.utils.decodeURI(obj.map.name), true),
+            nickname: tm.utils.strip(info.nickname, true),
+          }),
+          config.publicadd.public ? undefined : info.login
+        )
       }
     },
-    privilege: config.publicadd.privilege
-  }
+    privilege: config.publicadd.privilege,
+  },
 ]
 
 tm.commands.add(...commands)

@@ -4,49 +4,56 @@ const prefix = `$i` // Prefix all "fake" player messages with this (eg. $i, $t, 
 export default {
   defaultValue: `everyone`, // This value will be used for the name if you don't specify anything in e.g. /hi
   hi: {
-    text: `$g[#{nickname}$z$s$g] ${prefix}Hello, #{name}!`,
+    text: `$g[#{nickname}$z$s$g] ${prefix}Hello, #{name}$g!`,
     public: true,
     privilege: 0,
     aliases: ['hi', 'hey', 'hello'],
     help: `Greet a certain someone.`
   },
+  greet: {
+    text: `$g[#{nickname}$z$s$g] ${prefix}Hello, #{nickname_joiner}$g!`,
+    public: true,
+    privilege: 0,
+    aliases: ['greet'],
+    help: `Greet the latest joiner.`
+  },
   bye: {
-    text: `$g[#{nickname}$z$s$g] ${prefix}Goodbye, #{name}!`,
+    text: `$g[#{nickname}$z$s$g] ${prefix}Goodbye, #{name}$g!`,
     public: true,
     privilege: 0,
     aliases: ['bb', 'bye'],
     help: `Bid your farewell.`
   },
   thx: {
-    text: `$g[#{nickname}$z$s$g] ${prefix}Thanks, #{name}!`,
+    text: `$g[#{nickname}$z$s$g] ${prefix}Thanks, #{name}$g!`,
     public: true,
     privilege: 0,
     aliases: ['ty', 'tx', 'thx', 'thanks'],
     help: `Express your gratitude.`
   },
   gg: {
-    text: `$g[#{nickname}$z$s$g] ${prefix}Good game, #{name}!`,
+    text: `$g[#{nickname}$z$s$g] ${prefix}Good game, #{name}$g!`,
     public: true,
     privilege: 0,
     aliases: ['gg', 'goodgame'],
     help: `Inform others that you\'ve enjoyed the race.`
   },
   bg: {
-    text: `$g[#{nickname}$z$s$g] ${prefix}Bad game, #{name}!`,
+    text: `$g[#{nickname}$z$s$g] ${prefix}Bad game, #{name}$g!`,
     public: true,
     privilege: 0,
     aliases: ['bg', 'badgame'],
     help: `Allow others to find out about your disenjoyment of the round.`
   },
   n1: {
-    text: `$g[#{nickname}$z$s$g] ${prefix}Nice one, #{name}!`,
+    text: `$g[#{nickname}$z$s$g] ${prefix}Nice one, #{name}$g!`,
     public: true,
     privilege: 0,
     aliases: ['n1', 'nice1', 'niceone'],
     help: `Rain your blessings upon the few selected by thy divine ritual.`
   },
   gr: {
-    text: `$g[#{nickname}$z$s$g] ${prefix}Good race, #{name}!`,
+    text: `$g[#{nickname}$z$s$g] ${prefix}Good race, #{name}$g!`,
     public: true,
     privilege: 0,
     aliases: ['gr', 'goodrace'],
@@ -138,16 +145,14 @@ export default {
     help: `Find out about the current map playtime.`
   },
   laston: {
-    text: `${p.servermsg}Player ${p.highlight}#{name} ${p.servermsg}was last` +
-      ` active on${p.highlight} #{time}${p.servermsg}.`,
+    text: `${p.servermsg}Player ${p.highlight}#{name} ${p.servermsg}was last` + ` active on${p.highlight} #{time}${p.servermsg}.`,
     error: `${p.error}Unknown player ${p.highlight}#{name}${p.error}.`,
     privilege: 0,
     aliases: ['lo', 'laston'],
     help: `Enlighten yourself with the last visit date of the specifed specimen.`
   },
   sessiontime: {
-    text: `${p.servermsg}Current session time of ${p.highlight}#{name}${p.servermsg}` +
-      ` is${p.highlight} #{time}${p.servermsg}.`,
+    text: `${p.servermsg}Current session time of ${p.highlight}#{name}${p.servermsg}` + ` is${p.highlight} #{time}${p.servermsg}.`,
     selfText: `${p.servermsg}Your current session time is ${p.highlight}#{time}${p.servermsg}.`,
     error: `${p.error}Player ${p.highlight}#{name}${p.error} is not online.`,
     privilege: 0,
@@ -165,8 +170,7 @@ export default {
   admin: {
     text: `${p.error}Use //[command] for admin commands.`,
     privilege: 0,
-    aliases: ['admin', 'a'],
-    // help: `` // not needed here
+    aliases: ['admin', 'a'] // help: `` // not needed here
   },
   coppers: {
     text: `${p.admin}Current server coppers amount is ${p.highlight}#{value}C${p.admin}.`,

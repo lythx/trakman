@@ -1,5 +1,12 @@
-import config from './Paginator.config.js'
+import userConfig from './Paginator.config.js'
 import IDS from '../config/UtilIds.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  buttonWidth: 3,
+  buttonHeight: 3,
+  margin: 0.4,
+  padding: 0.2,
+})
 
 const ID = IDS.Paginator
 
@@ -8,11 +15,13 @@ const ID = IDS.Paginator
  * Remember to use destroy() before deleting the object to avoid memory leaks
  */
 export default class Paginator {
-
   private _buttonCount: number = 0
   /** Parent element ID */
   readonly parentId: number
-  private readonly loginPages: { readonly login: string, page: number }[] = []
+  private readonly loginPages: {
+    readonly login: string
+    page: number
+  }[] = []
   /** Default page (will be displayed if no page is specified) */
   defaultPage: number
   /** Button width */
@@ -53,7 +62,14 @@ export default class Paginator {
    * @param defaultPage Default page (will be displayed if no page is specified)
    * @param noMidGap If true there will be no bonus gap between previous and next buttons
    */
-  constructor(parentId: number, parentWidth: number, parentHeight: number, pageCount: number, defaultPage: number = 1, noMidGap?: true) {
+  constructor(
+    parentId: number,
+    parentWidth: number,
+    parentHeight: number,
+    pageCount: number,
+    defaultPage: number = 1,
+    noMidGap?: true
+  ) {
     this.parentId = parentId
     this.width = parentWidth
     this.height = parentHeight
@@ -80,16 +96,26 @@ export default class Paginator {
         parentWidth / 2 + (this.buttonW + this.margin) * 2.5,
       ]
     }
-    this.ids = Object.entries(ID).map(a => this.parentId + a[1])
-    if (pageCount > 1) { this._buttonCount = 1 }
-    if (pageCount > 3) { this._buttonCount = 2 }
-    if (pageCount > 10) { this._buttonCount = 3 }
+    this.ids = Object.entries(ID).map((a) => this.parentId + a[1])
+    if (pageCount > 1) {
+      this._buttonCount = 1
+    }
+    if (pageCount > 3) {
+      this._buttonCount = 2
+    }
+    if (pageCount > 10) {
+      this._buttonCount = 3
+    }
     this.clickListener = (info: tm.ManialinkClickInfo): void => {
       if (this.ids.includes(info.actionId)) {
-        const playerPage = this.loginPages.find(a => a.login === info.login)
-        if (playerPage === undefined) { // Should never happen
+        const playerPage = this.loginPages.find((a) => a.login === info.login)
+        if (playerPage === undefined) {
+          // Should never happen
           const page: number = this.getPageFromClick(info.actionId, this.defaultPage)
-          this.loginPages.push({ login: info.login, page: page })
+          this.loginPages.push({
+            login: info.login,
+            page: page,
+          })
           this._onPageChange(info.login, page, info)
           return
         }
@@ -122,8 +148,8 @@ export default class Paginator {
    * @returns Page number
    */
   getPageByLogin(login: string): number {
-    const playerPage = this.loginPages.find(a => a.login === login)?.page ?? this.defaultPage
-    return (playerPage > this._pageCount ? this.defaultPage : playerPage)
+    const playerPage = this.loginPages.find((a) => a.login === login)?.page ?? this.defaultPage
+    return playerPage > this._pageCount ? this.defaultPage : playerPage
   }
 
   /**
@@ -133,11 +159,18 @@ export default class Paginator {
    * @returns Page number
    */
   setPageForLogin(login: string, page: number): number {
-    const loginPage = this.loginPages.find(a => a.login === login)
-    if (page > this._pageCount) { page = this._pageCount }
-    if (page < 1) { page = 1 }
+    const loginPage = this.loginPages.find((a) => a.login === login)
+    if (page > this._pageCount) {
+      page = this._pageCount
+    }
+    if (page < 1) {
+      page = 1
+    }
     if (loginPage === undefined) {
-      this.loginPages.push({ login, page })
+      this.loginPages.push({
+        login,
+        page,
+      })
     } else {
       loginPage.page = page
     }
@@ -149,12 +182,20 @@ export default class Paginator {
    * @param pageCount Page count
    */
   setPageCount(pageCount: number): void {
-    if (pageCount < 1) { pageCount = 1 }
+    if (pageCount < 1) {
+      pageCount = 1
+    }
     this._pageCount = pageCount
     this._buttonCount = 0
-    if (pageCount > 1) { this._buttonCount = 1 }
-    if (pageCount > 3) { this._buttonCount = 2 }
-    if (pageCount > 10) { this._buttonCount = 3 }
+    if (pageCount > 1) {
+      this._buttonCount = 1
+    }
+    if (pageCount > 3) {
+      this._buttonCount = 2
+    }
+    if (pageCount > 10) {
+      this._buttonCount = 3
+    }
   }
 
   /** Amount of currently displayed buttons. It's relative to the page count */
@@ -171,25 +212,34 @@ export default class Paginator {
     switch (id) {
       case this.parentId + ID.previous:
         page--
-        if (page < 1) { return 1 }
+        if (page < 1) {
+          return 1
+        }
         return page
       case this.parentId + ID.next: {
         const lastPage: number = this._pageCount
         page++
-        if (page > lastPage) { return lastPage }
+        if (page > lastPage) {
+          return lastPage
+        }
         return page
-      } case this.parentId + ID.first:
+      }
+      case this.parentId + ID.first:
         return 1
       case this.parentId + ID.last:
         return this._pageCount
       case this.parentId + ID.jumpBackwards:
         page -= 10
-        if (page < 1) { return page = 1 }
+        if (page < 1) {
+          return 1
+        }
         return page
       case this.parentId + ID.jumpForwards: {
         const lastPage: number = this._pageCount
         page += 10
-        if (page > lastPage) { return lastPage }
+        if (page > lastPage) {
+          return lastPage
+        }
         return page
       }
       default:
@@ -201,7 +251,9 @@ export default class Paginator {
    * Removes click listener. Use this before deleting the object to avoid memory leaks.
    */
   destroy(): void {
-    if (this.clickListener === undefined) { return }
+    if (this.clickListener === undefined) {
+      return
+    }
     tm.removeListener(this.clickListener)
     this.clickListener = undefined
   }
@@ -221,7 +273,7 @@ export default class Paginator {
   constructXml(arg: number | string): string {
     let page: number
     if (typeof arg === 'string') {
-      page = this.loginPages.find(a => a.login === arg)?.page ?? this.defaultPage
+      page = this.loginPages.find((a) => a.login === arg)?.page ?? this.defaultPage
     } else {
       page = arg
     }
@@ -240,8 +292,7 @@ export default class Paginator {
             <quad posn="${this.xPos[1]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.jumpBackwards}" 
             imagefocus="${config.iconsHover[1]}"
             image="${config.icons[1]}"/>`
-      }
-      else if (this._buttonCount > 1) {
+      } else if (this._buttonCount > 1) {
         xml += `<quad posn="${this.xPos[1]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.first}" 
         imagefocus="${config.iconsHover[0]}"
         image="${config.icons[0]}"/>`
@@ -265,8 +316,7 @@ export default class Paginator {
           <quad posn="${this.xPos[5]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.last}" 
           imagefocus="${config.iconsHover[5]}"
           image="${config.icons[5]}"/>`
-      }
-      else if (this._buttonCount > 1) {
+      } else if (this._buttonCount > 1) {
         xml += `<quad posn="${this.xPos[4]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.last}" 
           imagefocus="${config.iconsHover[5]}"
           image="${config.icons[5]}"/>`
@@ -281,5 +331,4 @@ export default class Paginator {
     }
     return xml
   }
-
 }

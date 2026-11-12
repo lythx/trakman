@@ -3,12 +3,33 @@
  * @since 0.3
  */
 
-import { Grid, componentIds, type GridCellFunction, centeredText, closeButton, PopupWindow, Paginator } from '../UI.js'
-import config from './Changelog.config.js'
+import { centeredText, closeButton, componentIds, Grid, type GridCellFunction, Paginator, PopupWindow } from '../UI.js'
+import userConfig from './Changelog.config.js'
 import fs from 'fs/promises'
 
-export default class Changelog extends PopupWindow<{ page: number }> {
+const config = tm.utils.withDefaults(userConfig, {
+  navbar: [
+    {
+      name: 'Command List',
+      actionId: componentIds.commandList,
+    },
+  ],
+  textScale: 1.4,
+  marginBig: 1,
+  entries: 2,
+  versionWidth: 6,
+  headerHeight: 3,
+  lineCount: 19,
+  lineCharacterLimit: 60,
+  command: {
+    aliases: ['changes', 'changelog'],
+    privilege: 0,
+  },
+})
 
+export default class Changelog extends PopupWindow<{
+  page: number
+}> {
   private readonly versions: {
     version: string
     date: string
@@ -25,18 +46,20 @@ export default class Changelog extends PopupWindow<{ page: number }> {
       callback: (info) => {
         tm.openManialink(this.openId, info.login)
       },
-      privilege: config.command.privilege
+      privilege: config.command.privilege,
     })
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, 1, 1)
     this.paginator.onPageChange = (login, page) => {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
-    this.grid = new Grid(this.contentWidth, this.contentHeight, new Array(config.entries).fill(1), [1], { margin: config.marginBig })
+    this.grid = new Grid(this.contentWidth, this.contentHeight, new Array(config.entries).fill(1), [1], {
+      margin: config.marginBig,
+    })
     this.readChangelog()
   }
 
   private async readChangelog() {
-    const file: Buffer | Error = await fs.readFile('./CHANGELOG.md').catch(err => err)
+    const file: Buffer | Error = await fs.readFile('./CHANGELOG.md').catch((err) => err)
     if (file instanceof Error) {
       tm.log.warn(`Can't read CHANGELOG.md file`)
       return
@@ -46,16 +69,23 @@ export default class Changelog extends PopupWindow<{ page: number }> {
       const lines = split[i].split('\n')
       const version = lines[0].trim()
       const date = lines[1].split('**')[1]
-      const content = lines.map(a => {
-        if (a.length > config.lineCharacterLimit) {
-          a = a.slice(0, config.lineCharacterLimit)
-          return a.split(' ').slice(0, -1).join(' ') + '...'
-        } else {
-          return a
-        }
-      }).slice(2, 2 + config.lineCount).join('\n')
+      const content = lines
+        .map((a) => {
+          if (a.length > config.lineCharacterLimit) {
+            a = a.slice(0, config.lineCharacterLimit)
+            return a.split(' ').slice(0, -1).join(' ') + '...'
+          } else {
+            return a
+          }
+        })
+        .slice(2, 2 + config.lineCount)
+        .join('\n')
       if (![version, date, content].includes(undefined as any)) {
-        this.versions.push({ version, date, content })
+        this.versions.push({
+          version,
+          date,
+          content,
+        })
       }
     }
     this.paginator.setPageCount(Math.ceil(this.versions.length / config.entries))
@@ -67,7 +97,14 @@ export default class Changelog extends PopupWindow<{ page: number }> {
     this.displayToPlayer(info.login, { page }, `${page}/${this.paginator.pageCount}`)
   }
 
-  protected constructContent(login: string, { page }: { page: number }): string {
+  protected constructContent(
+    login: string,
+    {
+      page,
+    }: {
+      page: number
+    }
+  ): string {
     const index = config.entries * (page - 1)
     const cells: GridCellFunction[] = []
     const cell: GridCellFunction = (i, j, w, h) => {
@@ -86,10 +123,16 @@ export default class Changelog extends PopupWindow<{ page: number }> {
     const dateW = w - (versionWidth + this.margin)
     return `<format textsize="1"/>
       <quad posn="0 0 3" sizen="${versionWidth} ${headerH}" bgcolor="${this.headerBackground}"/>
-      ${centeredText(`$s$${tm.utils.palette.green}${title}`, versionWidth, headerH, { padding: this.margin, textScale: config.textScale })}
+      ${centeredText(`$s$${tm.utils.palette.green}${title}`, versionWidth, headerH, {
+        padding: this.margin,
+        textScale: config.textScale,
+      })}
       <frame posn="${versionWidth + this.margin} 0 2">
         <quad posn="0 0 2" sizen="${dateW} ${headerH}" bgcolor="${this.headerBackground}"/>
-        ${centeredText(`$s${date}`, dateW, headerH, { padding: this.margin, textScale: config.textScale })}
+        ${centeredText(`$s${date}`, dateW, headerH, {
+          padding: this.margin,
+          textScale: config.textScale,
+        })}
       </frame>
       <frame posn="0 ${-headerH - this.margin} 2">
         <quad posn="0 0 2" sizen="${w} ${h - (headerH + this.margin)}" bgcolor="${config.tileBackground}"/>
@@ -99,8 +142,14 @@ export default class Changelog extends PopupWindow<{ page: number }> {
       </frame>`
   }
 
-  protected constructFooter(login: string, { page }: { page: number }): string {
+  protected constructFooter(
+    login: string,
+    {
+      page,
+    }: {
+      page: number
+    }
+  ): string {
     return closeButton(this.closeId, this.windowWidth, this.footerHeight) + this.paginator.constructXml(page)
   }
-
 }

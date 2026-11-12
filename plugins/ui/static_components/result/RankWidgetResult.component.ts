@@ -4,10 +4,15 @@
  */
 
 import { componentIds, StaticComponent } from '../../UI.js'
-import config from './RankWidgetResult.config.js'
+import userConfig from './RankWidgetResult.config.js'
+import cfg from '../../config/ResultUi.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 6.5,
+  width: cfg.width,
+})
 
 export default class RankWidgetResult extends StaticComponent {
-
   private xml: string = ''
 
   constructor() {
@@ -20,19 +25,28 @@ export default class RankWidgetResult extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     return this.xml
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
-    return { xml: this.xml, login }
+    if (!this.isDisplayed) {
+      return
+    }
+    return {
+      xml: this.xml,
+      login,
+    }
   }
 
   protected onPositionChange(): void {
     this.constructXml()
     const xml = this.display()
-    if (xml !== undefined) { tm.sendManialink(xml) }
+    if (xml !== undefined) {
+      tm.sendManialink(xml)
+    }
   }
 
   private constructXml(): void {
@@ -44,5 +58,4 @@ export default class RankWidgetResult extends StaticComponent {
       </frame>
     </manialink>`
   }
-
 }

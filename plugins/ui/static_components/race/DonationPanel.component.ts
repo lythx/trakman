@@ -4,11 +4,18 @@
  */
 
 import { donations } from '../../../donations/Donations.js'
-import { componentIds, StaticHeader, centeredText, StaticComponent } from '../../UI.js'
-import config from './DonationPanel.config.js'
+import { centeredText, componentIds, raceConfig, StaticComponent, StaticHeader } from '../../UI.js'
+import userConfig from './DonationPanel.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 4.49,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  hidePanel: true,
+  amounts: [50, 100, 200, 500, 1000, 5000],
+})
 
 export default class DonationPanel extends StaticComponent {
-
   private readonly header: StaticHeader
   private xml: string = ''
 
@@ -32,17 +39,27 @@ export default class DonationPanel extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
-    return { xml: this.xml, login: tm.players.list.filter(a => a.isUnited).map(a => a.login) }
+    if (!this.isDisplayed) {
+      return
+    }
+    return {
+      xml: this.xml,
+      login: tm.players.list.filter((a) => a.isUnited).map((a) => a.login),
+    }
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
     if (tm.players.get(login)?.isUnited) {
-      return { xml: this.xml, login }
+      return {
+        xml: this.xml,
+        login,
+      }
     }
   }
 
@@ -63,7 +80,7 @@ export default class DonationPanel extends StaticComponent {
              bgcolor="${config.background}" action="${this.id + i + 1}"/>`
       xmltext += centeredText(e.toString(), iconWidth - marginSmall, headerHeight, {
         xOffset: iconWidth * i,
-        yOffset: headerHeight + marginSmall
+        yOffset: headerHeight + marginSmall,
       })
     }
     this.xml = `
@@ -76,5 +93,4 @@ export default class DonationPanel extends StaticComponent {
         </frame>
       </manialink>`
   }
-
 }

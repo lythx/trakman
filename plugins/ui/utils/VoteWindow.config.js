@@ -1,10 +1,11 @@
 import icons from '../config/Icons.js'
 import cfg from '../config/RaceUi.js'
 import header from './StaticHeaderRace.config.js'
+
 const p = tm.utils.palette
 
 export default {
-  title: " Vote ",
+  title: ' Vote ',
   width: 25,
   height: 10, // Without the admin buttons
   margin: cfg.margin,

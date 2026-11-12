@@ -1,5 +1,6 @@
 import cfg from '../../config/RaceUi.js'
 import icons from '../../config/Icons.js'
+
 const p = tm.utils.palette
 
 export default {
@@ -8,7 +9,7 @@ export default {
   privilege: 1,
   margin: cfg.margin,
   background: cfg.background,
-  title: "Admin Panel",
+  title: 'Admin Panel',
   icon: icons.gears,
   disabledColour: '333C',
   public: true,

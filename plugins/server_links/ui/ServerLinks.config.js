@@ -1,9 +1,9 @@
-import { raceConfig as cfg, icons } from '../../ui/UI.js'
+import { icons, raceConfig as cfg } from '../../ui/UI.js'
 
 export default {
   height: 33,
   width: cfg.width,
-  title: "Linked Servers",
+  title: 'Linked Servers',
   icon: icons.infoList,
   margin: cfg.margin,
   entries: 5,
@@ -25,7 +25,7 @@ export default {
       Stunts: icons.stuntsMode
     }
   },
-  iconBackground: "000a",
+  iconBackground: '000a',
   textBackground: cfg.background,
   textScale: 0.9,
   textPadding: 0.15,

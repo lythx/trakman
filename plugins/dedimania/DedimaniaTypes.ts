@@ -7,12 +7,16 @@ export interface DediRecord {
   readonly isLapRecord: boolean
 }
 
-export type NewDediRecord = Omit<tm.Player & DediRecord & {
-  readonly position: number
-  readonly previous?: {
-    readonly time: number,
-    readonly position: number
-  }
-}, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>
+export type NewDediRecord = Omit<
+  tm.Player &
+    DediRecord & {
+      readonly position: number
+      readonly previous?: {
+        readonly time: number
+        readonly position: number
+      }
+    },
+  'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'
+>
 
 export type DediLeaderboard = 'TimeAttack' | 'Rounds' | 'Disabled'

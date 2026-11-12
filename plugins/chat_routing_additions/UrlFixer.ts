@@ -1,4 +1,10 @@
-import config from './UrlFixer.config.js'
+import userConfig from './UrlFixer.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  matchRegex: /(http:\/\/|https:\/\/)/gi,
+  importance: 1,
+})
 
 if (config.isEnabled) {
   tm.chat.addMessageTextModifier(async (info): Promise<string | undefined> => {

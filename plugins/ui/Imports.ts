@@ -1,8 +1,8 @@
 /*
------------------
-STATIC COMPONENTS
------------------
-*/
+ -----------------
+ STATIC COMPONENTS
+ -----------------
+ */
 
 import RankWidget from './static_components/race/RankWidget.component.js'
 import DediRanking from './static_components/race/DediRanking.component.js'
@@ -43,11 +43,10 @@ import BannerWidget from './static_components/result/BannerWidget.component.js'
 import UltiRanking from './static_components/race/UltiRanking.component.js'
 
 /*
-------------------
-DYNAMIC COMPONENTS
-------------------
-*/
-
+ ------------------
+ DYNAMIC COMPONENTS
+ ------------------
+ */
 import CommandList from './dynamic_components/Commandlist.component.js'
 import LocalCps from './dynamic_components/checkpoint_windows/LocalCps.component.js'
 import LiveSectors from './dynamic_components/checkpoint_windows/LiveSectors.component.js'
@@ -70,63 +69,67 @@ import Operatorlist from './dynamic_components/admin_lists/Operatorlist.componen
 import Adminlist from './dynamic_components/admin_lists/Adminlist.component.js'
 import Masteradminlist from './dynamic_components/admin_lists/Masteradminlist.component.js'
 
-tm.addListener(`Startup`, (): void => {
-  new RankWidget()
-  new DediRanking()
-  new MapWidget()
-  new PreviousAndBest()
-  new KarmaWidget()
-  new TimerWidget()
-  new LocalRanking()
-  new LiveRanking()
-  new ButtonsWidget()
-  new TMXRanking()
-  new AdminPanel()
-  new DonationPanel()
-  new BestCps()
-  new BestFinishes()
-  new CpCounter()
-  new NextMapRecords()
-  new MapWidgetResult()
-  new TimerWidgetResult()
-  new KarmaRanking()
-  new VotersRanking()
-  new VisitorsRanking()
-  new PlaytimeRanking()
-  new DonatorsRanking()
-  new AveragesRanking()
-  new RankWidgetResult()
-  new KarmaWidgetResult()
-  new LocalRankingResult()
-  new DediRankingResult()
-  new RoundAveragesRanking()
-  new AdminPanelResult()
-  new WinnersRanking()
-  new MostRecordsRanking()
-  new CommandList()
-  new LiveCps()
-  new LocalCps()
-  new LocalSectors()
-  new LiveSectors()
-  new PlayerList()
-  new Banlist()
-  new Blacklist()
-  new Guestlist()
-  new Mutelist()
-  new Changelog()
-  new ChatLog()
-  new TMXSearchWindow()
-  new ServerInfoWindow()
-  new RoundScore()
-  new TeamScore()
-  new RoundsPointsRanking()
-  new LapRanking()
-  new Warn()
-  new BannerWidget()
-  new PlayerStatsWindow()
-  new TMXDetailsWindow()
-  new Operatorlist()
-  new Adminlist()
-  new Masteradminlist()
-  new UltiRanking()
-}, true)
+tm.addListener(
+  `Startup`,
+  (): void => {
+    new RankWidget()
+    new DediRanking()
+    new MapWidget()
+    new PreviousAndBest()
+    new KarmaWidget()
+    new TimerWidget()
+    new LocalRanking()
+    new LiveRanking()
+    new ButtonsWidget()
+    new TMXRanking()
+    new AdminPanel()
+    new DonationPanel()
+    new BestCps()
+    new BestFinishes()
+    new CpCounter()
+    new NextMapRecords()
+    new MapWidgetResult()
+    new TimerWidgetResult()
+    new KarmaRanking()
+    new VotersRanking()
+    new VisitorsRanking()
+    new PlaytimeRanking()
+    new DonatorsRanking()
+    new AveragesRanking()
+    new RankWidgetResult()
+    new KarmaWidgetResult()
+    new LocalRankingResult()
+    new DediRankingResult()
+    new RoundAveragesRanking()
+    new AdminPanelResult()
+    new WinnersRanking()
+    new MostRecordsRanking()
+    new CommandList()
+    new LiveCps()
+    new LocalCps()
+    new LocalSectors()
+    new LiveSectors()
+    new PlayerList()
+    new Banlist()
+    new Blacklist()
+    new Guestlist()
+    new Mutelist()
+    new Changelog()
+    new ChatLog()
+    new TMXSearchWindow()
+    new ServerInfoWindow()
+    new RoundScore()
+    new TeamScore()
+    new RoundsPointsRanking()
+    new LapRanking()
+    new Warn()
+    new BannerWidget()
+    new PlayerStatsWindow()
+    new TMXDetailsWindow()
+    new Operatorlist()
+    new Adminlist()
+    new Masteradminlist()
+    new UltiRanking()
+  },
+  true
+)

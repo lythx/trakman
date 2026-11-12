@@ -1,5 +1,6 @@
 import cfg from '../../config/ResultUi.js'
 import icons from '../../config/Icons.js'
+
 const p = tm.utils.palette
 
 export default {
@@ -9,7 +10,7 @@ export default {
   margin: cfg.margin,
   background: cfg.background,
   shufflePrivilege: 2,
-  title: "Admin Panel",
+  title: 'Admin Panel',
   icon: icons.gears,
   disabledColour: '333C',
   public: true,

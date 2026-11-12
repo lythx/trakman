@@ -8,13 +8,9 @@ export default {
   posX: cfg.leftPosition + (cfg.width + cfg.margin) * 2 + cfg.margin,
   posY: cfg.topBorder,
   side: false,
-  title: "Most Records",
+  title: 'Most Records',
   icon: icons.personBetter,
   margin: cfg.margin,
   background: cfg.background,
-  columnProportions: [
-    1,
-    1.9,
-    5.1
-  ]
+  columnProportions: [1, 1.9, 5.1]
 }

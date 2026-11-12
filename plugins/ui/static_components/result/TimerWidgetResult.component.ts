@@ -4,10 +4,15 @@
  */
 
 import { componentIds, StaticComponent } from '../../UI.js'
-import config from './TimerWidgetResult.config.js'
+import userConfig from './TimerWidgetResult.config.js'
+import cfg from '../../config/ResultUi.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 6.1,
+  width: cfg.width,
+})
 
 export default class TimerWidgetResult extends StaticComponent {
-
   private xml: string = ''
 
   constructor() {
@@ -18,21 +23,30 @@ export default class TimerWidgetResult extends StaticComponent {
   getHeight(): number {
     return config.height
   }
-  
+
   protected onPositionChange(): void {
     this.constructXml()
     const xml = this.display()
-    if(xml !== undefined) { tm.sendManialink(xml) }
+    if (xml !== undefined) {
+      tm.sendManialink(xml)
+    }
   }
 
   display() {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     return this.xml
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
-    return { xml: this.xml, login }
+    if (!this.isDisplayed) {
+      return
+    }
+    return {
+      xml: this.xml,
+      login,
+    }
   }
 
   private constructXml(): void {
@@ -44,5 +58,4 @@ export default class TimerWidgetResult extends StaticComponent {
       </frame>
     </manialink>`
   }
-
 }

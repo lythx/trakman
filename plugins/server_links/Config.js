@@ -9,15 +9,12 @@ export default {
   updateLimit: 30,
   dataFilePath: './plugins/server_links/temp/data.txt',
   // to connect a remote server set "url" instead of "path"
-  servers: [
-    {
-      name: 'name1',
-      path: 'D://<controller_directory>/plugins/server_links/temp/data.txt'
-    },
-    {
-      name: 'name2',
-      url: 'http://url:port'
-    }
-  ],
+  servers: [{
+    name: 'name1',
+    path: 'D://<controller_directory>/plugins/server_links/temp/data.txt'
+  }, {
+    name: 'name2',
+    url: 'http://url:port'
+  }],
   noDataText: '--'
 }

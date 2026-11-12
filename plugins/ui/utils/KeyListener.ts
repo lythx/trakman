@@ -1,6 +1,10 @@
 import utilIds from '../config/UtilIds.js'
 
-let keyListeners: { callback: ((info: tm.ManialinkClickInfo) => void), key: 'F5' | 'F6' | 'F7', importance: number }[] = []
+let keyListeners: {
+  callback: (info: tm.ManialinkClickInfo) => void
+  key: 'F5' | 'F6' | 'F7'
+  importance: number
+}[] = []
 
 /**
  * Registers a callback function to execute on given key press.
@@ -8,8 +12,16 @@ let keyListeners: { callback: ((info: tm.ManialinkClickInfo) => void), key: 'F5'
  * @param callback Function to execute on key press, it takes ManialinkClickInfo as a parameter
  * @param importance Importance index - only the function with highest importance index will get executed
  */
-export const addKeyListener = (key: 'F5' | 'F6' | 'F7', callback: (info: tm.ManialinkClickInfo) => void, importance: number) => {
-  keyListeners.unshift({ callback, key, importance })
+export const addKeyListener = (
+  key: 'F5' | 'F6' | 'F7',
+  callback: (info: tm.ManialinkClickInfo) => void,
+  importance: number
+) => {
+  keyListeners.unshift({
+    callback,
+    key,
+    importance,
+  })
 }
 
 /**
@@ -17,7 +29,7 @@ export const addKeyListener = (key: 'F5' | 'F6' | 'F7', callback: (info: tm.Mani
  * @param callback Reference to function to remove
  */
 export const removeKeyListener = (callback: (info: tm.ManialinkClickInfo) => void) => {
-  keyListeners = keyListeners.filter(a => callback !== a.callback)
+  keyListeners = keyListeners.filter((a) => callback !== a.callback)
 }
 
 export const initialize = (): void => {
@@ -35,7 +47,8 @@ export const initialize = (): void => {
 }
 
 tm.addListener('PlayerJoin', (info): void => {
-  tm.sendManialink(`<manialinks>
+  tm.sendManialink(
+    `<manialinks>
   <manialink id="${utilIds.F5}">
     <quad posn="0 0 0" sizen="0 0" actionkey="1" action="${utilIds.F5}"/>
   </manialink>
@@ -45,18 +58,20 @@ tm.addListener('PlayerJoin', (info): void => {
   <manialink id="${utilIds.F7}">
     <quad posn="0 0 0" sizen="0 0" actionkey="3" action="${utilIds.F7}"/>
   </manialink>
-  </manialinks>`, info.login)
+  </manialinks>`,
+    info.login
+  )
 })
 
 tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {
   switch (info.actionId) {
     case utilIds.F5:
-      keyListeners.find(a => a.key === 'F5')?.callback(info)
+      keyListeners.find((a) => a.key === 'F5')?.callback(info)
       break
     case utilIds.F6:
-      keyListeners.find(a => a.key === 'F6')?.callback(info)
+      keyListeners.find((a) => a.key === 'F6')?.callback(info)
       break
     case utilIds.F7:
-      keyListeners.find(a => a.key === 'F7')?.callback(info)
+      keyListeners.find((a) => a.key === 'F7')?.callback(info)
   }
 })

@@ -2,7 +2,6 @@ import { Logger } from '../Logger.js'
 import xml2js from 'xml2js'
 
 export class ClientResponse {
-
   private _status: 'pending' | 'overloaded' | 'completed' = 'pending'
   private readonly _targetLength: number
   private readonly _id: number
@@ -16,21 +15,21 @@ export class ClientResponse {
   private _errorCode: number = 0
 
   /**
-  * Initiates an object to store buffers received from dedicated server
-  * @param targetLength first 4 bytes of response
-  * @param id second 4 bytes of response
-  */
+   * Initiates an object to store buffers received from dedicated server
+   * @param targetLength first 4 bytes of response
+   * @param id second 4 bytes of response
+   */
   constructor(targetLength: number, id: number) {
     this._targetLength = targetLength
     this._id = id
   }
 
   /**
-  * Concats new buffer with previous ones and sets status to completed if response reached its target length.
-  * If response length is greater than target length (new data contains fragment of next response)
-  * status is set to overloaded and next response buffer can be extracted using extractOverload() method
-  * @param data buffer received from dedicated server
-  */
+   * Concats new buffer with previous ones and sets status to completed if response reached its target length.
+   * If response length is greater than target length (new data contains fragment of next response)
+   * status is set to overloaded and next response buffer can be extracted using extractOverload() method
+   * @param data buffer received from dedicated server
+   */
   addData(data: Buffer): void {
     const newBuffer: Buffer = Buffer.concat([this._data, data])
     if (newBuffer.length > this._targetLength) {
@@ -53,7 +52,7 @@ export class ClientResponse {
     return this._id
   }
 
-  get status(): "pending" | "overloaded" | "completed" {
+  get status(): 'pending' | 'overloaded' | 'completed' {
     return this._status
   }
 
@@ -90,10 +89,10 @@ export class ClientResponse {
   }
 
   /**
-  * Returns buffer fragment written after reaching target length (next response buffer)
-  * and sets status to completed
-  * @returns next response buffer
-  */
+   * Returns buffer fragment written after reaching target length (next response buffer)
+   * and sets status to completed
+   * @returns next response buffer
+   */
   extractOverload(): Buffer {
     this._status = 'completed'
     if (this._overload === null) {
@@ -140,7 +139,8 @@ export class ClientResponse {
       switch (type) {
         case 'boolean':
           return value === '1'
-        case 'int': case 'i4':
+        case 'int':
+        case 'i4':
           return parseInt(value)
         case 'double':
           return parseFloat(value)
@@ -156,7 +156,9 @@ export class ClientResponse {
           return obj
         case 'array':
           for (const el of value.data) {
-            if (el.value === undefined) { continue } // NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
+            if (el.value === undefined) {
+              continue
+            } // NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
             for (const e of el.value) {
               const t: string = Object.keys(e)[0]
               const val: any = e[t][0]
@@ -191,7 +193,8 @@ export class ClientResponse {
         const type = Object.keys(element)[0]
         return parseType(element[type][0], type)
       } else {
-        for (const p of param.param) { // some callbacks return multiple values instead of an array. NICE!!!!
+        for (const p of param.param) {
+          // some callbacks return multiple values instead of an array. NICE!!!!
           const element: any = p.value[0]
           const type = Object.keys(element)[0]
           arr.push(parseType(element[type][0], type))
@@ -200,5 +203,4 @@ export class ClientResponse {
     }
     return arr
   }
-
 }

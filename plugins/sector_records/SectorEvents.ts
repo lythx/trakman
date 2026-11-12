@@ -34,7 +34,10 @@ const addListener = <T extends keyof SectorEventFunctions>(event: T, callback: S
   }
 }
 
-const emitEvent = async <T extends keyof SectorEventFunctions>(event: T, ...params: Parameters<SectorEventFunctions[T]>) => {
+const emitEvent = async <T extends keyof SectorEventFunctions>(
+  event: T,
+  ...params: Parameters<SectorEventFunctions[T]>
+) => {
   let listeners: any
   switch (event) {
     case 'BestSector':

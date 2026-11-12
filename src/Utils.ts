@@ -1,19 +1,29 @@
-import { Client } from "./client/Client.js"
+import { Client } from './client/Client.js'
 import specialCharmap from './data/SpecialCharmap.js'
 import countries from './data/Countries.js'
 import { Events } from './Events.js'
-import { PlayerService } from "./services/PlayerService.js"
+import { PlayerService } from './services/PlayerService.js'
 import colours from './data/Colours.js'
 import { palette } from '../config/PrefixesAndPalette.js'
-import config from '../config/Config.js'
+import config from './ControllerConfig.js'
+import { withDefaults } from './ConfigDefaults.js'
 import { Logger } from './Logger.js'
 import uFuzzy from '@leeoniya/ufuzzy'
 
 const uf = new uFuzzy(config.searchOptions)
 
-const bills: { id: number, callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void) }[] = []
+const reverseSpecialCharmap = Object.fromEntries(
+  Object.entries(specialCharmap)
+    .map(([letter, specials]: [string, string[]]): [string, string][] => specials.map((s) => [s, letter]))
+    .flat()
+)
+
+const bills: {
+  id: number
+  callback: (status: 'error' | 'refused' | 'accepted', errorString?: string) => void
+}[] = []
 Events.addListener('BillUpdated', (info: tm.BillUpdatedInfo): void => {
-  const billIndex: number = bills.findIndex(a => a.id === info.id)
+  const billIndex: number = bills.findIndex((a) => a.id === info.id)
   if (billIndex !== -1) {
     switch (info.state) {
       case 4:
@@ -33,7 +43,6 @@ Events.addListener('BillUpdated', (info: tm.BillUpdatedInfo): void => {
 })
 
 export const Utils = {
-
   /**
    * Formats time for prettier display. If the current gamemode is Stunts treats the first param as score.
    * @param time Time to format
@@ -49,7 +58,7 @@ export const Utils = {
     const m = d.getUTCMinutes().toString()
     const s = d.getUTCSeconds().toString().padStart(2, '0')
     const ms = d.getUTCMilliseconds().toString().padStart(3, '0').slice(0, -1)
-    return h !== '0' ? (`${h}:${m.padStart(2, '0')}:${s}.${ms}`) : (`${m}:${s}.${ms}`)
+    return h !== '0' ? `${h}:${m.padStart(2, '0')}:${s}.${ms}` : `${m}:${s}.${ms}`
   },
 
   /**
@@ -66,7 +75,7 @@ export const Utils = {
       prefix = '-'
       pos = -pos
     }
-    return prefix + pos.toString() + (['st', 'nd', 'rd'][((pos + 90) % 100 - 10) % 10 - 1] || 'th')
+    return prefix + pos.toString() + (['st', 'nd', 'rd'][((((pos + 90) % 100) - 10) % 10) - 1] || 'th')
   },
 
   /**
@@ -76,12 +85,14 @@ export const Utils = {
    * @returns String without formatting
    */
   strip(str: string, removeColours: boolean = true): string {
-    if (str === undefined) { return '' }
+    if (str === undefined) {
+      return ''
+    }
     let regex: RegExp
     if (removeColours) {
-      regex = /\${1}(L|H|P)\[.*?\](.*?)\$(L|H|P)|\${1}(L|H|P)\[.*?\](.*?)|\${1}(L|H|P)(.*?)|\${1}[SHWIPLONGTZ]|\$(?:[\da-f][^$][^$]|[\da-f][^$]|[^][hlp]|(?=[][])|$)|\${1}[^\💀]/gi
+      regex = /\$(?:[lhp](?:\[.*?\])?|[iowsnmgtz<>]|[0-9a-f][^$]{0,2})/gi
     } else {
-      regex = /\${1}(L|H|P)\[.*?\](.*?)\$(L|H|P)|\${1}(L|H|P)\[.*?\](.*?)|\${1}(L|H|P)(.*?)|\${1}[SHWIPLONGTZ]/gi
+      regex = /\$(?:[lhp](?:\[.*?\])?|[iowsnmgtz<>])/gi
     }
     return str.replace('$$', '💀').replace(regex, '').replace('💀', '$$$$')
   },
@@ -95,21 +106,21 @@ export const Utils = {
    */
   makeGradient(text: string, startColour: string, endColour: string): string {
     const length: number = text.length
-    if (length === 0) { // Why
+    if (length === 0) {
+      // Why
       return ''
     }
     const textSplit: string[] = text.split('')
     let gradient: string = ''
-    let [startRGB, endRGB] = [this.getRGB(startColour), this.getRGB(endColour)]
-    let colours: string[] = []
+    const [startRGB, endRGB] = [this.getRGB(startColour), this.getRGB(endColour)]
+    const colours: string[] = []
     let alpha: number = 0.0
     for (let i = 0; i !== length; i++) {
-      let cc: Array<number> = []
-      alpha += (1.0 / length)
-      cc = [
+      alpha += 1.0 / length
+      const cc: Array<number> = [
         startRGB[0] * alpha + (1 - alpha) * endRGB[0],
         startRGB[1] * alpha + (1 - alpha) * endRGB[1],
-        startRGB[2] * alpha + (1 - alpha) * endRGB[2]
+        startRGB[2] * alpha + (1 - alpha) * endRGB[2],
       ]
       colours.push(this.getHex(cc, false))
     }
@@ -126,9 +137,14 @@ export const Utils = {
    */
   getRGB(hex: string): Array<number> {
     if (hex.length === 3) {
-      hex = hex.split('').map((a): string => { return a + a }).join('')
+      hex = hex
+        .split('')
+        .map((a): string => {
+          return a + a
+        })
+        .join('')
     }
-    const sh: RegExpExecArray | null = (/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i).exec(hex)
+    const sh: RegExpExecArray | null = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
     return sh ? [parseInt(sh[1], 16), parseInt(sh[2], 16), parseInt(sh[3], 16)] : []
   },
 
@@ -139,7 +155,7 @@ export const Utils = {
    * @returns Hex colour string
    */
   getHex(rgb: Array<number>, getFull: boolean = true): string {
-    let hex: string = (1 << 24 | rgb[0] << 16 | rgb[1] << 8 | rgb[2]).toString(16).slice(1)
+    const hex: string = ((1 << 24) | (rgb[0] << 16) | (rgb[1] << 8) | rgb[2]).toString(16).slice(1)
     return getFull ? hex : hex[0] + hex[2] + hex[4] // idk maybe this can be done better
   },
 
@@ -155,25 +171,18 @@ export const Utils = {
   /**
    * Attempts to convert supplied string to latin text based on the special charmap.
    * @param str String to convert
+   * @param ignoreNumbers Whether to ignore numbers when converting (eg. 0 -> o), defaults to false
    * @returns Converted string
    */
-  stripSpecialChars(str: string): string {
-    const charmap = Object.fromEntries(Object.entries(specialCharmap).map((a: [string, string[]]): [string, string[]] =>
-      [a[0], [a[0], ...a[1]]]
-    ))
+  stripSpecialChars(str: string, ignoreNumbers: boolean = false): string {
     let strippedStr: string = ''
     for (const letter of str) {
-      let foundLetter: boolean = false
-      for (const key in charmap) {
-        if (charmap[key].includes(letter)) {
-          strippedStr += key
-          foundLetter = true
-          break
-        }
-      }
-      if (!foundLetter) {
+      if (ignoreNumbers && /\d/.test(letter)) {
         strippedStr += letter
+        continue
       }
+      const latinLetter = reverseSpecialCharmap[letter]
+      strippedStr += latinLetter === undefined ? letter : latinLetter
     }
     return strippedStr
   },
@@ -181,18 +190,26 @@ export const Utils = {
   /**
    * Gets country information from region in Nadeo format (eg. World|Poland|Pomorskie)
    * @param region Region in Nadeo format, can start with World but doesn't have to
-   * @returns Object containing parsed region (eg. Poland|Pomorskie), country and 
-   * country code (eg. POL) if matching one was found 
+   * @returns Object containing parsed region (eg. Poland|Pomorskie), country and
+   * country code (eg. POL) if matching one was found
    */
-  getRegionInfo(region: string): { region: string, country: string, countryCode?: string } {
-    let split = region.split('|')
+  getRegionInfo(region: string): {
+    region: string
+    country: string
+    countryCode: string
+  } {
+    const split = region.split('|')
     if (region.startsWith('World')) {
       split.shift()
     }
     const r: string = split.join('|')
     const country: string = split[0]
-    const countryCode: string | undefined = this.countryToCode(country)
-    return { region: r, country, countryCode }
+    const countryCode: string = this.countryToCode(country)
+    return {
+      region: r,
+      country,
+      countryCode,
+    }
   },
 
   /**
@@ -200,7 +217,9 @@ export const Utils = {
    * @param environment Environment of type tm.Environment
    * @returns Whatever on earth Nadeo wanted to call their environment
    */
-  environmentToNadeoEnvironment(environment: tm.Environment): Omit<tm.Environment, 'Desert' | 'Snow'> | 'Speed' | 'Alpine' {
+  environmentToNadeoEnvironment(
+    environment: tm.Environment
+  ): Omit<tm.Environment, 'Desert' | 'Snow'> | 'Speed' | 'Alpine' {
     const environmentMap: { [environment in tm.Environment]: string } = {
       Stadium: 'Stadium',
       Island: 'Island',
@@ -208,9 +227,9 @@ export const Utils = {
       Rally: 'Rally',
       Bay: 'Bay',
       Coast: 'Coast',
-      Snow: 'Alpine'
+      Snow: 'Alpine',
     }
-    return environmentMap[environment]
+    return environmentMap[environment] ?? environment
   },
 
   matchString,
@@ -220,8 +239,8 @@ export const Utils = {
    * @param country Country name (eg. Poland)
    * @returns Country code (eg. POL)
    */
-  countryToCode(country: string): string | undefined {
-    return countries.find(a => a.name === country)?.code
+  countryToCode(country: string): string {
+    return countries.find((a) => a.name === country)?.code ?? 'OTH'
   },
 
   /**
@@ -229,17 +248,27 @@ export const Utils = {
    * @param current Object containing current record time (treated as score in Stunts mode) and position
    * @param previous Optional object containing previous record time and position
    * @param ignoreGamemode If true won't treat times as scores in Stunts Mode
-   * @returns Object containing the verb to use (eg. 'acquired', 'improved') and 
+   * @returns Object containing the verb to use (eg. 'acquired', 'improved') and
    * the time difference string if previous record was specified
    */
-  getRankingString(current: { time: number, position: number }, previous?: { time: number, position: number }, ignoreGamemode?: true): {
-    status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved',
+  getRankingString(
+    current: {
+      time: number
+      position: number
+    },
+    previous?: {
+      time: number
+      position: number
+    },
+    ignoreGamemode?: true
+  ): {
+    status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved'
     difference?: string
   } {
     let calc: boolean = false
     const obj: any = {
       status: ``,
-      difference: undefined
+      difference: undefined,
     }
     if (previous === undefined) {
       obj.status = 'acquired'
@@ -263,7 +292,11 @@ export const Utils = {
       let i: number = -1
       while (true) {
         i++
-        if (obj.difference[i] === undefined || (!isNaN(Number(obj.difference[i])) && Number(obj.difference[i]) !== 0) || obj.difference.length === 4) {
+        if (
+          obj.difference[i] === undefined ||
+          (!isNaN(Number(obj.difference[i])) && Number(obj.difference[i]) !== 0) ||
+          obj.difference.length === 4
+        ) {
           break
         }
         if (Number(obj.difference[i]) !== 0) {
@@ -287,9 +320,21 @@ export const Utils = {
    * @param targetLogin Login of the receiver
    * @returns Whether the payment went through or error
    */
-  async sendCoppers(payerLogin: string, amount: number, message: string, targetLogin: string = ''): Promise<boolean | Error> {
-    const billId: any | Error = await Client.call('SendBill', [{ string: payerLogin }, { int: amount }, { string: message }, { string: targetLogin }])
-    if (billId instanceof Error) { return billId }
+  async sendCoppers(
+    payerLogin: string,
+    amount: number,
+    message: string,
+    targetLogin: string = ''
+  ): Promise<boolean | Error> {
+    const billId: any | Error = await Client.call('SendBill', [
+      { string: payerLogin },
+      { int: amount },
+      { string: message },
+      { string: targetLogin },
+    ])
+    if (billId instanceof Error) {
+      return billId
+    }
     return await new Promise((resolve): void => {
       const callback = (status: 'error' | 'refused' | 'accepted', errorString?: string): void => {
         switch (status) {
@@ -303,7 +348,10 @@ export const Utils = {
             resolve(new Error(errorString ?? 'error'))
         }
       }
-      bills.push({ id: billId, callback })
+      bills.push({
+        id: billId,
+        callback,
+      })
     })
   },
 
@@ -315,8 +363,14 @@ export const Utils = {
    * @returns True on payment success or error
    */
   async payCoppers(targetLogin: string, amount: number, message: string): Promise<true | Error> {
-    const billId: any | Error = await Client.call('Pay', [{ string: targetLogin }, { int: amount }, { string: message }])
-    if (billId instanceof Error) { return billId }
+    const billId: any | Error = await Client.call('Pay', [
+      { string: targetLogin },
+      { int: amount },
+      { string: message },
+    ])
+    if (billId instanceof Error) {
+      return billId
+    }
     return await new Promise((resolve): void => {
       const callback = (status: 'error' | 'refused' | 'accepted', errorString?: string): void => {
         switch (status) {
@@ -332,7 +386,10 @@ export const Utils = {
             resolve(new Error(errorString ?? 'error'))
         }
       }
-      bills.push({ id: billId, callback })
+      bills.push({
+        id: billId,
+        callback,
+      })
     })
   },
 
@@ -350,16 +407,32 @@ export const Utils = {
     const days: number = d.getUTCDate() - 1
     const months: number = d.getUTCMonth()
     const years: number = d.getUTCFullYear() - 1970
-    if (years > 0) { str += years === 1 ? `${years} year, ` : `${years} years, ` }
-    if (months > 0) { str += months === 1 ? `${months} month, ` : `${months} months, ` }
-    if (days > 0) { str += days === 1 ? `${days} day, ` : `${days} days, ` }
-    if (hours > 0) { str += hours === 1 ? `${hours} hour, ` : `${hours} hours, ` }
-    if (minutes > 0) { str += minutes === 1 ? `${minutes} minute, ` : `${minutes} minutes, ` }
-    if (seconds > 0) { str += seconds === 1 ? `${seconds} second, ` : `${seconds} seconds, ` }
+    if (years > 0) {
+      str += years === 1 ? `${years} year, ` : `${years} years, `
+    }
+    if (months > 0) {
+      str += months === 1 ? `${months} month, ` : `${months} months, `
+    }
+    if (days > 0) {
+      str += days === 1 ? `${days} day, ` : `${days} days, `
+    }
+    if (hours > 0) {
+      str += hours === 1 ? `${hours} hour, ` : `${hours} hours, `
+    }
+    if (minutes > 0) {
+      str += minutes === 1 ? `${minutes} minute, ` : `${minutes} minutes, `
+    }
+    if (seconds > 0) {
+      str += seconds === 1 ? `${seconds} second, ` : `${seconds} seconds, `
+    }
     str = str.substring(0, str.length - 2)
     const index: number = str.lastIndexOf(',')
-    if (index !== -1) { str = str.substring(0, index) + ' and' + str.substring(index + 1) }
-    if (str === '') { return '0 seconds' }
+    if (index !== -1) {
+      str = str.substring(0, index) + ' and' + str.substring(index + 1)
+    }
+    if (str === '') {
+      return '0 seconds'
+    }
     return str
   },
 
@@ -373,7 +446,9 @@ export const Utils = {
       '&': '&amp;',
       '"': '&quot;',
     }
-    return str.replace(/[&"]/g, (m): string => { return map[m as keyof typeof map] })
+    return str.replace(/[&"]/g, (m): string => {
+      return map[m as keyof typeof map]
+    })
   },
 
   /**
@@ -385,23 +460,28 @@ export const Utils = {
     const map = {
       '&amp;': '\&',
       '&quot;': '\"',
-      '&apos;': '\'',
+      '&apos;': "'",
       '&gt;': '\>',
       '&lt;': '\<',
-      '+': ' '
+      '+': ' ',
     }
     let res: string
     try {
       res = decodeURIComponent(str)
-    } catch (e) {
+    } catch {
       // try to cut off the last percent sign and try again
       // this failure happens so little I do not care about speed that much
       // it looks much better usually
       const i = str.indexOf('%', str.length - 3)
-      if (i === -1) res = str
-      else res = this.decodeURI(str.slice(0, i)) + "..."
+      if (i === -1) {
+        res = str
+      } else {
+        res = this.decodeURI(str.slice(0, i)) + '...'
+      }
     }
-    return res.replace(/&amp;|&quot;|&apos;|&gt;|&lt;|\+/g, (m): string => { return map[m as keyof typeof map] })
+    return res.replace(/&amp;|&quot;|&apos;|&gt;|&lt;|\+/g, (m): string => {
+      return map[m as keyof typeof map]
+    })
   },
 
   /**
@@ -426,7 +506,7 @@ export const Utils = {
     }
     const matches = []
     const indices = this.matchString(nickname, strippedNicknames)
-    matches.push(indices.map(a => players[a]))
+    matches.push(indices.map((a) => players[a]))
     if (matches.length === 0) {
       return undefined
     }
@@ -436,8 +516,8 @@ export const Utils = {
   /**
    * Converts date string to time in milliseconds.
    * This method is used to parse time in chat commands.
-   * @param dateStr Date string, number followed by optional modifier 
-   * [s - seconds, m - minutes, h - hours, d - days]). 
+   * @param dateStr Date string, number followed by optional modifier
+   * [s - seconds, m - minutes, h - hours, d - days]).
    * If no modifier is specified the number will be treated as minutes.
    * @returns Time in milliseconds, RangeError if time is bigger than max js Date,
    * TypeError if the dateStr is not a valid date string
@@ -485,7 +565,9 @@ export const Utils = {
    */
   formatDate(date: Date, displayDay?: true): string {
     if (displayDay === true) {
-      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1)
+        .toString()
+        .padStart(2, '0')}/${date.getFullYear()}`
     }
     return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
   },
@@ -504,8 +586,11 @@ export const Utils = {
           text += `[`
           hasOptionals = true
         }
-        if (i === 0) { text += `${e.name} <${e.type ?? 'string'}>` }
-        else { text += `, ${e.name} <${e.type ?? 'string'}>` }
+        if (i === 0) {
+          text += `${e.name} <${e.type ?? 'string'}>`
+        } else {
+          text += `, ${e.name} <${e.type ?? 'string'}>`
+        }
       }
     }
     if (hasOptionals) {
@@ -521,10 +606,19 @@ export const Utils = {
    * @returns Coppers amount after subtracting tax
    */
   getCoppersAfterTax(coppers: number): number {
-    return Math.round(coppers * 1.05) + 2 - coppers
+    return coppers - (Math.round(coppers * 0.05) + 2)
   },
 
   strVar,
+
+  /**
+   * Fills in missing settings of a (possibly outdated) config object with hard-coded defaults.
+   * Nested objects are merged recursively, arrays and primitives present in the config are kept as-is.
+   * @param config Config object (e.g. imported from a `.js` config file)
+   * @param defaults Defaults for the settings that must be present
+   * @returns Config object with the defaults applied
+   */
+  withDefaults,
 
   /**
    * List of colours in Trackmania format (prefixed with $ and in 3 digit hex).
@@ -543,30 +637,42 @@ export const Utils = {
    */
   get countries() {
     return countries
-  }
-
+  },
 }
 
-/** 
+/**
  * Replaces #{variableName} in string with given variables.
  * @param str String to replace #{variableName} in
  * @param variables Object containing values for variable names (key is variableName)
  * @returns String with replaced variables
  */
-function strVar(str: string, variables: { [name: string]: any }): string
-/** 
+function strVar(
+  str: string,
+  variables: {
+    [name: string]: any
+  }
+): string
+/**
  * Replaces #{variableName} in string with given variables
  * @param str String to replace #{variableName} in
  * @param variables Array containing values for variables in order
  * @returns String with replaced variables
  */
 function strVar(str: string, variables: any[]): string
-function strVar(str: string, vars: { [name: string]: any }): string {
+function strVar(
+  str: string,
+  vars: {
+    [name: string]: any
+  }
+): string {
+  if (str === undefined) {
+    return ''
+  }
   if (Array.isArray(vars)) {
     for (const e of vars) {
       if (typeof e === 'string') {
         let arr: string[] = e.split('')
-        arr = arr.map(a => a === '$' ? '$$' : a)
+        arr = arr.map((a) => (a === '$' ? '$$' : a))
         str = str.replace(/#{([^}]*)}/, arr.join(''))
       } else {
         str = str.replace(/#{([^}]*)}/, e)
@@ -577,7 +683,7 @@ function strVar(str: string, vars: { [name: string]: any }): string {
   for (const [k, v] of Object.entries(vars)) {
     if (typeof v === 'string') {
       let arr: string[] = v.split('')
-      arr = arr.map(a => a === '$' ? '$$' : a)
+      arr = arr.map((a) => (a === '$' ? '$$' : a))
       str = str.replace(`#{${k}}`, arr.join(''))
     } else {
       str = str.replace(`#{${k}}`, v)
@@ -586,15 +692,51 @@ function strVar(str: string, vars: { [name: string]: any }): string {
   return str
 }
 
+const matchStringCache: Map<string, string> = new Map()
+const matchStringCacheIgnoreNumbers: Map<string, string> = new Map()
+
 /**
  * Searches for a given string in a given array of values
  * @param needle What string to search for
  * @param haystack Array where to search
+ * @param stripTrackmaniaFormatting Removes all Trackmania specific formatting (e.g. $w, $fff, etc.) from the haystack strings
  * @returns Indices that match the search
  */
-function matchString(needle: string, haystack: string[]): number[] {
-  if (haystack.length === 0) { return [] }
-  haystack = uFuzzy.latinize(haystack)
+function matchString(needle: string, haystack: string[], stripTrackmaniaFormatting: boolean = false): number[] {
+  if (haystack.length === 0) {
+    return []
+  }
+  needle = needle.toLowerCase()
+
+  const needleHasNumbers = /\d/.test(needle)
+
+  const reduxMode = haystack.length > config.matchStringReduxModeThreshold
+
+  const cache = needleHasNumbers ? matchStringCacheIgnoreNumbers : matchStringCache
+
+  haystack = haystack.map((val) => {
+    let modifiedVal = val.toLowerCase()
+
+    const cachedVal = cache.get(modifiedVal)
+    if (cachedVal !== undefined) {
+      return cachedVal
+    }
+
+    if (!reduxMode) {
+      if (stripTrackmaniaFormatting) {
+        modifiedVal = Utils.strip(modifiedVal, true)
+      }
+      modifiedVal = Utils.stripSpecialChars(modifiedVal, needleHasNumbers)
+    }
+    modifiedVal = uFuzzy.latinize(modifiedVal)
+
+    cache.set(val, modifiedVal)
+    if (cache.size > config.matchStringCacheSize) {
+      cache.clear()
+    }
+    return modifiedVal
+  })
+
   const arr = []
   const idxs = uf.filter(haystack, needle)
   if (idxs != null && idxs.length > 0) {

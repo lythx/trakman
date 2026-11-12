@@ -1,7 +1,6 @@
-import type { ButtonData } from "./ButtonData.js"
+import type { ButtonData } from './ButtonData.js'
 
 export abstract class UiButton {
-
   abstract buttonData: ButtonData
   private static readonly replayListeners: ((buttonName: string) => void)[] = []
   private static readonly updateListeners: ((buttonData: ButtonData) => void)[] = []
@@ -37,4 +36,11 @@ export abstract class UiButton {
     UiButton.skipListeners.push(callback)
   }
 
+  /**
+   * If `ButtonData.perPlayer` is set to true this function will be used for rendering, instead
+   * of static rendering based on `ButtonData` (see `MedalButton.ts`)
+   */
+  public renderForPlayer(login: string, i: number, j: number, w: number, h: number): string {
+    return ``
+  }
 }

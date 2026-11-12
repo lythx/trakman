@@ -3,6 +3,7 @@ interface Caller {
   readonly nickname: string
   readonly privilege: number
 }
+
 interface Song {
   name: string
   author: string
@@ -11,14 +12,14 @@ interface Song {
   caller?: Caller
 }
 
-type QueueChangedCallback =
-  ((queue: Song[], change?: {
-    song: Song,
+type QueueChangedCallback = (
+  queue: Song[],
+  change?: {
+    song: Song
     action: 'added' | 'removed' | 'addedToQueue' | 'removedFromQueue'
-  }) => void | Promise<void>)
-type SongAddedCallback = ((song: Song, caller?: Readonly<Caller>) => void | Promise<void>)
-type SongRemovedCallback = ((song: Song, caller?: Readonly<Caller>) => void | Promise<void>)
+  }
+) => void | Promise<void>
+type SongAddedCallback = (song: Song, caller?: Readonly<Caller>) => void | Promise<void>
+type SongRemovedCallback = (song: Song, caller?: Readonly<Caller>) => void | Promise<void>
 
-export type {
-  Caller, Song, QueueChangedCallback, SongAddedCallback, SongRemovedCallback
-}
+export type { Caller, Song, QueueChangedCallback, SongAddedCallback, SongRemovedCallback }

@@ -6,7 +6,7 @@ export default {
   cupEntries: 8,
   entryHeight: 2.15,
   width: cfg.width,
-  title: "Rounds Points",
+  title: 'Rounds Points',
   icon: icons.chartLocal,
   margin: cfg.margin,
   topCount: 5,

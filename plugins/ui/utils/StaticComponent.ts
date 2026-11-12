@@ -1,8 +1,106 @@
-import RaceUi from "../config/RaceUi.js"
-import ResultUi from "../config/ResultUi.js"
-import { components, addKeyListener } from '../UI.js'
+import userRaceUi from '../config/RaceUi.js'
+import userResultUi from '../config/ResultUi.js'
+import { addKeyListener, components } from '../UI.js'
 
-interface PlayerML { login: string | string[], xml: string }
+const RaceUi = tm.utils.withDefaults(userRaceUi, {
+  reduxModeEnablePlayerAmount: 20,
+  reduxModeDisablePlayerAmount: 18,
+  marginBig: 0.27,
+  topBorder: 47.85,
+  rightPosition: 49.13,
+  leftPosition: -63.75,
+  rightSideOrder: [
+    'MapWidget',
+    'PreviousAndBest',
+    'TMXRanking',
+    'TimerWidget',
+    'LocalRanking',
+    'LiveRanking',
+    'DonationPanel',
+  ],
+  leftSideOrder: ['ButtonsWidget', 'RankWidget', 'KarmaWidget', 'DediRanking', 'AdminPanel'],
+  otherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+  roundsRightSideOrder: [
+    'MapWidget',
+    'PreviousAndBest',
+    'TMXRanking',
+    'TimerWidget',
+    'RoundScore',
+    'RoundsPointsRanking',
+    'DonationPanel',
+  ],
+  roundsLeftSideOrder: ['ButtonsWidget', 'RankWidget', 'KarmaWidget', 'DediRanking', 'LocalRanking', 'AdminPanel'],
+  roundsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+  cupRightSideOrder: [
+    'MapWidget',
+    'PreviousAndBest',
+    'TMXRanking',
+    'TimerWidget',
+    'RoundScore',
+    'RoundsPointsRanking',
+    'DonationPanel',
+  ],
+  cupLeftSideOrder: ['ButtonsWidget', 'RankWidget', 'KarmaWidget', 'DediRanking', 'LocalRanking', 'AdminPanel'],
+  cupOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+  teamsRightSideOrder: [
+    'MapWidget',
+    'PreviousAndBest',
+    'TMXRanking',
+    'TimerWidget',
+    'RoundScore',
+    'LocalRanking',
+    'TeamScore',
+    'DonationPanel',
+  ],
+  teamsLeftSideOrder: ['ButtonsWidget', 'RankWidget', 'KarmaWidget', 'DediRanking', 'AdminPanel'],
+  teamsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+  lapsRightSideOrder: [
+    'MapWidget',
+    'PreviousAndBest',
+    'TMXRanking',
+    'TimerWidget',
+    'LiveRanking',
+    'LocalRanking',
+    'DonationPanel',
+  ],
+  lapsLeftSideOrder: ['ButtonsWidget', 'RankWidget', 'KarmaWidget', 'DediRanking', 'LapRanking', 'AdminPanel'],
+  lapsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+  stuntsRightSideOrder: ['MapWidget', 'PreviousAndBest', 'DonationPanel', 'TimerWidget', 'LocalRanking', 'LiveRanking'],
+  stuntsLeftSideOrder: ['ButtonsWidget', 'RankWidget', 'KarmaWidget', 'TMXRanking', 'UltiRanking', 'AdminPanel'],
+  stuntsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+})
+
+const ResultUi = tm.utils.withDefaults(userResultUi, {
+  marginBig: 0.27,
+  topBorder: 47.85,
+  rightPosition: 49.13,
+  leftPosition: -63.75,
+  rightSideOrder: [
+    'MapWidgetResult',
+    'NextMapRecords',
+    'TimerWidgetResult',
+    'KarmaRanking',
+    'VotersRanking',
+    'VisitorsRanking',
+    'DonationPanelResult',
+  ],
+  leftSideOrder: [
+    'AveragesRanking',
+    'RankWidgetResult',
+    'KarmaWidgetResult',
+    'LocalRankingResult',
+    'DediRankingResult',
+    'RoundAveragesRanking',
+    'AdminPanelResult',
+  ],
+  otherComponents: ['DonatorsRanking', 'MostRecordsRanking', 'PlaytimeRanking', 'WinnersRanking', 'BannerWidget'],
+})
+
+interface PlayerML {
+  login: string | string[]
+  xml: string
+}
+
 type PlayerMLList = (string | PlayerML | void)[]
 type MLLike = string | PlayerML | PlayerMLList
 
@@ -10,53 +108,68 @@ type MLLike = string | PlayerML | PlayerMLList
  * Abstract class for static manialink components.
  */
 export default abstract class StaticComponent {
-
   static components: {
-    [mode in tm.GameMode | 'Result']: { [sideOrList in 'left' | 'right' | 'other']:
-      { name: string, getHeight: () => number }[] }
-  } =
-      {
-        TimeAttack: {
-          left: [],
-          right: [],
-          other: []
-        },
-        Rounds: {
-          left: [],
-          right: [],
-          other: []
-        },
-        Cup: {
-          left: [],
-          right: [],
-          other: []
-        },
-        Laps: {
-          left: [],
-          right: [],
-          other: []
-        },
-        Teams: {
-          left: [],
-          right: [],
-          other: []
-        },
-        Stunts: {
-          left: [],
-          right: [],
-          other: []
-        },
-        Result: {
-          left: [],
-          right: [],
-          other: []
-        }
-      }
+    [mode in tm.GameMode | 'Result']: {
+      [sideOrList in 'left' | 'right' | 'other']: {
+        name: string
+        getHeight: () => number
+      }[]
+    }
+  } = {
+    TimeAttack: {
+      left: [],
+      right: [],
+      other: [],
+    },
+    Rounds: {
+      left: [],
+      right: [],
+      other: [],
+    },
+    Cup: {
+      left: [],
+      right: [],
+      other: [],
+    },
+    Laps: {
+      left: [],
+      right: [],
+      other: [],
+    },
+    Teams: {
+      left: [],
+      right: [],
+      other: [],
+    },
+    Stunts: {
+      left: [],
+      right: [],
+      other: [],
+    },
+    Result: {
+      left: [],
+      right: [],
+      other: [],
+    },
+  }
   static displayedComponents: {
-    left: { name: string, getHeight: () => number }[],
-    right: { name: string, getHeight: () => number }[],
-    other: { name: string, getHeight: () => number }[]
-  } = { left: [], right: [], other: [] }
+    left: {
+      name: string
+      getHeight: () => number
+    }[]
+    right: {
+      name: string
+      getHeight: () => number
+    }[]
+    other: {
+      name: string
+      getHeight: () => number
+    }[]
+  } = {
+    left: [],
+    right: [],
+    other: [],
+  }
   private _isDisplayed = true
   /** Component manialink ID */
   readonly id: number
@@ -66,7 +179,7 @@ export default abstract class StaticComponent {
   protected side: boolean
   static componentListCreated = false
   private static listeners: {
-    event: keyof tm.Events,
+    event: keyof tm.Events
     callback: (params: any) => MLLike | void
   }[] = []
   private static listenersAdded = false
@@ -84,7 +197,9 @@ export default abstract class StaticComponent {
     }
     this.id = id
     this.renderOnEvent('EndMap', (info) => {
-      if (info.isRestart && info.serverSideRankings[0]?.BestTime === -1) { return } // ignore the short restart
+      if (info.isRestart && info.serverSideRankings[0]?.BestTime === -1) {
+        return
+      } // ignore the short restart
       this.updateIsDisplayed()
       this.updatePosition()
       return this._isDisplayed ? this.display() : this.hide()
@@ -130,13 +245,23 @@ export default abstract class StaticComponent {
       }
       StaticComponent.sendMultipleManialinks(manialinks)
     })
-    tm.addListener('EndMap', (info): void => {
-      if (info.isRestart && info.serverSideRankings[0]?.BestTime === -1) { return } // ignore the short restart
-      StaticComponent.updateDisplayedComponents()
-    }, true)
-    tm.addListener('BeginMap', (): void => {
-      StaticComponent.updateDisplayedComponents()
-    }, true)
+    tm.addListener(
+      'EndMap',
+      (info): void => {
+        if (info.isRestart && info.serverSideRankings[0]?.BestTime === -1) {
+          return
+        } // ignore the short restart
+        StaticComponent.updateDisplayedComponents()
+      },
+      true
+    )
+    tm.addListener(
+      'BeginMap',
+      (): void => {
+        StaticComponent.updateDisplayedComponents()
+      },
+      true
+    )
     tm.addListener('PlayerJoin', () => this.updateReduxModeStatus())
     tm.addListener('PlayerLeave', (info) => {
       const index = this.panelHideList.indexOf(info.login)
@@ -148,17 +273,21 @@ export default abstract class StaticComponent {
       }
       this.updateReduxModeStatus()
     })
-    addKeyListener('F7', (info) => {
-      const index = this.panelHideList.indexOf(info.login)
-      if (index !== -1) {
-        this.panelHideList.splice(index)
-      } else {
-        this.panelHideList.push(info.login)
-      }
-      for (const e of this.panelHideListeners) {
-        e(info)
-      }
-    }, 1)
+    addKeyListener(
+      'F7',
+      (info) => {
+        const index = this.panelHideList.indexOf(info.login)
+        if (index !== -1) {
+          this.panelHideList.splice(index)
+        } else {
+          this.panelHideList.push(info.login)
+        }
+        for (const e of this.panelHideListeners) {
+          e(info)
+        }
+      },
+      1
+    )
   }
 
   private static initialize() {
@@ -229,20 +358,35 @@ export default abstract class StaticComponent {
    * Updates _isDisplayed prop based on current static UI layout
    */
   updateIsDisplayed(): void {
-    this._isDisplayed = (StaticComponent.displayedComponents.left.some(a => a.name === this.constructor.name) ||
-      StaticComponent.displayedComponents.right.some(a => a.name === this.constructor.name) ||
-      StaticComponent.displayedComponents.other.some(a => a.name === this.constructor.name))
+    this._isDisplayed =
+      StaticComponent.displayedComponents.left.some((a) => a.name === this.constructor.name) ||
+      StaticComponent.displayedComponents.right.some((a) => a.name === this.constructor.name) ||
+      StaticComponent.displayedComponents.other.some((a) => a.name === this.constructor.name)
   }
 
-  private static mapComponentHeight(names: (string | number)[]): { name: string, getHeight: () => number }[] {
-    const ret: { name: string, getHeight: () => number }[] = []
+  private static mapComponentHeight(names: (string | number)[]): {
+    name: string
+    getHeight: () => number
+  }[] {
+    const ret: {
+      name: string
+      getHeight: () => number
+    }[] = []
     for (const e of names) {
       if (typeof e === 'number') {
-        ret.push({ name: '__margin__', getHeight: () => e })
+        ret.push({
+          name: '__margin__',
+          getHeight: () => e,
+        })
       } else {
         const comp = components.findStatic(e)
-        if (comp === undefined) { continue }
-        ret.push({ name: e, getHeight: comp.getHeight.bind(comp) })
+        if (comp === undefined) {
+          continue
+        }
+        ret.push({
+          name: e,
+          getHeight: comp.getHeight.bind(comp),
+        })
       }
     }
     return ret
@@ -259,37 +403,37 @@ export default abstract class StaticComponent {
     c.TimeAttack = {
       left: f(r.leftSideOrder),
       right: f(r.rightSideOrder),
-      other: f(r.otherComponents)
+      other: f(r.otherComponents),
     }
     c.Rounds = {
       left: f(r.roundsLeftSideOrder),
       right: f(r.roundsRightSideOrder),
-      other: f(r.roundsOtherComponents)
+      other: f(r.roundsOtherComponents),
     }
     c.Cup = {
       left: f(r.cupLeftSideOrder),
       right: f(r.cupRightSideOrder),
-      other: f(r.cupOtherComponents)
+      other: f(r.cupOtherComponents),
     }
     c.Teams = {
       left: f(r.teamsLeftSideOrder),
       right: f(r.teamsRightSideOrder),
-      other: f(r.teamsOtherComponents)
+      other: f(r.teamsOtherComponents),
     }
     c.Laps = {
       left: f(r.lapsLeftSideOrder),
       right: f(r.lapsRightSideOrder),
-      other: f(r.lapsOtherComponents)
+      other: f(r.lapsOtherComponents),
     }
     c.Stunts = {
       left: f(r.stuntsLeftSideOrder),
       right: f(r.stuntsRightSideOrder),
-      other: f(r.stuntsOtherComponents)
+      other: f(r.stuntsOtherComponents),
     }
     c.Result = {
       left: f(res.leftSideOrder),
       right: f(res.rightSideOrder),
-      other: f(res.otherComponents)
+      other: f(res.otherComponents),
     }
     this.updateDisplayedComponents()
   }
@@ -298,7 +442,11 @@ export default abstract class StaticComponent {
    * Gets position relative to other static manialinks based on current static UI layout.
    * @returns Object containing coordinates and side of the component
    */
-  private getRelativePosition(): { x: number, y: number, side: boolean } {
+  private getRelativePosition(): {
+    x: number
+    y: number
+    side: boolean
+  } {
     const widgetName: string = this.constructor.name
     let cfg
     if (tm.getState() === 'result') {
@@ -309,14 +457,25 @@ export default abstract class StaticComponent {
     const left = StaticComponent.displayedComponents.left
     const right = StaticComponent.displayedComponents.right
     let side = false
-    if (right.some(a => a.name === widgetName)) { side = true }
-    const order: { name: string; getHeight: () => number; }[] = side ? right : left
+    if (right.some((a) => a.name === widgetName)) {
+      side = true
+    }
+    const order: {
+      name: string
+      getHeight: () => number
+    }[] = side ? right : left
     let positionSum = 0
     for (const e of order) {
-      if (e.name === widgetName) { break }
+      if (e.name === widgetName) {
+        break
+      }
       positionSum += e.getHeight() + cfg.marginBig
     }
-    return { y: cfg.topBorder - positionSum, x: side ? cfg.rightPosition : cfg.leftPosition, side }
+    return {
+      y: cfg.topBorder - positionSum,
+      x: side ? cfg.rightPosition : cfg.leftPosition,
+      side,
+    }
   }
 
   /**
@@ -347,11 +506,14 @@ export default abstract class StaticComponent {
   }
 
   hideToPlayer(login: string): PlayerML {
-    return { xml: `<manialink id="${this.id}"></manialink>`, login }
+    return {
+      xml: `<manialink id="${this.id}"></manialink>`,
+      login,
+    }
   }
 
   /**
-   * Add a callback function to execute when new component object gets created 
+   * Add a callback function to execute when new component object gets created
    * @param callback Function to execute on event
    */
   static onComponentCreated(callback: (component: StaticComponent) => void): void {
@@ -359,7 +521,10 @@ export default abstract class StaticComponent {
   }
 
   protected renderOnEvent<T extends keyof tm.Events>(event: T, callback: (params: tm.Events[T]) => MLLike | void) {
-    StaticComponent.listeners.push({ event, callback })
+    StaticComponent.listeners.push({
+      event,
+      callback,
+    })
   }
 
   static reduxModeChangeListeners: (() => MLLike | void)[] = []
@@ -373,7 +538,9 @@ export default abstract class StaticComponent {
   }
 
   static async sendMultipleManialinks(manialinks?: MLLike | void) {
-    if (manialinks === undefined) { return }
+    if (manialinks === undefined) {
+      return
+    }
     if (typeof manialinks === 'string') {
       tm.sendManialink(manialinks)
       return
@@ -383,13 +550,15 @@ export default abstract class StaticComponent {
       return
     }
     if (Array.isArray(manialinks)) {
-      manialinks = manialinks.filter(a => a !== undefined)
+      manialinks = manialinks.filter((a) => a !== undefined)
     }
     const xmls: Record<string, string> = {}
     for (let i = 0; i < manialinks.length; i++) {
       const ml: string | PlayerML | void = manialinks[i]
       let login: string | string[] = (ml as any).login ?? '*'
-      if (Array.isArray(login)) { login = login.join(',') }
+      if (Array.isArray(login)) {
+        login = login.join(',')
+      }
       if (!(login in xmls)) {
         xmls[login] = ''
       } else if ((xmls[login] + ml).length > 64000) {
@@ -398,7 +567,7 @@ export default abstract class StaticComponent {
         } else {
           tm.sendManialink('<manialinks>' + xmls[login] + '</manialinks>', login)
         }
-        await new Promise(r => setImmediate(r))
+        await new Promise((r) => setImmediate(r))
         xmls[login] = ''
       }
       xmls[login] += (ml as any).xml ?? ml
@@ -434,5 +603,4 @@ export default abstract class StaticComponent {
   protected get panelHideList() {
     return [...StaticComponent.panelHideList]
   }
-
 }

@@ -1,16 +1,24 @@
 import { centeredText } from '../UI.js'
-import config from './Navbar.config.js'
+import userConfig from './Navbar.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 3.5,
+  margin: 0.15,
+})
 
 /**
  * Util to display horizontal navbar, used by popup windows.
  */
 export default class Navbar {
-
   /** Navbar width */
   readonly width: number
   /** Navbar height */
   readonly height: number
-  private buttons: { name: string, actionId: number, privilege: number }[]
+  private buttons: {
+    name: string
+    actionId: number
+    privilege: number
+  }[]
   /** Background image displayed on button hover */
   readonly hoverImage: string
   /** Background colour */
@@ -24,14 +32,23 @@ export default class Navbar {
    * @param background Navbar background
    * @param hoverImgUrl Background image to display on button hover
    */
-  constructor(buttons: {
-    name: string, actionId: number,
-    privilege?: number
-  }[], width: number, height: number | null = config.height,
-    background: string = config.background, hoverImgUrl: string = config.hoverImage) {
+  constructor(
+    buttons: {
+      name: string
+      actionId: number
+      privilege?: number
+    }[],
+    width: number,
+    height: number | null = config.height,
+    background: string = config.background,
+    hoverImgUrl: string = config.hoverImage
+  ) {
     this.width = width
     this.height = height ?? config.height
-    this.buttons = buttons.map(a => ({ ...a, privilege: a.privilege ?? 0 }))
+    this.buttons = buttons.map((a) => ({
+      ...a,
+      privilege: a.privilege ?? 0,
+    }))
     this.hoverImage = hoverImgUrl
     this.background = background
   }
@@ -42,7 +59,7 @@ export default class Navbar {
    * @returns Button count
    */
   getButtonCount(privilege: number = 0): number {
-    return this.buttons.filter(a => a.privilege <= privilege).length
+    return this.buttons.filter((a) => a.privilege <= privilege).length
   }
 
   /**
@@ -52,7 +69,7 @@ export default class Navbar {
    */
   constructXml(privilege: number = 0): string {
     let xml: string = ``
-    const arr = this.buttons.filter(a => a.privilege <= privilege)
+    const arr = this.buttons.filter((a) => a.privilege <= privilege)
     const w: number = (this.width + config.margin) / arr.length
     for (const [i, e] of arr.entries()) {
       xml += `<frame posn="${w * i} 0 1">
@@ -63,5 +80,4 @@ export default class Navbar {
     }
     return xml
   }
-
 }

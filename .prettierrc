@@ -1,0 +1,8 @@
+{
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "objectWrap": "preserve",
+  "bracketSameLine": true,
+  "quoteProps": "consistent"
+}

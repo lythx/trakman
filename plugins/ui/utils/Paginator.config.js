@@ -5,7 +5,7 @@ export default {
   buttonHeight: 3,
   margin: 0.4,
   padding: 0.2,
-  background: "000D",
+  background: '000D',
   icons: [
     icons.pageFirst,
     icons.pageDoubleLeft,

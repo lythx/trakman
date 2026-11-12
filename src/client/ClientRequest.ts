@@ -1,24 +1,25 @@
 export class ClientRequest {
-
   private readonly xml: string
 
   /**
-  * Prepares XML string for a dedicated server request.
-  * List of dedicated server methods: https://methods.xaseco.org/methodstmf.php
-  */
+   * Prepares XML string for a dedicated server request.
+   * List of dedicated server methods: https://methods.xaseco.org/methodstmf.php
+   */
   constructor(method: string, params: tm.CallParams[]) {
     this.xml = `<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>${method}</methodName><params>`
     for (const param of params) {
       const str = this.handleParamType(param)
-      if (str instanceof Error) { throw str }
+      if (str instanceof Error) {
+        throw str
+      }
       this.xml += `<param><value>${str}</value></param>`
     }
     this.xml += '</params></methodCall>'
   }
 
   /**
-  * Prepares and returns buffer from XML string
-  */
+   * Prepares and returns buffer from XML string
+   */
   getPreparedBuffer(requestId: number): Buffer {
     const bufferLength: number = Buffer.byteLength(this.xml)
     const buffer: Buffer = Buffer.alloc(8 + bufferLength) // alloc 8 bonus bytes for target length and id
@@ -86,9 +87,10 @@ export class ClientRequest {
       '<': '&lt;',
       '>': '&gt;',
       '"': '&quot;',
-      "'": '&#039;'
+      "'": '&#039;',
     }
-    return str.replace(/[&<>"']/g, (m): string => { return map[m as keyof typeof map] })
+    return str.replace(/[&<>"']/g, (m): string => {
+      return map[m as keyof typeof map]
+    })
   }
-
 }

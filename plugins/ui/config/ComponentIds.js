@@ -82,6 +82,7 @@ export default {
   localSectors: 520000,
   ultiRanking: 530000,
   ultiRecords: 540000,
+  favouriteButton: 560000,
   liveCpsRanking: 550000,
   // needs 3.1 mil ids
   mapList: 10000000

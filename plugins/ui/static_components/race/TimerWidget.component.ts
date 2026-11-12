@@ -3,11 +3,47 @@
  * @since 0.1
  */
 
-import { componentIds, StaticHeader, StaticComponent, centeredText, addManialinkListener } from '../../UI.js'
-import config from './TimerWidget.config.js'
+import {
+  addManialinkListener,
+  centeredText,
+  componentIds,
+  raceConfig,
+  StaticComponent,
+  StaticHeader,
+} from '../../UI.js'
+import icons from '../../config/Icons.js'
+import userConfig from './TimerWidget.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 6.45,
+  stuntsDynamicMarginTop: 5.5,
+  stuntsHeight: 6.45 + 5.5,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  timerActionsPrivilege: 1,
+  buttonWidth: 1.8,
+  buttonOrder: ['pause', 'add', 'subtract'],
+  textYOffset: -0.3,
+  icons: {
+    pause: icons.pause,
+    resume: icons.play,
+    add: icons.plus,
+    subtract: icons.minus,
+  },
+  iconsHover: {
+    pause: icons.pauseGreen,
+    resume: icons.playGreen,
+    add: icons.plusGreen,
+    subtract: icons.minusGreen,
+  },
+  timeColours: ['FFF', tm.utils.palette.yellow, tm.utils.palette.red],
+  colourChangeThresholds: [180, 60],
+  iconPadding: 0.3,
+  timeAddedOnClick: 5 * 60 * 1000,
+  timeSubtractedOnClick: 5 * 60 * 1000,
+})
 
 export default class TimerWidget extends StaticComponent {
-
   private readonly header: StaticHeader
   private dynamicTimerInterval: NodeJS.Timeout | undefined
   private noButtonXml: string = ''
@@ -51,14 +87,16 @@ export default class TimerWidget extends StaticComponent {
       return this.display()
     })
     addManialinkListener(this.pauseButtonId, (info) => {
-      if (info.privilege < config.timerActionsPrivilege) { return }
+      if (info.privilege < config.timerActionsPrivilege) {
+        return
+      }
       if (!tm.timer.isDynamic) {
         tm.sendMessage(config.notDynamic, info.login)
         return
       }
       const strObject = {
         title: info.title,
-        adminName: tm.utils.strip(info.nickname)
+        adminName: tm.utils.strip(info.nickname),
       }
       if (tm.timer.isPaused) {
         tm.sendMessage(tm.utils.strVar(config.resume, strObject))
@@ -69,7 +107,9 @@ export default class TimerWidget extends StaticComponent {
       }
     })
     addManialinkListener(this.addButtonid, (info) => {
-      if (info.privilege < config.timerActionsPrivilege) { return }
+      if (info.privilege < config.timerActionsPrivilege) {
+        return
+      }
       if (!tm.timer.isDynamic) {
         tm.sendMessage(config.notDynamic, info.login)
         return
@@ -78,29 +118,33 @@ export default class TimerWidget extends StaticComponent {
       const strObject = {
         title: info.title,
         adminName: tm.utils.strip(info.nickname),
-        time: tm.utils.getVerboseTime(tm.timer.remainingRaceTime)
+        time: tm.utils.getVerboseTime(tm.timer.remainingRaceTime),
       }
       tm.sendMessage(tm.utils.strVar(config.set, strObject))
     })
     addManialinkListener(this.subtractButtonId, (info) => {
-      if (info.privilege < config.timerActionsPrivilege) { return }
+      if (info.privilege < config.timerActionsPrivilege) {
+        return
+      }
       if (!tm.timer.isDynamic) {
         tm.sendMessage(config.notDynamic, info.login)
         return
       }
       const subtracted: boolean = tm.timer.subtractTime(config.timeSubtractedOnClick)
-      if (!subtracted) { return }
+      if (!subtracted) {
+        return
+      }
       const strObject = {
         title: info.title,
         adminName: tm.utils.strip(info.nickname),
-        time: tm.utils.getVerboseTime(tm.timer.remainingRaceTime)
+        time: tm.utils.getVerboseTime(tm.timer.remainingRaceTime),
       }
       tm.sendMessage(tm.utils.strVar(config.set, strObject))
     })
   }
 
   getHeight(): number {
-    const isStunts = tm.getGameMode() === "Stunts"
+    const isStunts = tm.getGameMode() === 'Stunts'
     if (isStunts && tm.timer.isDynamic) {
       return config.height + config.stuntsDynamicMarginTop
     }
@@ -120,8 +164,12 @@ export default class TimerWidget extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
-    if (this.isPaused && tm.timer.isPaused) { return }
+    if (!this.isDisplayed) {
+      return
+    }
+    if (this.isPaused && tm.timer.isPaused) {
+      return
+    }
     // if (tm.getGameMode() === 'Stunts' && !tm.timer.isDynamic) {
     //   return [this.hide()]
     // }
@@ -134,15 +182,23 @@ export default class TimerWidget extends StaticComponent {
   }
 
   displayToPlayer(login: string, privilege?: number) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     // if (tm.getGameMode() === 'Stunts' && !tm.timer.isDynamic) {
     //   return { xml: this.hide() ?? '', login }
     // }
     privilege ??= tm.players.get(login)?.privilege ?? 0
     if (this.isOnRestart || !tm.timer.isDynamic || privilege < config.timerActionsPrivilege) {
-      return { xml: this.noButtonXml, login }
+      return {
+        xml: this.noButtonXml,
+        login,
+      }
     } else {
-      return { xml: this.xmlWithButtons, login }
+      return {
+        xml: this.xmlWithButtons,
+        login,
+      }
     }
   }
 
@@ -154,8 +210,7 @@ export default class TimerWidget extends StaticComponent {
 
   private constructXml(isDynamic: boolean): string {
     const headerHeight: number = this.header.options.height
-    let headerXml = isDynamic ? this.getButtonsXml() :
-      this.header.constructXml(config.title, config.icon, this.side)
+    const headerXml = isDynamic ? this.getButtonsXml() : this.header.constructXml(config.title, config.icon, this.side)
     let timeXml = ''
     let bottomH = config.height - (headerHeight + config.margin)
     const isStunts = tm.getGameMode() === 'Stunts'
@@ -164,8 +219,11 @@ export default class TimerWidget extends StaticComponent {
     }
     if (tm.timer.isDynamic && !this.isOnRestart) {
       if (tm.timer.isPaused) {
-        timeXml = centeredText(config.pausedText, config.width, bottomH,
-          { specialFont: true, yOffset: -0.3, xOffset: 0.2 })
+        timeXml = centeredText(config.pausedText, config.width, bottomH, {
+          specialFont: true,
+          yOffset: -0.3,
+          xOffset: 0.2,
+        })
       } else {
         const time = Math.floor(tm.timer.remainingRaceTime / 1000)
         let timeColour = config.timeColours[0]
@@ -179,11 +237,13 @@ export default class TimerWidget extends StaticComponent {
         const minutes = (~~(time / 60) % 60).toString().padStart(2, '0')
         const seconds = (time % 60).toString().padStart(2, '0')
         const timeStr = hoursAmount < 100 ? `${hours}${minutes}:${seconds}` : `${hoursAmount} hours`
-        timeXml = centeredText('$' + timeColour + timeStr, config.width, bottomH,
-          { specialFont: true, yOffset: config.textYOffset })
+        timeXml = centeredText('$' + timeColour + timeStr, config.width, bottomH, {
+          specialFont: true,
+          yOffset: config.textYOffset,
+        })
       }
     }
-    let stuntsMargin = (isStunts && isDynamic) ? config.stuntsDynamicMarginTop : 0
+    const stuntsMargin = isStunts && isDynamic ? config.stuntsDynamicMarginTop : 0
     if (isStunts && !isDynamic) {
       return `
     <manialink id="${this.id}">
@@ -237,8 +297,8 @@ export default class TimerWidget extends StaticComponent {
       buttonXml += `<quad posn="${x} 0 0" sizen="${w} ${h}" bgcolor="${this.header.options.iconBackground}" />
       <quad posn="${x + m} ${-m} 1" sizen="${w - 2 * m} ${h - 2 * m}" imagefocus="${hoverIcon}" image="${icon}" action="${id}"/>`
     }
-    return this.header.constructXml(config.title, config.icon,
-      this.side, { rectangleWidth: headerRectWidth }) + buttonXml
+    return (
+      this.header.constructXml(config.title, config.icon, this.side, { rectangleWidth: headerRectWidth }) + buttonXml
+    )
   }
-
 }

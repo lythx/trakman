@@ -3,15 +3,33 @@
  * @since 1.5.0
  */
 
-import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
+import { componentIds, raceConfig, RecordList, StaticComponent, StaticHeader } from '../../UI.js'
 import { ultimania } from '../../../ultimania/Ultimania.js'
+import userConfig from './UltiRanking.config.js'
 
-import config from './UltiRanking.config.js'
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 12,
+  teamsEntries: 15,
+  roundsEntries: 7,
+  cupEntries: 7,
+  lapsEntries: 7,
+  entryHeight: 2.15,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  topCount: 5,
+  teamsTopCount: 5,
+  roundsTopCount: 3,
+  cupTopCount: 3,
+  lapsTopCount: 3,
+  displayNoRecordEntry: true,
+  hidePanel: true,
+  maxRecordCount: 5000,
+})
 
 export default class UltiRanking extends StaticComponent {
-
   private readonly header: StaticHeader
   private recordList!: RecordList
+
   constructor() {
     super(componentIds.ultiRanking)
     this.header = new StaticHeader('race')
@@ -20,10 +38,14 @@ export default class UltiRanking extends StaticComponent {
     ultimania.onRecord(() => this.sendMultipleManialinks(this.display()))
     ultimania.onNicknameUpdate(() => this.sendMultipleManialinks(this.display()))
     this.renderOnEvent('PlayerJoin', (info: tm.JoinInfo) => {
-      if (ultimania.getRecord(info.login) !== undefined) { return this.display() }
+      if (ultimania.getRecord(info.login) !== undefined) {
+        return this.display()
+      }
     })
     this.renderOnEvent('PlayerLeave', (info: tm.LeaveInfo) => {
-      if (ultimania.getRecord(info.login) !== undefined) { return this.display() }
+      if (ultimania.getRecord(info.login) !== undefined) {
+        return this.display()
+      }
     })
     this.onPanelHide((player) => {
       this.sendMultipleManialinks(this.displayToPlayer(player.login))
@@ -31,8 +53,12 @@ export default class UltiRanking extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return }
-    if (this.reduxModeEnabled) { return this.displayToPlayer('')?.xml }
+    if (!this.isDisplayed) {
+      return
+    }
+    if (this.reduxModeEnabled) {
+      return this.displayToPlayer('')?.xml
+    }
     const arr = []
     for (const player of tm.players.list) {
       arr.push(this.displayToPlayer(player.login))
@@ -41,7 +67,9 @@ export default class UltiRanking extends StaticComponent {
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
@@ -51,22 +79,32 @@ export default class UltiRanking extends StaticComponent {
         <format textsize="1" textcolor="FFFF"/> 
         ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.ultiRecords })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
-          ${this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, ultimania.records.map(a => ({ ...a, name: a.nickname, time: a.score })))}
+          ${this.recordList.constructXml(
+            this.reduxModeEnabled ? undefined : login,
+            ultimania.records.map((a) => ({
+              ...a,
+              name: a.nickname,
+              time: a.score,
+            }))
+          )}
         </frame>
       </frame>
     </manialink>`,
-      login
+      login,
     }
   }
 
   getEntries(): number {
     if (tm.getGameMode() === 'Teams') {
       return config.teamsEntries
-    } if (tm.getGameMode() === 'Rounds') {
+    }
+    if (tm.getGameMode() === 'Rounds') {
       return config.roundsEntries
-    } if (tm.getGameMode() === 'Cup') {
+    }
+    if (tm.getGameMode() === 'Cup') {
       return config.cupEntries
-    } if (tm.getGameMode() === 'Laps') {
+    }
+    if (tm.getGameMode() === 'Laps') {
       return config.lapsEntries
     }
     return config.entries
@@ -79,11 +117,14 @@ export default class UltiRanking extends StaticComponent {
   getTopCount(): number {
     if (tm.getGameMode() === 'Teams') {
       return config.teamsTopCount
-    } if (tm.getGameMode() === 'Rounds') {
+    }
+    if (tm.getGameMode() === 'Rounds') {
       return config.roundsTopCount
-    } if (tm.getGameMode() === 'Cup') {
+    }
+    if (tm.getGameMode() === 'Cup') {
       return config.cupTopCount
-    } if (tm.getGameMode() === 'Laps') {
+    }
+    if (tm.getGameMode() === 'Laps') {
       return config.lapsTopCount
     }
     return config.topCount
@@ -96,16 +137,26 @@ export default class UltiRanking extends StaticComponent {
 
   private getRecordList(): void {
     this.recordList?.destroy?.()
-    this.recordList = new RecordList('race', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin),
-      this.getEntries(), this.side, this.getTopCount(), config.maxRecordCount, config.displayNoRecordEntry,
-      { noRecordEntryText: config.noRecordEntryText })
+    this.recordList = new RecordList(
+      'race',
+      this.id,
+      config.width,
+      this.getHeight() - (this.header.options.height + config.margin),
+      this.getEntries(),
+      this.side,
+      this.getTopCount(),
+      config.maxRecordCount,
+      config.displayNoRecordEntry,
+      { noRecordEntryText: config.noRecordEntryText }
+    )
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
-      if (this.reduxModeEnabled) { return }
+      if (this.reduxModeEnabled) {
+        return
+      }
       const obj = this.displayToPlayer(info.login)
       if (obj !== undefined) {
         tm.sendManialink(obj.xml, obj.login)
       }
     })
   }
-
 }

@@ -6,7 +6,7 @@ export default {
   height: 9.13,
   margin: cfg.margin,
   width: cfg.width,
-  title: "Ongoing",
+  title: 'Ongoing',
   background: cfg.background,
   mapPadding: 0.3,
   customTags: [
@@ -16,11 +16,19 @@ export default {
      map name is tested both stripped and unstripped from special characters
      Tags are read from top to bottom
      */
-    { authors: ['Fwo Niro'], icon: icons.tagRed }, 
-    { authors: ['tony89300'], icon: icons.tagPinkCyan },
-    { names: [/{Kackiest Kacky}*/], icon: icons.tagKacky },
-    { names: [/\$w\$i\$f70ARC_*/], icon: icons.tagArcade }
-  ],
+    {
+      authors: ['Fwo Niro'],
+      icon: icons.tagRed
+    }, {
+      authors: ['tony89300'],
+      icon: icons.tagPinkCyan
+    }, {
+      names: [/{Kackiest Kacky}*/],
+      icon: icons.tagKacky
+    }, {
+      names: [/\$w\$i\$f70ARC_*/],
+      icon: icons.tagArcade
+    }],
   icons: {
     header: icons.ongoingMap,
     tags: {
@@ -35,10 +43,10 @@ export default {
     authorScore: icons.clockAuthor
   },
   textScale: 1,
-  noDateText: "N/A",
+  noDateText: 'N/A',
   titles: {
-    lastTrack: "Last Map",
-    currTrack: "Ongoing",
-    nextTrack: "Next Map"
+    lastTrack: 'Last Map',
+    currTrack: 'Ongoing',
+    nextTrack: 'Next Map'
   }
 }

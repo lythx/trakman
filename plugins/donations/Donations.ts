@@ -1,16 +1,24 @@
-import config from './Config.js'
+import userConfig from './Config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  minimalAmount: 50,
+})
 
 interface DonationInfo {
   readonly login: string
   nickname: string
-  sum: number,
+  sum: number
   readonly history: {
-    readonly date: Date,
+    readonly date: Date
     readonly amount: number
   }[]
 }
 
-const listeners: ((info: DonationInfo & { readonly amount: number }) => void)[] = []
+const listeners: ((
+  info: DonationInfo & {
+    readonly amount: number
+  }
+) => void)[] = []
 const nicknameChangeListeners: ((info: DonationInfo[]) => void)[] = []
 let onlineDonators: DonationInfo[] = []
 await tm.db.query(`CREATE TABLE IF NOT EXISTS donations(
@@ -20,23 +28,25 @@ await tm.db.query(`CREATE TABLE IF NOT EXISTS donations(
   PRIMARY KEY(player_id, date)
 );`)
 
-tm.addListener("Startup", async (): Promise<void> => {
-  onlineDonators = await getFromDB(tm.players.list.map(a => a.login))
+tm.addListener('Startup', async (): Promise<void> => {
+  onlineDonators = await getFromDB(tm.players.list.map((a) => a.login))
 })
 
-tm.addListener("PlayerJoin", async (info): Promise<void> => {
+tm.addListener('PlayerJoin', async (info): Promise<void> => {
   const res: DonationInfo | undefined = await getFromDB(info.login)
-  if (res !== undefined) { onlineDonators.push(res) }
+  if (res !== undefined) {
+    onlineDonators.push(res)
+  }
 })
 
 tm.addListener('PlayerLeave', (info): void => {
-  onlineDonators = onlineDonators.filter(a => a.login !== info.login)
+  onlineDonators = onlineDonators.filter((a) => a.login !== info.login)
 })
 
 tm.addListener('PlayerDataUpdated', (info): void => {
   const changedObjects: DonationInfo[] = []
   for (const e of onlineDonators) {
-    const newNickname: string | undefined = info.find(a => a.login === e.login)?.nickname
+    const newNickname: string | undefined = info.find((a) => a.login === e.login)?.nickname
     if (newNickname !== undefined) {
       e.nickname = newNickname
       changedObjects.push(e)
@@ -64,40 +74,65 @@ async function getFromDB(logins: string[]): Promise<DonationInfo[]>
 async function getFromDB(logins: string | string[]): Promise<DonationInfo | undefined | DonationInfo[]> {
   if (typeof logins === 'string') {
     const id: number | undefined = await tm.db.getPlayerId(logins)
-    if (id === undefined) { return }
-    const res: any[] | Error = await tm.db.query(`SELECT nickname, date, amount FROM donations
+    if (id === undefined) {
+      return
+    }
+    const res: any[] | Error = await tm.db.query(
+      `SELECT nickname, date, amount FROM donations
     JOIN players ON players.id=donations.player_id
     WHERE player_id=$1
-    ORDER BY date ASC`, id)
+    ORDER BY date ASC`,
+      id
+    )
     if (res instanceof Error) {
       tm.log.error(`Failed to get donation info for player ${logins}`, res.message, res.stack)
       return
     }
-    if (res[0] === undefined) { return undefined }
+    if (res[0] === undefined) {
+      return undefined
+    }
     return {
-      login: logins, nickname: res[0].nickname,
-      sum: res.reduce((acc, cur) => acc += cur.amount, 0),
-      history: res.map(a => ({ amount: a.amount, date: a.date }))
+      login: logins,
+      nickname: res[0].nickname,
+      sum: res.reduce((acc, cur) => acc + cur.amount, 0),
+      history: res.map((a) => ({
+        amount: a.amount,
+        date: a.date,
+      })),
     }
   }
   const ids = await tm.db.getPlayerId(logins)
-  if (ids.length === 0) { return [] }
-  const res: any[] | Error = await tm.db.query(`SELECT login, nickname, date, amount FROM donations
+  if (ids.length === 0) {
+    return []
+  }
+  const res: any[] | Error = await tm.db.query(
+    `SELECT login, nickname, date, amount FROM donations
   JOIN players ON players.id=donations.player_id
-  WHERE ${logins.map((a, i): string => `player_id=$${i + 1} OR `).join('').slice(0, -3)}
-  ORDER BY date ASC`, ...ids.map(a => a.id))
+  WHERE ${logins
+    .map((a, i): string => `player_id=$${i + 1} OR `)
+    .join('')
+    .slice(0, -3)}
+  ORDER BY date ASC`,
+    ...ids.map((a) => a.id)
+  )
   if (res instanceof Error) {
     tm.log.error(`Failed to get donation info for players ${logins.join(',')}`, res.message, res.stack)
     return []
   }
   const ret: DonationInfo[] = []
   for (const login of logins) {
-    const arr: any[] = res.filter(a => a.login === login)
-    if (arr.length === 0) { continue }
+    const arr: any[] = res.filter((a) => a.login === login)
+    if (arr.length === 0) {
+      continue
+    }
     ret.push({
-      login, nickname: arr[0]?.nickname,
-      sum: arr.reduce((acc, cur) => acc += cur.amount, 0),
-      history: arr.map(a => ({ amount: a.amount, date: a.date }))
+      login,
+      nickname: arr[0]?.nickname,
+      sum: arr.reduce((acc, cur) => acc + cur.amount, 0),
+      history: arr.map((a) => ({
+        amount: a.amount,
+        date: a.date,
+      })),
     })
   }
   return ret
@@ -115,16 +150,21 @@ const addToDB = async (login: string, amount: number, date: Date): Promise<void>
 tm.commands.add({
   aliases: ['donate'],
   help: 'Donate coppers to the server.',
-  params: [{ name: 'amount', type: 'int' }],
+  params: [
+    {
+      name: 'amount',
+      type: 'int',
+    },
+  ],
   callback(info, amount: number) {
     donate(info.login, info.nickname, amount)
   },
-  privilege: 0
+  privilege: 0,
 })
 
 /**
  * Donate coppers to server
- * @param payerLogin Login of the player 
+ * @param payerLogin Login of the player
  * @param payerNickname Nickname of the player
  * @param amount Amount of coppers to donate
  * @returns True if successful, false if player refuses payment, Error if dedicated server call fails
@@ -142,26 +182,37 @@ const donate = async (payerLogin: string, payerNickname: string, amount: number)
     return status
   } else if (status === true) {
     void addToDB(payerLogin, amount, date)
-    tm.sendMessage(tm.utils.strVar(config.paymentSuccess, {
-      nickname: tm.utils.strip(payerNickname),
-      amount
-    }))
-    let info: DonationInfo | undefined = onlineDonators.find(a => a.login === payerLogin)
+    tm.sendMessage(
+      tm.utils.strVar(config.paymentSuccess, {
+        nickname: tm.utils.strip(payerNickname),
+        amount,
+      })
+    )
+    let info: DonationInfo | undefined = onlineDonators.find((a) => a.login === payerLogin)
     const isOnline = tm.players.get(payerLogin) !== undefined
     if (info === undefined) {
       if (isOnline) {
         info = {
-          login: payerLogin, nickname: payerNickname, sum: 0, history: []
+          login: payerLogin,
+          nickname: payerNickname,
+          sum: 0,
+          history: [],
         }
         onlineDonators.push(info)
       } else {
         return true
       }
     }
-    info.history.push({ amount, date })
+    info.history.push({
+      amount,
+      date,
+    })
     info.sum += amount
     for (const e of listeners) {
-      e({ ...info, amount })
+      e({
+        ...info,
+        amount,
+      })
     }
     return true
   }
@@ -182,9 +233,9 @@ function getDonation(login: string): DonationInfo | undefined
 function getDonation(logins: string[]): DonationInfo[]
 function getDonation(logins: string | string[]): DonationInfo | DonationInfo[] | undefined {
   if (typeof logins === 'string') {
-    return onlineDonators.find(a => a.login === logins)
+    return onlineDonators.find((a) => a.login === logins)
   }
-  return onlineDonators.filter(a => logins.includes(a.login))
+  return onlineDonators.filter((a) => logins.includes(a.login))
 }
 
 /**
@@ -194,7 +245,6 @@ function getDonation(logins: string | string[]): DonationInfo | DonationInfo[] |
  * @since 0.4
  */
 export const donations = {
-
   donate,
 
   fetch: getFromDB,
@@ -205,7 +255,13 @@ export const donations = {
    * Add a callback function to execute on donation
    * @param callback Function to execute on event. It takes donation object as a parameter
    */
-  onDonation(callback: (info: DonationInfo & { readonly amount: number }) => void) {
+  onDonation(
+    callback: (
+      info: DonationInfo & {
+        readonly amount: number
+      }
+    ) => void
+  ) {
     listeners.push(callback)
   },
 
@@ -222,6 +278,5 @@ export const donations = {
    */
   get onlineList(): DonationInfo[] {
     return [...onlineDonators]
-  }
-
+  },
 }

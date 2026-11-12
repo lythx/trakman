@@ -1,8 +1,7 @@
-import {Repository} from "./Repository.js"
-import config from "../../config/Config.js"
+import { Repository } from './Repository.js'
+import config from '../ControllerConfig.js'
 
 export class MapIdsRepository extends Repository {
-
   /**
    * Fetches map database id
    * @param mapUid Map uid
@@ -14,8 +13,20 @@ export class MapIdsRepository extends Repository {
    * @param mapUids Array of map uids
    * @returns Array of objects containing map id and uid. If map is not in the database it won't be in the array
    */
-  async get(mapUids: string[]): Promise<{ uid: string, id: number }[]>
-  async get(mapUids: string[] | string): Promise<{ uid: string, id: number }[] | number | undefined> {
+  async get(mapUids: string[]): Promise<
+    {
+      uid: string
+      id: number
+    }[]
+  >
+  async get(mapUids: string[] | string): Promise<
+    | {
+        uid: string
+        id: number
+      }[]
+    | number
+    | undefined
+  > {
     let isArr = true
     if (typeof mapUids === 'string') {
       mapUids = [mapUids]
@@ -25,7 +36,10 @@ export class MapIdsRepository extends Repository {
     }
     const query = `SELECT uid, id
                    FROM map_ids
-                   WHERE ${mapUids.map((a, i) => `uid=$${i + 1} OR `).join('').slice(0, -3)}`
+                   WHERE ${mapUids
+                     .map((a, i) => `uid=$${i + 1} OR `)
+                     .join('')
+                     .slice(0, -3)}`
     const res = await this.query(query, ...mapUids)
     return isArr ? res : res[0]?.id
   }
@@ -44,14 +58,25 @@ export class MapIdsRepository extends Repository {
     const len = Math.ceil(mapUids.length / splitby)
     const ret = []
     for (let i = 0; i < len; i++) {
-      ret.push(...await this.get(mapUids.slice(i * splitby, (i + 1) * splitby)))
+      ret.push(...(await this.get(mapUids.slice(i * splitby, (i + 1) * splitby))))
     }
     return ret
   }
 
   async addAndGet(mapUid: string): Promise<number>
-  async addAndGet(mapUids: string[]): Promise<{ uid: string, id: number }[]>
-  async addAndGet(mapUids: string[] | string): Promise<{ uid: string, id: number }[] | number> {
+  async addAndGet(mapUids: string[]): Promise<
+    {
+      uid: string
+      id: number
+    }[]
+  >
+  async addAndGet(mapUids: string[] | string): Promise<
+    | {
+        uid: string
+        id: number
+      }[]
+    | number
+  > {
     let isArr = true
     if (typeof mapUids === 'string') {
       mapUids = [mapUids]
@@ -63,8 +88,7 @@ export class MapIdsRepository extends Repository {
     const query = `INSERT INTO map_ids(uid) ${this.getInsertValuesString(1, uidSet.size)} ON CONFLICT (uid) DO
     UPDATE SET uid=EXCLUDED.uid
         RETURNING id, uid`
-    const res = (await this.query(query, ...uidSet))
+    const res = await this.query(query, ...uidSet)
     return isArr ? res : res[0]?.id
   }
-
 }

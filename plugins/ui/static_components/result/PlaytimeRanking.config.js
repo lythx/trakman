@@ -8,13 +8,9 @@ export default {
   posX: cfg.rightPosition - (cfg.marginBig + cfg.width),
   posY: cfg.topBorder,
   side: true,
-  title: "Top Hours Played",
+  title: 'Top Hours Played',
   icon: icons.clockList,
   margin: cfg.margin,
   background: cfg.background,
-  columnProportions: [
-    1,
-    1.9,
-    5.1
-  ]
+  columnProportions: [1, 1.9, 5.1]
 }

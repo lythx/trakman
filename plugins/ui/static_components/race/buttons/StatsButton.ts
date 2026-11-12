@@ -1,12 +1,24 @@
-import type { ButtonData } from "./ButtonData.js"
-import { UiButton } from "./UiButton.js"
-import config from "./ButtonsWidget.config.js"
+import type { ButtonData } from './ButtonData.js'
+import { UiButton } from './UiButton.js'
+import userConfig from './ButtonsWidget.config.js'
 import { componentIds } from '../../../UI.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  statsButton: {
+    texts: {
+      0: 'PLAYER',
+      1: '$AF4STATS',
+      equal: true,
+    },
+    width: 1.9,
+    height: 1.9,
+    padding: 0.2,
+  },
+})
 
 const cfg = config.statsButton
 
 export class StatsButton extends UiButton {
-
   buttonData: ButtonData
 
   constructor() {
@@ -19,8 +31,7 @@ export class StatsButton extends UiButton {
       iconHeight: cfg.height,
       padding: cfg.padding,
       actionId: componentIds.topRanks,
-      equalTexts: cfg.texts.equal
+      equalTexts: cfg.texts.equal,
     }
   }
-
-}  
+}

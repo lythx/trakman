@@ -3,12 +3,31 @@
  * @since 1.2
  */
 
-import { RecordList, componentIds, StaticHeader, StaticComponent, type RLImage } from '../../UI.js'
+import { componentIds, raceConfig, RecordList, type RLImage, StaticComponent, StaticHeader } from '../../UI.js'
+import icons from '../../config/Icons.js'
 
-import config from './RoundScore.config.js'
+import userConfig from './RoundScore.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  roundsEntries: 12,
+  teamsEntries: 10,
+  cupEntries: 12,
+  entryHeight: 2.15,
+  width: raceConfig.width,
+  margin: raceConfig.margin,
+  roundsTopCount: 5,
+  teamsTopCount: 5,
+  cupTopCount: 5,
+  cupPositionImages: [icons.trophyClassic, icons.trophySilver, icons.trophyBronze],
+  displayNoRecordEntry: true,
+  markerBackgrounds: {
+    red: tm.utils.palette.red + '6',
+    blue: tm.utils.palette.purple + '6',
+  },
+  hidePanel: true,
+})
 
 export default class RoundScore extends StaticComponent {
-
   private readonly header: StaticHeader
   private recordList!: RecordList
 
@@ -19,7 +38,9 @@ export default class RoundScore extends StaticComponent {
     this.renderOnEvent('PlayerFinish', () => this.display())
     this.renderOnEvent('BeginRound', () => this.display())
     this.renderOnEvent('PlayerDataUpdated', (info) => {
-      if (tm.records.roundRecords.some(a => info.some(b => b.login === a.login))) { return this.display() }
+      if (tm.records.roundRecords.some((a) => info.some((b) => b.login === a.login))) {
+        return this.display()
+      }
     })
     this.onPanelHide((player) => {
       this.sendMultipleManialinks(this.displayToPlayer(player.login))
@@ -29,7 +50,8 @@ export default class RoundScore extends StaticComponent {
   getEntries(): number {
     if (tm.getGameMode() === 'Teams') {
       return config.teamsEntries
-    } if (tm.getGameMode() === 'Cup') {
+    }
+    if (tm.getGameMode() === 'Cup') {
       return config.cupEntries
     }
     return config.roundsEntries
@@ -42,15 +64,20 @@ export default class RoundScore extends StaticComponent {
   getTopCount(): number {
     if (tm.getGameMode() === 'Teams') {
       return config.teamsTopCount
-    } if (tm.getGameMode() === 'Cup') {
+    }
+    if (tm.getGameMode() === 'Cup') {
       return config.cupTopCount
     }
     return config.roundsTopCount
   }
 
   display() {
-    if (!this.isDisplayed) { return }
-    if (this.reduxModeEnabled) { return this.displayToPlayer('')?.xml }
+    if (!this.isDisplayed) {
+      return
+    }
+    if (this.reduxModeEnabled) {
+      return this.displayToPlayer('')?.xml
+    }
     const arr = []
     for (const player of tm.players.list) {
       arr.push(this.displayToPlayer(player.login))
@@ -59,7 +86,9 @@ export default class RoundScore extends StaticComponent {
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
@@ -69,18 +98,24 @@ export default class RoundScore extends StaticComponent {
         <format textsize="1" textcolor="FFFF"/> 
         ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.localCps })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
-          ${this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, tm.records.roundRecords
-        .map(a => ({
-          name: a.nickname, time: a.time, checkpoints: a.checkpoints,
-          login: a.login, points: a.roundPoints,
-          colour: a.team !== undefined ? config.markerBackgrounds[a.team] : undefined,
-          markerImage: this.getCupImage(a)
-        }))
-        .slice(0, tm.records.maxLocalsAmount))}
+          ${this.recordList.constructXml(
+            this.reduxModeEnabled ? undefined : login,
+            tm.records.roundRecords
+              .map((a) => ({
+                name: a.nickname,
+                time: a.time,
+                checkpoints: a.checkpoints,
+                login: a.login,
+                points: a.roundPoints,
+                colour: a.team !== undefined ? config.markerBackgrounds[a.team] : undefined,
+                markerImage: this.getCupImage(a),
+              }))
+              .slice(0, tm.records.maxLocalsAmount)
+          )}
         </frame>
       </frame>
     </manialink>`,
-      login
+      login,
     }
   }
 
@@ -93,10 +128,21 @@ export default class RoundScore extends StaticComponent {
     const height = this.getHeight()
     const entries = this.getEntries()
     this.recordList?.destroy?.()
-    this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
-      entries, this.side, this.getTopCount(), 250, config.displayNoRecordEntry)
+    this.recordList = new RecordList(
+      'race',
+      this.id,
+      config.width,
+      height - (this.header.options.height + config.margin),
+      entries,
+      this.side,
+      this.getTopCount(),
+      250,
+      config.displayNoRecordEntry
+    )
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
-      if (this.reduxModeEnabled) { return }
+      if (this.reduxModeEnabled) {
+        return
+      }
       const obj = this.displayToPlayer(info.login)
       if (obj !== undefined) {
         tm.sendManialink(obj.xml, obj.login)
@@ -108,8 +154,9 @@ export default class RoundScore extends StaticComponent {
     if (player.isCupFinalist) {
       return { url: config.cupFinalistIcon }
     }
-    if (player.cupPosition === undefined) { return undefined }
+    if (player.cupPosition === undefined) {
+      return undefined
+    }
     return { url: config.cupPositionImages[player.cupPosition - 1] ?? config.otherCupPositionsImage }
   }
-
 }

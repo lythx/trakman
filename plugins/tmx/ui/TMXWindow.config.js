@@ -3,10 +3,13 @@ import { componentIds as ids, icons } from '../../ui/UI.js'
 export default {
   icon: icons.ongoingMap,
   title: 'Map Info',
-  navbar: [
-    { name: 'Map List', actionId: ids.mapList },
-    { name: 'Current Map Details', actionId: ids.TMXDetailsWindow }
-  ],
+  navbar: [{
+    name: 'Map List',
+    actionId: ids.mapList
+  }, {
+    name: 'Current Map Details',
+    actionId: ids.TMXDetailsWindow
+  }],
   itemsPerPage: 3,
   queueCount: 4,
   historyCount: 4,
@@ -68,11 +71,11 @@ export default {
     tmxAuthor: icons.personBuilder,
     checkpointsAmount: icons.clockList
   },
-  iconBackground: "222C",
-  contentBackground: "777C",
+  iconBackground: '222C',
+  contentBackground: '777C',
   gridBackground: '444A',
   info: {
-    background: "FFFA",
+    background: 'FFFA',
     columnsProportions: [1.3, 1.3, 1, 1],
     rows: 4,
     iconWidth: 2,

@@ -2,13 +2,35 @@ import IDS from '../config/UtilIds.js'
 import { centeredText, rightAlignedText } from './TextUtils.js'
 import { Vote } from '../../vote/Vote.js'
 import { addManialinkListener, removeManialinkListener, StaticHeader, type StaticHeaderOptions } from '../UI.js'
-import config from './VoteWindow.config.js'
+import userConfig from './VoteWindow.config.js'
+import cfg from '../config/RaceUi.js'
+import header from './StaticHeaderRace.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  width: 25,
+  height: 10,
+  margin: cfg.margin,
+  posX: cfg.leftPosition + cfg.marginBig + cfg.width,
+  posY: cfg.topBorder - (14.5 + cfg.marginBig),
+  headerHeight: header.height,
+  buttonHeight: 2.5,
+  buttonWidth: 2.5,
+  headerTextXOffset: 0.2,
+  textScale: 0.7,
+  bigTextScale: 1,
+  counterTextScale: 0.4,
+  timerColourChanges: [20, 5],
+  adminButtons: {
+    height: 3,
+    width: 6,
+    textScale: 1.2,
+  },
+})
 
 /**
  * Util to manage votes and render vote manialink window
  */
 export default class VoteWindow {
-
   private vote: Vote
   private readonly title: string = config.title
   private readonly message: string
@@ -41,7 +63,14 @@ export default class VoteWindow {
    * @param seconds Amount of time to vote
    * @param iconUrl Icon image url
    */
-  constructor(callerLogin: string, goal: number, headerMessage: string, chatMessage: string, seconds: number, iconUrl: string) {
+  constructor(
+    callerLogin: string,
+    goal: number,
+    headerMessage: string,
+    chatMessage: string,
+    seconds: number,
+    iconUrl: string
+  ) {
     this.vote = new Vote(callerLogin, goal, seconds)
     this.chatMessage = chatMessage
     this.message = headerMessage
@@ -60,7 +89,20 @@ export default class VoteWindow {
    * @returns Vote result as boolean if time ran out or all the players voted, object containing result and optional caller player object
    * if vote got passed or cancelled, undefined if there is another vote running
    */
-  startAndGetResult(eligibleLogins: { login: string, privilege: number }[]): Promise<boolean | { result: boolean, caller?: tm.Player }> | undefined {
+  startAndGetResult(
+    eligibleLogins: {
+      login: string
+      privilege: number
+    }[]
+  ):
+    | Promise<
+        | boolean
+        | {
+            result: boolean
+            caller?: tm.Player
+          }
+      >
+    | undefined {
     return new Promise((resolve): void => {
       this.vote.onUpdate = (votes, seconds): void => {
         this.display(votes, seconds)
@@ -80,7 +122,9 @@ export default class VoteWindow {
       this.vote.onSecondsChanged = (seconds, votes): void => {
         this.display(votes, seconds)
       }
-      if (!this.vote.start(eligibleLogins)) { return }
+      if (!this.vote.start(eligibleLogins)) {
+        return
+      }
       addManialinkListener(this.passId, this.passListener)
       addManialinkListener(this.cancelId, this.cancelListener)
       for (const e of this.vote.loginList) {
@@ -105,9 +149,16 @@ export default class VoteWindow {
     this.vote.cancel(caller)
   }
 
-  private display(votes: { login: string; vote: boolean; }[], seconds: number): void {
+  private display(
+    votes: {
+      login: string
+      vote: boolean
+    }[],
+    seconds: number
+  ): void {
     for (const e of this.vote.loginList) {
-      tm.sendManialink(`<manialink id="${this.id}">
+      tm.sendManialink(
+        `<manialink id="${this.id}">
         <format textsize="1"/>
         <frame posn="${this.positionX} ${this.positionY} 1">
           ${this.constructHeader()}
@@ -118,11 +169,16 @@ export default class VoteWindow {
         <frame posn="${this.positionX + this.leftW + this.margin} ${this.positionY - (this.headerHeight + this.margin)}">
           ${this.constructRight(votes, seconds)}
         </frame>
-        ${e.privilege < Vote.passCancelPrivilege ? '' :
-          `<frame posn="${this.positionX} ${this.positionY - (this.height + this.margin)}">
+        ${
+          e.privilege < Vote.passCancelPrivilege
+            ? ''
+            : `<frame posn="${this.positionX} ${this.positionY - (this.height + this.margin)}">
             ${this.constructAdminButtons()}
-          </frame>`}
-      </manialink>`, e.login)
+          </frame>`
+        }
+      </manialink>`,
+        e.login
+      )
     }
   }
 
@@ -134,28 +190,44 @@ export default class VoteWindow {
     const cfg: StaticHeaderOptions = this.header.options
     return `
     <quad posn="0 0 1" sizen="${this.width - (cfg.squareWidth + cfg.margin)} ${cfg.height}" bgcolor="${cfg.textBackground}"/>
-    ${rightAlignedText(this.title, this.width - (cfg.squareWidth + cfg.margin), cfg.height, { textScale: cfg.textScale, xOffset: config.headerTextXOffset })}
+    ${rightAlignedText(this.title, this.width - (cfg.squareWidth + cfg.margin), cfg.height, {
+      textScale: cfg.textScale,
+      xOffset: config.headerTextXOffset,
+    })}
     <frame posn="${this.width - (cfg.squareWidth + cfg.margin) + cfg.margin} 0 1">
       <quad posn="0 0 1" sizen="${cfg.squareWidth} ${cfg.height}" bgcolor="${cfg.textBackground}"/>
       <quad posn="${cfg.iconHorizontalPadding} ${-cfg.iconVerticalPadding} 4" sizen="${cfg.iconWidth} ${cfg.iconHeight}" image="${this.icon}"/> 
     </frame>`
   }
 
-  private constructLeft(votes: { login: string; vote: boolean; }[]): string {
+  private constructLeft(
+    votes: {
+      login: string
+      vote: boolean
+    }[]
+  ): string {
     const w: number = this.leftW
     const h: number = this.height - (this.headerHeight + this.margin)
     const rowH: number = (h - this.buttonH) / 2 - this.margin
     const allVotes: number = votes.length
-    const noVotes: number = votes.filter(a => a.vote === false).length
+    const noVotes: number = votes.filter((a) => a.vote === false).length
     const noVotesW: number = (noVotes / votes.length) * w
     const neededAmount: number = Math.ceil(allVotes * this.vote.goal)
-    const colour: string = (neededAmount - (allVotes - noVotes)) <= 0 ? `$${config.colours.yes}` : `$${config.colours.no}`
+    const colour: string = neededAmount - (allVotes - noVotes) <= 0 ? `$${config.colours.yes}` : `$${config.colours.no}`
     return `
     <quad posn="0 0 1" sizen="${w} ${rowH}" bgcolor="${this.bg}"/>
     ${centeredText(this.message, w, rowH, { textScale: config.bigTextScale })}
     <frame posn="0 ${-rowH - this.margin} 1">
     <quad posn="0 0 1" sizen="${w} ${rowH}" bgcolor="${this.bg}"/>
-    ${centeredText(tm.utils.strVar(config.message, { colour, amount: neededAmount }), w, rowH, { textScale: config.bigTextScale })}
+    ${centeredText(
+      tm.utils.strVar(config.message, {
+        colour,
+        amount: neededAmount,
+      }),
+      w,
+      rowH,
+      { textScale: config.bigTextScale }
+    )}
     </frame>
     <frame posn="0 ${-h + this.buttonH} 1">
       <quad posn="0 0 1" sizen="${w} ${this.buttonH}" bgcolor="${this.bg}" action="${this.vote.noId}"/>
@@ -164,18 +236,41 @@ export default class VoteWindow {
     </frame>`
   }
 
-  private constructRight(votes: { login: string; vote: boolean; }[], seconds: number): string {
+  private constructRight(
+    votes: {
+      login: string
+      vote: boolean
+    }[],
+    seconds: number
+  ): string {
     const w: number = this.rightW
     const h: number = this.height - (this.headerHeight + this.margin)
     const rowH: number = (h - this.buttonH) / 2 - this.margin
-    const timeColour: string = '$' + config.colours.timer[[...config.timerColourChanges, -1].findIndex(a => a < seconds)]
+    const timeColour: string =
+      '$' + config.colours.timer[[...config.timerColourChanges, -1].findIndex((a) => a < seconds)]
     return `<quad posn="0 0 1" sizen="${w - this.margin} ${rowH}" bgcolor="${this.bg}"/>
-    ${centeredText(`${timeColour}${seconds}`, w - this.margin, rowH, { textScale: config.counterTextScale, specialFont: true })}
+    ${centeredText(`${timeColour}${seconds}`, w - this.margin, rowH, {
+      textScale: config.counterTextScale,
+      specialFont: true,
+    })}
     <frame posn="0 ${-rowH - this.margin} 1">
       <quad posn="0 0 1" sizen="${w / 2 - this.margin} ${rowH}" bgcolor="${this.bg}"/>
-      ${centeredText(`$${config.colours.no}` + votes.filter(a => a.vote === false).length.toString(), w / 2 - this.margin, rowH, { textScale: config.bigTextScale })}
+      ${centeredText(
+        `$${config.colours.no}` + votes.filter((a) => a.vote === false).length.toString(),
+        w / 2 - this.margin,
+        rowH,
+        { textScale: config.bigTextScale }
+      )}
       <quad posn="${w / 2} 0 1" sizen="${w / 2 - this.margin} ${rowH}" bgcolor="${this.bg}"/>
-      ${centeredText(`$${config.colours.yes}` + votes.filter(a => a.vote === true).length.toString(), w / 2 - this.margin, rowH, { xOffset: w / 2, textScale: config.bigTextScale })}
+      ${centeredText(
+        `$${config.colours.yes}` + votes.filter((a) => a.vote === true).length.toString(),
+        w / 2 - this.margin,
+        rowH,
+        {
+          xOffset: w / 2,
+          textScale: config.bigTextScale,
+        }
+      )}
     </frame>
     <frame posn="0 ${-h + this.buttonH} 1">
       <quad posn="0 0 1" sizen="${w / 2 - this.margin} ${this.buttonH}" bgcolor="${this.bg}" action="${this.vote.noId}"/>
@@ -196,5 +291,4 @@ export default class VoteWindow {
        ${centeredText(cfg.passText, w, h, { textScale: cfg.textScale })} 
     </frame>`
   }
-
 }

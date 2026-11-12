@@ -9,12 +9,12 @@ import { ServerConfig } from './ServerConfig.js'
 import { VoteService } from './services/VoteService.js'
 import { Logger } from './Logger.js'
 import { AdministrationService } from './services/AdministrationService.js'
-import config from '../config/Config.js'
+import config from './ControllerConfig.js'
 import { Utils } from './Utils.js'
 import { RoundsService } from './services/RoundsService.js'
 
 let isRestart: boolean = false
-let timeouts = new Array(260).fill(0) // playerId's range from 0 to ~250
+const timeouts = new Array(260).fill(0) // playerId's range from 0 to ~250
 
 export class Listeners {
   private static readonly listeners: tm.Listener[] = [
@@ -39,36 +39,58 @@ export class Listeners {
           Logger.info(`Banned player ${playerInfo.Login} (${Utils.strip(playerInfo.NickName)}) attempted to join.`)
           return
         }
-        const player: tm.Player = await PlayerService.join(playerInfo.Login, playerInfo.NickName,
-          playerInfo.Path, isSpectator, playerInfo.PlayerId, ip, playerInfo.OnlineRights === 3,
-          playerInfo?.LadderStats.PlayerRankings[0]?.Score, playerInfo?.LadderStats.PlayerRankings[0]?.Ranking)
-        AdministrationService.updateNickname({ login, nickname: player.nickname })
-        RecordService.updateInfo({ login, nickname: player.nickname, region: player.region, title: player.title })
+        const pi: any | Error = await Client.call('GetPlayerInfo', [{ string: login }])
+        const player: tm.Player = await PlayerService.join(
+          playerInfo.Login,
+          playerInfo.NickName,
+          playerInfo.Path,
+          isSpectator,
+          playerInfo.PlayerId,
+          ip,
+          playerInfo.OnlineRights === 3,
+          playerInfo?.LadderStats.PlayerRankings[0]?.Score,
+          playerInfo?.LadderStats.PlayerRankings[0]?.Ranking
+        )
+        AdministrationService.updateNickname({
+          login,
+          nickname: player.nickname,
+        })
+        RecordService.updateInfo({
+          login,
+          nickname: player.nickname,
+          region: player.region,
+          title: player.title,
+        })
         RoundsService.registerPlayer(player)
-        Events.emit('PlayerDataUpdated', [{
-          login, nickname: player.nickname, country: {
-            name: player.country,
-            code: player.countryCode,
-            region: player.region
-          }, title: player.title
-        }])
+        Events.emit('PlayerDataUpdated', [
+          {
+            login,
+            nickname: player.nickname,
+            country: {
+              name: player.country,
+              code: player.countryCode,
+              region: player.region,
+            },
+            title: player.title,
+          },
+        ])
         Events.emit('PlayerJoin', player)
         // Update rank for the arriving player, this can take time hence no await
         void RecordService.fetchAndStoreRanks(playerInfo.Login)
-      }
+      },
     },
     {
       event: 'TrackMania.PlayerDisconnect',
       callback: (login: tm.Events['TrackMania.PlayerDisconnect']): void => {
         // [0] = Login
-        if (AdministrationService.banlist.some(a => a.login === login)) {
+        if (AdministrationService.banlist.some((a) => a.login === login)) {
           return
         }
         const leaveInfo: tm.LeaveInfo | Error = PlayerService.leave(login)
         if (!(leaveInfo instanceof Error)) {
           Events.emit('PlayerLeave', leaveInfo)
         }
-      }
+      },
     },
     {
       event: 'TrackMania.PlayerChat',
@@ -82,41 +104,59 @@ export class Listeners {
         if (!(messageInfo instanceof Error)) {
           Events.emit('PlayerChat', messageInfo)
         }
-      }
+      },
     },
     {
       event: 'TrackMania.PlayerCheckpoint',
-      callback: async ([playerId, login, timeOrScore, currentLap, checkpointIndex]:
-        tm.Events['TrackMania.PlayerCheckpoint']): Promise<void> => {
+      callback: async ([
+        playerId,
+        login,
+        timeOrScore,
+        currentLap,
+        checkpointIndex,
+      ]: tm.Events['TrackMania.PlayerCheckpoint']): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore, [3] = CurLap, [4] = CheckpointIndex
         // Ignore inexistent people // Please elaborate // PID 0 = Server // HOW CAN SERVER GET A CHECKPOINT
-        if (playerId === 0) { return }
+        if (playerId === 0) {
+          return
+        }
         const player: tm.Player | undefined = PlayerService.get(login)
         if (player === undefined) {
           Logger.error(`Can't find player ${login} in memory on checkpoint event`)
           return
         }
         const cpsPerLap = MapService.current.checkpointsPerLap
-        let div = player.currentCheckpoints.length / cpsPerLap
+        const div = player.currentCheckpoints.length / cpsPerLap
         const startIndex = cpsPerLap * Math.floor(div)
         const lapCheckpointIndex = checkpointIndex - startIndex
         const lapCheckpointTime = timeOrScore - (player.currentCheckpoints[startIndex - 1]?.time ?? 0)
         const isLapFinish = (lapCheckpointIndex + 1) % MapService.current.checkpointsPerLap === 0
         const checkpoint: tm.Checkpoint = {
-          index: checkpointIndex, time: timeOrScore, lap: currentLap,
-          lapCheckpointIndex, lapCheckpointTime,
-          isLapFinish
+          index: checkpointIndex,
+          time: timeOrScore,
+          lap: currentLap,
+          lapCheckpointIndex,
+          lapCheckpointTime,
+          isLapFinish,
         }
         const cpStatus = PlayerService.addCP(player, checkpoint)
         const info: tm.CheckpointInfo = {
           time: timeOrScore,
           lap: currentLap,
           index: checkpointIndex,
-          player, lapCheckpointIndex, lapCheckpointTime, isLapFinish
+          player,
+          lapCheckpointIndex,
+          lapCheckpointTime,
+          isLapFinish,
         }
         if ((cpStatus as any).isFinish !== undefined) {
-          const lapObj = await RecordService.addLap(MapService.current.id, player, (cpStatus as any).lapTime,
-            (cpStatus as any).lapCheckpoints, (cpStatus as any).isFinish)
+          const lapObj = await RecordService.addLap(
+            MapService.current.id,
+            player,
+            (cpStatus as any).lapTime,
+            (cpStatus as any).lapCheckpoints,
+            (cpStatus as any).isFinish
+          )
           if (lapObj !== false) {
             Events.emit(`PlayerLap`, lapObj.lapInfo)
             if (lapObj.lapRecord !== undefined) {
@@ -146,7 +186,7 @@ export class Listeners {
           // Register player checkpoint
           Events.emit('PlayerCheckpoint', info)
         }
-      }
+      },
     },
     {
       event: 'TrackMania.PlayerFinish',
@@ -169,19 +209,19 @@ export class Listeners {
         //   // fun fact this is probably impossible to even get :D
         //   // return
         // }
-      }
+      },
     },
     {
       event: 'TrackMania.BeginRace',
       callback: (params: tm.Events['TrackMania.BeginRace']): void => {
         // [0] = Challenge
-      }
+      },
     },
     {
       event: 'TrackMania.EndRace',
       callback: (params: tm.Events['TrackMania.EndRace']): void => {
         // [0] = Rankings[arr], [1] = Challenge
-      }
+      },
     },
     {
       event: 'TrackMania.BeginRound',
@@ -190,7 +230,7 @@ export class Listeners {
         const roundRecords = RoundsService.roundRecords
         RoundsService.handleBeginRound()
         Events.emit('BeginRound', roundRecords)
-      }
+      },
     },
     {
       event: 'TrackMania.EndRound',
@@ -199,7 +239,7 @@ export class Listeners {
 
         await RoundsService.handleEndRound()
         Events.emit('EndRound', RoundsService.roundRecords)
-      }
+      },
     },
     {
       event: 'TrackMania.BeginChallenge',
@@ -212,7 +252,7 @@ export class Listeners {
         // Check whether the map was restarted
         if (!isRestart) {
           // In case it wasn't, update the votes and records
-          await MapService.update()
+          await MapService.update(map.UId)
           await RecordService.nextMap()
           await VoteService.nextMap()
         } else {
@@ -223,20 +263,31 @@ export class Listeners {
         // Update server config
         await ServerConfig.update()
         // Register map update
-        Events.emit('BeginMap', { ...MapService.current, isRestart })
-      }
+        Events.emit('BeginMap', {
+          ...MapService.current,
+          isRestart,
+        })
+      },
     },
     {
       event: 'TrackMania.EndChallenge',
-      callback: async ([rankings, map, wasWarmUp, continuesOnNextMap, restart]:
-        tm.Events['TrackMania.EndChallenge']): Promise<void> => {
+      callback: async ([
+        rankings,
+        map,
+        wasWarmUp,
+        continuesOnNextMap,
+        restart,
+      ]: tm.Events['TrackMania.EndChallenge']): Promise<void> => {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         // If rankings are non-existent, index 0 becomes the current map, unsure whose fault is that, but I blame Nadeo usually
         PlayerService.resetCheckpoints()
         let droppedMap: undefined | tm.EndMapInfo['droppedMap']
         const nextJb = MapService.jukebox[0]
-        if (!config.keepQueueAfterLeave && nextJb.callerLogin !== undefined
-          && PlayerService.get(nextJb.callerLogin) === undefined) {
+        if (
+          !config.keepQueueAfterLeave &&
+          nextJb.callerLogin !== undefined &&
+          PlayerService.get(nextJb.callerLogin) === undefined
+        ) {
           droppedMap = nextJb as tm.EndMapInfo['droppedMap']
           MapService.removeFromQueue(nextJb.map.id)
         }
@@ -262,13 +313,13 @@ export class Listeners {
           winnerWins: wins,
           serverSideRankings: rankings,
           isRestart,
-          droppedMap
+          droppedMap,
         }
         // Update the player record averages, this can take a long time
         void PlayerService.calculateAveragesAndRanks()
         // Register map ending
         Events.emit('EndMap', endMapInfo)
-      }
+      },
     },
     {
       event: 'TrackMania.StatusChanged',
@@ -285,7 +336,7 @@ export class Listeners {
         // IIRC it's important that we don't start the controller before server switches to Play
 
         // Doesn't seem to matter actually
-      }
+      },
     },
     {
       event: 'TrackMania.PlayerManialinkPageAnswer',
@@ -295,7 +346,9 @@ export class Listeners {
           return
         }
         timeouts[playerId] = Date.now() + config.manialinkInteractionTimeout
-        if (PlayerService.get(login)?.privilege === -1) { return }
+        if (PlayerService.get(login)?.privilege === -1) {
+          return
+        }
         const temp: any = PlayerService.get(login)
         if (temp === undefined) {
           Logger.error(`Player ${login} not online in TrackMania.PlayerManialinkPageAnswer event`)
@@ -304,15 +357,20 @@ export class Listeners {
         temp.actionId = answer
         const info: tm.ManialinkClickInfo = temp
         Events.emit('ManialinkClick', info)
-      }
+      },
     },
     {
       event: 'TrackMania.BillUpdated',
       callback: ([id, state, stateName, transactionId]: tm.Events['TrackMania.BillUpdated']): void => {
         // [0] = BillId, [1] = State, [2] = StateName, [3] = TransactionId
-        const bill: tm.BillUpdatedInfo = { id, state, stateName, transactionId }
+        const bill: tm.BillUpdatedInfo = {
+          id,
+          state,
+          stateName,
+          transactionId,
+        }
         Events.emit('BillUpdated', bill)
-      }
+      },
     },
     {
       event: 'TrackMania.ChallengeListModified',
@@ -325,14 +383,14 @@ export class Listeners {
         if (config.updateMatchSettingsOnChange && isListModified) {
           void MapService.updateList()
         }
-      }
+      },
     },
     {
       event: 'TrackMania.PlayerInfoChanged',
       callback: (playerInfo: tm.Events['TrackMania.PlayerInfoChanged']): void => {
         // [0] = PlayerInfo
-        const spec: any = playerInfo.SpectatorStatus.toString()
-        const flags: any = playerInfo.Flags.toString()
+        const spec: any = playerInfo.SpectatorStatus.toString().padStart(4, '0')
+        const flags: any = playerInfo.Flags.toString().padStart(7, '0')
         const info: tm.InfoChangedInfo = {
           login: playerInfo.Login,
           nickname: playerInfo.NickName,
@@ -342,8 +400,7 @@ export class Listeners {
           isSpectator: spec?.[spec.length - 1] === '1',
           isTemporarySpectator: spec?.[spec.length - 2] === '1',
           isPureSpectator: spec?.[spec.length - 3] === '1',
-          autoTarget: spec?.[spec.length - 4] === '1',
-          // this is 255 when the player is spectating nobody OR when the player was spectating nobody
+          autoTarget: spec?.[spec.length - 4] === '1', // this is 255 when the player is spectating nobody OR when the player was spectating nobody
           // and just changed back into race mode because this callback gets fired twice when that happens :D
           currentTargetId: Number(spec?.substring(0, spec.length - 4)) || 0,
           forceSpectator: Number(flags?.[flags.length - 1]) || 0,
@@ -352,18 +409,18 @@ export class Listeners {
           isUsingStereoscopy: flags?.[flags.length - 4] === '1',
           isManagedByOtherServer: flags?.[flags.length - 5] === '1',
           isServer: flags?.[flags.length - 6] === '1',
-          hasPlayerSlot: flags?.[flags.length - 7] === '1'
+          hasPlayerSlot: flags?.[flags.length - 7] === '1',
         }
         PlayerService.setPlayerInfo(info)
         Events.emit('PlayerInfoChanged', info)
-      }
+      },
     },
     {
       event: 'TrackMania.PlayerIncoherence',
       callback: async (): Promise<void> => {
         // [0] = PlayerUid, [1] = Login
         // No real use case. Game will tell you about redtime anyway
-      }
+      },
     },
     {
       event: 'TrackMania.Echo',
@@ -371,25 +428,22 @@ export class Listeners {
         // [0] = Internal, [1] = Public
         // Have to understand what this thing actually does first
         // 8 results on Google, either xaseco source or callbacks list lol
-      }
+      },
     },
     {
       event: 'TrackMania.VoteUpdated',
       callback: async (): Promise<void> => {
         // [0] = StateName, [1] = Login, [2] = CmdName, [3] = CmdParam
         // Tied to CallVotes. Very unlikely we'll use those at all
-      }
-    }
+      },
+    },
   ]
 
   static async initialize(): Promise<true | Error> {
     for (const listener of this.listeners) {
       Events.addListener(listener.event, listener.callback)
     }
-    const cb: any | Error = await Client.call('EnableCallbacks', [
-      { boolean: true }
-    ])
+    const cb: any | Error = await Client.call('EnableCallbacks', [{ boolean: true }])
     return cb instanceof Error ? cb : true
   }
-
 }

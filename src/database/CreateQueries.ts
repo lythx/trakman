@@ -149,5 +149,5 @@ export const createQueries = [
     CONSTRAINT fk_caller_id
       FOREIGN KEY(caller_id)
 	      REFERENCES players(id)
-  );`
+  );`,
 ]

@@ -3,20 +3,52 @@
  * @since 1.0
  */
 
-import { componentIds, Grid, leftAlignedText, centeredText, closeButton, Paginator, type GridCellFunction, PopupWindow } from '../UI.js'
-import config from './Chatlog.config.js'
+import {
+  centeredText,
+  closeButton,
+  componentIds,
+  Grid,
+  type GridCellFunction,
+  leftAlignedText,
+  Paginator,
+  PopupWindow,
+} from '../UI.js'
+import userConfig from './Chatlog.config.js'
 
-export default class ChatLog extends PopupWindow<{ page: number }> {
+const config = tm.utils.withDefaults(userConfig, {
+  entries: 16,
+  columnProportions: [2, 3, 2.5, 7],
+  navbar: [],
+  grid: {
+    margin: 0.15,
+  },
+  command: {
+    aliases: ['chatlog', 'cl'],
+    privilege: 0,
+  },
+})
 
+export default class ChatLog extends PopupWindow<{
+  page: number
+}> {
   readonly grid: Grid
   readonly paginator: Paginator
 
   constructor() {
     super(componentIds.chatlog, config.icon, config.title, config.navbar)
-    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
-      new Array(config.entries).fill(1), config.grid)
-    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
-      Math.ceil(tm.chat.messageCount / (config.entries - 1)))
+    this.grid = new Grid(
+      this.contentWidth,
+      this.contentHeight,
+      config.columnProportions,
+      new Array(config.entries).fill(1),
+      config.grid
+    )
+    this.paginator = new Paginator(
+      this.openId,
+      this.contentWidth,
+      this.footerHeight,
+      Math.ceil(tm.chat.messageCount / (config.entries - 1))
+    )
     this.paginator.onPageChange = (login, page) => {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
@@ -28,7 +60,7 @@ export default class ChatLog extends PopupWindow<{ page: number }> {
       aliases: config.command.aliases,
       help: config.command.help,
       callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
-      privilege: config.command.privilege
+      privilege: config.command.privilege,
     })
     tm.addListener('PlayerDataUpdated', () => this.reRender())
   }
@@ -46,7 +78,12 @@ export default class ChatLog extends PopupWindow<{ page: number }> {
     }
   }
 
-  protected constructContent(login: string, params: { page: number }): string {
+  protected constructContent(
+    login: string,
+    params: {
+      page: number
+    }
+  ): string {
     const page = params.page
     const index = (page - 1) * (config.entries - 1) - 1
     const messages = tm.chat.messages.reverse()
@@ -60,11 +97,15 @@ export default class ChatLog extends PopupWindow<{ page: number }> {
       return centeredText(tm.utils.formatDate(messages[index + i].date, true), w, h)
     }
     const nicknameCell: GridCellFunction = (i, j, w, h) => {
-      return centeredText(tm.utils.safeString(tm.utils.safeString(tm.utils.strip(messages[index + i].nickname, false))), w, h)
+      return centeredText(
+        tm.utils.safeString(tm.utils.safeString(tm.utils.strip(messages[index + i].nickname, false))),
+        w,
+        h
+      )
     }
     const loginCell: GridCellFunction = (i, j, w, h) => {
       const playerLogin = messages[index + i].login
-      return centeredText(login === playerLogin ? "$" + config.selfColour + playerLogin : playerLogin, w, h)
+      return centeredText(login === playerLogin ? '$' + config.selfColour + playerLogin : playerLogin, w, h)
     }
     const messageCell: GridCellFunction = (i, j, w, h) => {
       return leftAlignedText(tm.utils.safeString(tm.utils.strip(messages[index + i].text.replace(`\n`, ` `))), w, h)

@@ -9,7 +9,7 @@ export default {
   lapsEntries: 7,
   entryHeight: 2.15,
   width: cfg.width,
-  title: "Ultimania Records",
+  title: 'Ultimania Records',
   icon: icons.chartDedi,
   margin: cfg.margin,
   topCount: 5,

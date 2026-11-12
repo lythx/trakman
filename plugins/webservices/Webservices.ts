@@ -1,28 +1,39 @@
-import config from './Config.js'
+import userConfig from './Config.js'
 import http from 'http'
+import fetch from 'node-fetch'
+
+const config = tm.utils.withDefaults(userConfig, {
+  isEnabled: false,
+  altService: true,
+  altServiceURL: 'https://api.ul.unitedascenders.xyz',
+  cacheSize: 30,
+})
 
 const wsLogin: string | undefined = process.env.WEBSERVICES_LOGIN
 const wsPassword: string | undefined = process.env.WEBSERVICES_PASSWORD
 
-type FetchReturnType = {
-  id: number
-  login: string
-  nickname: string
-  united: boolean
-  path: string
-  idZone: number
-} | Error
+type FetchReturnType =
+  | {
+      id: number
+      login: string
+      nickname: string
+      united: boolean
+      path: string
+      idZone: number
+    }
+  | Error
 
 export interface WebservicesInfo {
-  id: number,
-  login: string,
-  united: boolean,
+  id: number
+  login: string
+  united: boolean
   idZone: number
-  nickname: string,
-  region: string,
-  country: string,
+  nickname: string
+  region: string
+  country: string
   countryCode: string
 }
+
 const regex: RegExp = /[A-Z\'^£$%&*()}{@#~?><>,|=+¬ ]/
 const currentAuthorListeners: ((data?: Readonly<WebservicesInfo>) => void)[] = []
 const nextAuthorListeners: ((data?: Readonly<WebservicesInfo>) => void)[] = []
@@ -32,41 +43,56 @@ let isMapRestart: boolean = false
 const cachedAuthors: WebservicesInfo[] = []
 
 const emitCurrentAuthorFetch = () => {
-  for (const e of currentAuthorListeners) { e(curAuthor) }
+  for (const e of currentAuthorListeners) {
+    e(curAuthor)
+  }
 }
 
 const emitNextAuthorFetch = () => {
-  for (const e of nextAuthorListeners) { e(nextAuthor) }
+  for (const e of nextAuthorListeners) {
+    e(nextAuthor)
+  }
 }
 
 const fetchWebservices = async (login: string): Promise<FetchReturnType> => {
   if (!config.isEnabled) {
     return new Error('Use webservices is set to false')
   }
+
   const options = {
     host: `ws.trackmania.com`,
     path: `/tmf/players/${login}/`,
     method: 'GET',
     headers: {
-      'Authorization': "Basic " + Buffer.from(`${wsLogin}:${wsPassword}`).toString('base64'),
-    }
+      Authorization: 'Basic ' + Buffer.from(`${wsLogin}:${wsPassword}`).toString('base64'),
+    },
   }
 
   return new Promise<FetchReturnType>((resolve, reject): void => {
-    http.request(options, (res): void => {
-      let data: string = ''
-      res.on('data', (chunk): void => { data += chunk })
-      if (res.statusCode === 200) {
-        try {
-          res.on('end', (): void => { resolve(JSON.parse(data)) })
-        } catch(error) {
-          reject(new Error(`Instead of a JSON, the request returned the following: ${data}. Error was: ${error}`))
+    http
+      .request(options, (res): void => {
+        let data: string = ''
+        res.on('data', (chunk): void => {
+          data += chunk
+        })
+        if (res.statusCode === 200) {
+          try {
+            res.on('end', (): void => {
+              resolve(JSON.parse(data))
+            })
+          } catch (error) {
+            reject(new Error(`Instead of a JSON, the request returned the following: ${data}. Error was: ${error}`))
+          }
+        } else {
+          reject(new Error(`Status code: ${res.statusCode}, message: ${data}`))
         }
-      } else {
-        reject(new Error(`Status code: ${res.statusCode}, message: ${data}`))
-      }
-    }).on('error', (): void => { reject(new Error(`HTTP request error.`)) })
-      .on('timeout', (): void => { reject(new Error(`HTTP request timeout.`)) })
+      })
+      .on('error', (): void => {
+        reject(new Error(`HTTP request error.`))
+      })
+      .on('timeout', (): void => {
+        reject(new Error(`HTTP request timeout.`))
+      })
       .end()
   }).catch((err: Error): Error => {
     const errStr = `Webservices fetch error: ${err?.message}`
@@ -75,21 +101,56 @@ const fetchWebservices = async (login: string): Promise<FetchReturnType> => {
   })
 }
 
+const fetchAlt = async (login: string): Promise<FetchReturnType> => {
+  try {
+    const url = `${config.altServiceURL}/player/${login}?ws=true`
+    const res = await fetch(url)
+    if (!res.ok) {
+      const errStr = `UnitedLadder responded with status ${res.status} for login ${login}`
+      tm.log.warn(errStr)
+      return new Error(errStr)
+    }
+    const json = (await res.json()) as any
+    return {
+      id: json?.id,
+      login: json?.login,
+      nickname: json?.nickname,
+      united: json?.united,
+      path: json?.path,
+      idZone: json?.zoneId,
+    }
+  } catch (err) {
+    const errStr = err instanceof Error ? err.message : String(err)
+    tm.log.warn(`UnitedLadder error for login ${login}: ${errStr}`)
+    return new Error(errStr)
+  }
+}
+
 /**
  * Fetches Trackmania Webservices for player information
  * @param login Player login
  * @returns Player information object or error if unsuccessful
  */
 const fetchPlayer = async (login: string): Promise<WebservicesInfo | Error> => {
-  const cacheEntry: WebservicesInfo | undefined = cachedAuthors.find(a => a.login === login)
-  if (cacheEntry !== undefined) { return cacheEntry }
-  if (regex.test(login)) { return new Error(`Login doesn't pass regex test`) }
-  const player = await fetchWebservices(login)
-  if (player instanceof Error) { // UNKOWN PLAYER MOMENT
+  const cacheEntry: WebservicesInfo | undefined = cachedAuthors.find((a) => a.login === login)
+  if (cacheEntry !== undefined) {
+    return cacheEntry
+  }
+  if (regex.test(login)) {
+    return new Error(`Login doesn't pass regex test`)
+  }
+  const player = config.altService ? await fetchAlt(login) : await fetchWebservices(login)
+  if (player instanceof Error) {
+    // UNKOWN PLAYER MOMENT
     return player
   } else {
+    if (player.path === null) {
+      throw new Error(`Received undefined region info from webservices for login ${login}`)
+    }
     const region = tm.utils.getRegionInfo(player.path)
-    if (region.countryCode === undefined) { throw new Error(`Received undefined country code from webservices for login ${login}`) }
+    if (region.countryCode === undefined) {
+      throw new Error(`Received undefined country code from webservices for login ${login}`)
+    }
     const info: WebservicesInfo = {
       id: Number(player.id),
       login: player.login,
@@ -98,7 +159,7 @@ const fetchPlayer = async (login: string): Promise<WebservicesInfo | Error> => {
       idZone: Number(player.idZone),
       region: region.region,
       country: region.country,
-      countryCode: region.countryCode
+      countryCode: region.countryCode,
     }
     cachedAuthors.unshift(info)
     cachedAuthors.length = Math.min(config.cacheSize, cachedAuthors.length)
@@ -116,15 +177,23 @@ tm.addListener('Startup', async (): Promise<void> => {
     return
   }
   const curRes: WebservicesInfo | Error = await fetchPlayer(tm.maps.current.author)
-  if (!(curRes instanceof Error)) { curAuthor = curRes }
+  if (!(curRes instanceof Error)) {
+    curAuthor = curRes
+  }
   emitCurrentAuthorFetch()
   const nextRes: WebservicesInfo | Error = await fetchPlayer(tm.jukebox.queue[0].id)
-  if (!(nextRes instanceof Error)) { nextAuthor = nextRes }
+  if (!(nextRes instanceof Error)) {
+    nextAuthor = nextRes
+  }
   emitNextAuthorFetch()
 })
 
-tm.addListener('EndMap', (info): void => { isMapRestart = info.isRestart })
-tm.addListener('BeginMap', (): void => { isMapRestart = false })
+tm.addListener('EndMap', (info): void => {
+  isMapRestart = info.isRestart
+})
+tm.addListener('BeginMap', (): void => {
+  isMapRestart = false
+})
 
 tm.addListener('JukeboxChanged', async (): Promise<void> => {
   const curLogin: string = tm.maps.current.author
@@ -132,7 +201,9 @@ tm.addListener('JukeboxChanged', async (): Promise<void> => {
     curAuthor = undefined
     emitCurrentAuthorFetch()
     const res: WebservicesInfo | Error = await fetchPlayer(curLogin)
-    if (!(res instanceof Error)) { curAuthor = res }
+    if (!(res instanceof Error)) {
+      curAuthor = res
+    }
   }
   emitCurrentAuthorFetch()
   const nextLogin: string = tm.jukebox.queue[0].author
@@ -140,7 +211,9 @@ tm.addListener('JukeboxChanged', async (): Promise<void> => {
     nextAuthor = undefined
     emitNextAuthorFetch()
     const res: WebservicesInfo | Error = await fetchPlayer(nextLogin)
-    if (!(res instanceof Error)) { nextAuthor = res }
+    if (!(res instanceof Error)) {
+      nextAuthor = res
+    }
   }
   emitNextAuthorFetch()
 })
@@ -152,7 +225,6 @@ tm.addListener('JukeboxChanged', async (): Promise<void> => {
  * @since 0.1
  */
 export const webservices = {
-
   fetchPlayer,
 
   /**
@@ -182,13 +254,14 @@ export const webservices = {
    * Next map author webservices data
    */
   get nextAuthor(): WebservicesInfo | undefined {
-    if (isMapRestart) { return curAuthor }
+    if (isMapRestart) {
+      return curAuthor
+    }
     return nextAuthor
   },
 
   /**
    * Plugin status
    */
-  isEnabled: config.isEnabled
-
+  isEnabled: config.isEnabled,
 }

@@ -1,6 +1,6 @@
 export default {
-  format: "$s",
+  format: '$s',
   textScale: 0.7,
   padding: 0.2,
-  yOffset: -0.1,
+  yOffset: -0.1
 }

@@ -17,8 +17,7 @@ export default {
   addrandom: {
     fetchError: `${p.error}Failed to fetch random map from TMX.`,
     addError: `${p.error}Failed to add the map.`,
-    added: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has added and queued` +
-      ` ${p.highlight}#{map}${p.admin} from TMX random.`,
+    added: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has added and queued` + ` ${p.highlight}#{map}${p.admin} from TMX random.`,
     public: true,
     privilege: tm.config.controller.privileges.addMap,
     aliases: ['ar', 'addr', 'addrandom'],
@@ -32,8 +31,7 @@ export default {
   addfromurl: {
     fetchError: `${p.error}Failed to fetch the map file.`,
     addError: `${p.error}Failed to add the map.`,
-    alreadyAdded: `${p.admin}Map ${p.highlight}#{map}${p.admin} added by ${p.highlight}#{nickname}${p.admin} is already on the server, ` +
-      `it will be ${p.highlight}queued ${p.admin}instead.`,
+    alreadyAdded: `${p.admin}Map ${p.highlight}#{map}${p.admin} added by ${p.highlight}#{nickname}${p.admin} is already on the server, ` + `it will be ${p.highlight}queued ${p.admin}instead.`,
     added: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has added and queued ${p.highlight}#{map}${p.admin} from url.`,
     public: true,
     privilege: tm.config.controller.privileges.addMap,
@@ -50,8 +48,7 @@ export default {
     notAvailable: `${p.error}Public ${p.highlight}/add ${p.error} is not available on this server.`,
     fetchError: `${p.error}Failed to fetch the map file from TMX.`,
     addError: `${p.error}Failed to add the map.`,
-    alreadyAdded: `${p.admin}Map ${p.highlight}#{map}${p.admin} added by ${p.highlight}#{nickname}${p.admin} is already on the server, ` +
-      `it will be ${p.highlight}queued ${p.admin}instead.`,
+    alreadyAdded: `${p.admin}Map ${p.highlight}#{map}${p.admin} added by ${p.highlight}#{nickname}${p.admin} is already on the server, ` + `it will be ${p.highlight}queued ${p.admin}instead.`,
     added: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has added and queued ${p.highlight}#{map}${p.admin} from TMX.`,
     public: true,
     privilege: 0,

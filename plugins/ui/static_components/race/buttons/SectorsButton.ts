@@ -1,12 +1,24 @@
-import type { ButtonData } from "./ButtonData.js"
-import { UiButton } from "./UiButton.js"
-import config from "./ButtonsWidget.config.js"
+import type { ButtonData } from './ButtonData.js'
+import { UiButton } from './UiButton.js'
+import userConfig from './ButtonsWidget.config.js'
 import { componentIds } from '../../../UI.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  sectorsButton: {
+    texts: {
+      0: 'SECTOR',
+      1: '$AF4RECORDS',
+      equal: true,
+    },
+    width: 1.8,
+    height: 1.8,
+    padding: 0.2,
+  },
+})
 
 const cfg = config.sectorsButton
 
 export class SectorsButton extends UiButton {
-
   buttonData: ButtonData
 
   constructor() {
@@ -19,8 +31,7 @@ export class SectorsButton extends UiButton {
       iconHeight: cfg.height,
       padding: cfg.padding,
       actionId: componentIds.sectorRecords,
-      equalTexts: cfg.texts.equal
+      equalTexts: cfg.texts.equal,
     }
   }
-
 }

@@ -1,9 +1,19 @@
-import { componentIds, StaticHeader, StaticComponent, leftAlignedText } from '../../ui/UI.js'
+import { componentIds, leftAlignedText, raceConfig, StaticComponent, StaticHeader } from '../../ui/UI.js'
 import type { Song } from '../Types.js'
-import config from './MusicWidget.config.js'
+import userConfig from './MusicWidget.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  height: 7,
+  margin: raceConfig.margin,
+  width: raceConfig.width,
+  side: true,
+  textScale: 0.9,
+  textPadding: 0.15,
+  iconWidth: 1.7,
+  hidePanel: true,
+})
 
 export default class MusicWidget extends StaticComponent {
-
   private song: Song | undefined
   private readonly header: StaticHeader
   private xml: string = ''
@@ -23,23 +33,30 @@ export default class MusicWidget extends StaticComponent {
   setCurrentSong(song: Song | undefined) {
     this.song = song
     const xml = this.display()
-    if(xml !== undefined) {
+    if (xml !== undefined) {
       tm.sendManialink(xml)
     }
   }
 
   display() {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     this.updateXML()
     return this.xml
   }
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) { return }
+    if (!this.isDisplayed) {
+      return
+    }
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
-    return { xml: this.xml, login }
+    return {
+      xml: this.xml,
+      login,
+    }
   }
 
   private updateXML(): void {
@@ -73,8 +90,10 @@ export default class MusicWidget extends StaticComponent {
   private text(text: string, w: number, h: number, xOffset: number = 0, background?: string): string {
     xOffset = xOffset ?? 0
     return `<quad posn="${xOffset} 0 2" sizen="${w} ${h}" bgcolor="${background ?? config.textBackground}"/>
-    ${leftAlignedText(text, w, h,
-      { textScale: config.textScale, padding: config.textPadding, xOffset, })}`
+    ${leftAlignedText(text, w, h, {
+      textScale: config.textScale,
+      padding: config.textPadding,
+      xOffset,
+    })}`
   }
-
 }

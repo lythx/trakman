@@ -1,8 +1,14 @@
-import config from './CloseButton.config.js'
+import userConfig from './CloseButton.config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  buttonWidth: 3,
+  buttonHeight: 3,
+  padding: 0.2,
+})
 
 interface CloseButtonOptions {
-  width?: number,
-  height?: number,
+  width?: number
+  height?: number
   padding?: number
 }
 
@@ -14,8 +20,12 @@ interface CloseButtonOptions {
  * @param options Optional properties
  * @returns Button XML string
  */
-export const closeButton = (actionId: number, parentWidth: number,
-  parentHeight: number, options?: CloseButtonOptions): string => {
+export const closeButton = (
+  actionId: number,
+  parentWidth: number,
+  parentHeight: number,
+  options?: CloseButtonOptions
+): string => {
   const width: number = options?.width ?? config.buttonWidth
   const height: number = options?.height ?? config.buttonHeight
   const padding: number = options?.padding ?? config.padding

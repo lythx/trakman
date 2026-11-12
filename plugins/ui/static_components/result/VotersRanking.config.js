@@ -5,13 +5,9 @@ export default {
   entries: 5,
   entryHeight: 2.15,
   width: cfg.width,
-  title: "Most Votes",
+  title: 'Most Votes',
   icon: icons.peopleKarma,
   margin: cfg.margin,
   background: cfg.background,
-  columnProportions: [
-    1,
-    1.9,
-    5.1
-  ]
+  columnProportions: [1, 1.9, 5.1]
 }

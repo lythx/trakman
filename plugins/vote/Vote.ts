@@ -1,6 +1,31 @@
-import { addKeyListener } from "../ui/utils/KeyListener.js"
+import { addKeyListener } from '../ui/utils/KeyListener.js'
 import IDS from '../ui/config/UtilIds.js'
-import config from './Config.js'
+import userConfig from './Config.js'
+
+const config = tm.utils.withDefaults(userConfig, {
+  yesKey: 'F5',
+  noKey: 'F6',
+  keyListenerImportance: 10,
+  passCancelPrivilege: 1,
+  commands: {
+    yes: {
+      aliases: ['y', 'yes'],
+      privilege: 0,
+    },
+    no: {
+      aliases: ['n', 'no'],
+      privilege: 0,
+    },
+    pass: {
+      aliases: ['pv', 'pass'],
+      privilege: 1,
+    },
+    cancel: {
+      aliases: ['cv', 'can', 'cancel'],
+      privilege: 1,
+    },
+  },
+})
 
 /**
  * Provides utilites for in-game votes.
@@ -8,7 +33,6 @@ import config from './Config.js'
  * @since 0.1
  */
 export class Vote {
-
   private static isListenerAdded: boolean = false
   private static isDisplayed: boolean = false
   /** Manialink action ID of yes vote */
@@ -18,44 +42,105 @@ export class Vote {
   /** Manialink action ID of yes vote */
   readonly goal: number
   static readonly passCancelPrivilege: number = config.passCancelPrivilege
-  private readonly votes: { login: string, vote: boolean }[] = []
-  private static listener: ((info: tm.ManialinkClickInfo) => void) = () => undefined
+  private readonly votes: {
+    login: string
+    vote: boolean
+  }[] = []
+  private static listener: (info: tm.ManialinkClickInfo) => void = () => undefined
   private static endMapListener: () => void = () => undefined
   private static startMapListener: () => void = () => undefined
-  private static onUpdate: ((votes: { login: string, vote: boolean }[], seconds: number, info: tm.ManialinkClickInfo) => void) = () => undefined
-  private static onEnd: ((result: boolean, votes: { login: string, vote: boolean }[]) => void) = () => undefined
-  private static onInterrupt: ((info: {
-    caller?: tm.Player,
-    result: boolean
-  }, votes: { login: string, vote: boolean }[]) => void) = () => undefined
-  private static onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
+  private static onUpdate: (
+    votes: {
+      login: string
+      vote: boolean
+    }[],
+    seconds: number,
+    info: tm.ManialinkClickInfo
+  ) => void = () => undefined
+  private static onEnd: (
+    result: boolean,
+    votes: {
+      login: string
+      vote: boolean
+    }[]
+  ) => void = () => undefined
+  private static onInterrupt: (
+    info: {
+      caller?: tm.Player
+      result: boolean
+    },
+    votes: {
+      login: string
+      vote: boolean
+    }[]
+  ) => void = () => undefined
+  private static onSecondsChanged: (
+    seconds: number,
+    votes: {
+      login: string
+      vote: boolean
+    }[]
+  ) => void = () => undefined
   private static pass: (caller?: tm.Player) => void = () => undefined
   private static cancel: (caller?: tm.Player) => void = () => undefined
-  /** 
+  /**
    * Callback function to execute on vote ratio update. It takes votes array, seconds left, and ManialinkClickInfo as parameters
    */
-  onUpdate: ((votes: { login: string, vote: boolean }[], seconds: number, info: tm.ManialinkClickInfo) => void) = () => undefined
-  /** 
+  onUpdate: (
+    votes: {
+      login: string
+      vote: boolean
+    }[],
+    seconds: number,
+    info: tm.ManialinkClickInfo
+  ) => void = () => undefined
+  /**
    * Callback function to execute on vote end. It takes result and votes array as parameters
    */
-  onEnd: ((result: boolean, votes: { login: string, vote: boolean }[]) => void) = () => undefined
-  /** 
+  onEnd: (
+    result: boolean,
+    votes: {
+      login: string
+      vote: boolean
+    }[]
+  ) => void = () => undefined
+  /**
    * Callback function to execute on vote interrupt. It takes object containing result, optional player interrupting the vote
    * and votes array as parameters
    */
-  onInterrupt: ((info: {
-    caller?: tm.Player,
-    result: boolean
-  }, votes: { login: string, vote: boolean }[]) => void) = () => undefined
-  /** 
+  onInterrupt: (
+    info: {
+      caller?: tm.Player
+      result: boolean
+    },
+    votes: {
+      login: string
+      vote: boolean
+    }[]
+  ) => void = () => undefined
+  /**
    * Callback function to execute on vote seconds left change. It takes seconds amount and votes array as parameters
    */
-  onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
+  onSecondsChanged: (
+    seconds: number,
+    votes: {
+      login: string
+      vote: boolean
+    }[]
+  ) => void = () => undefined
   /** Logins of players who can vote */
-  loginList: { login: string, privilege: number }[] = []
+  loginList: {
+    login: string
+    privilege: number
+  }[] = []
   private isActive: boolean = false
   private seconds: number
-  private interrupted: { caller?: tm.Player, result: boolean } | undefined
+  private interrupted:
+    | {
+        caller?: tm.Player
+        result: boolean
+      }
+    | undefined
   private readonly cancelOnRoundEnd: boolean
   private readonly cancelOnRoundStart: boolean
 
@@ -66,10 +151,23 @@ export class Vote {
    * @param seconds Amount of time to vote
    * @param options Optional parameters
    */
-  constructor(callerLogin: string, goal: number, seconds: number, options?: { dontCancelOnRoundEnd?: true, dontCancelOnRoundStart?: true }) {
-    if (goal <= 0 || goal >= 1) { throw new Error(`Vote goal has to be between 0 and 1`) }
+  constructor(
+    callerLogin: string,
+    goal: number,
+    seconds: number,
+    options?: {
+      dontCancelOnRoundEnd?: true
+      dontCancelOnRoundStart?: true
+    }
+  ) {
+    if (goal <= 0 || goal >= 1) {
+      throw new Error(`Vote goal has to be between 0 and 1`)
+    }
     this.goal = goal
-    this.votes.push({ login: callerLogin, vote: true })
+    this.votes.push({
+      login: callerLogin,
+      vote: true,
+    })
     this.seconds = seconds
     this.cancelOnRoundEnd = options?.dontCancelOnRoundEnd === undefined
     this.cancelOnRoundStart = options?.dontCancelOnRoundStart === undefined
@@ -81,20 +179,36 @@ export class Vote {
       } else if (!['F5', 'F6', 'F7'].includes(config.noKey)) {
         throw new Error(`Vote noKey needs to be either F5, F6 or F7, received${config.noKey}. Fix your vote config`)
       }
-      addKeyListener(config.yesKey as any, (info): void => Vote.listener({ ...info, actionId: this.yesId }), config.keyListenerImportance)
-      addKeyListener(config.noKey as any, (info): void => Vote.listener({ ...info, actionId: this.noId }), config.keyListenerImportance)
+      addKeyListener(
+        config.yesKey as any,
+        (info): void =>
+          Vote.listener({
+            ...info,
+            actionId: this.yesId,
+          }),
+        config.keyListenerImportance
+      )
+      addKeyListener(
+        config.noKey as any,
+        (info): void =>
+          Vote.listener({
+            ...info,
+            actionId: this.noId,
+          }),
+        config.keyListenerImportance
+      )
       tm.commands.add(
         {
           aliases: config.commands.yes.aliases,
           help: config.commands.yes.help,
           callback: (info): void => tm.openManialink(this.yesId, info.login),
-          privilege: config.commands.yes.privilege
+          privilege: config.commands.yes.privilege,
         },
         {
           aliases: config.commands.no.aliases,
           help: config.commands.no.help,
           callback: (info): void => tm.openManialink(this.noId, info.login),
-          privilege: config.commands.no.privilege
+          privilege: config.commands.no.privilege,
         },
         {
           aliases: config.commands.pass.aliases,
@@ -104,7 +218,7 @@ export class Vote {
               Vote.pass(info)
             }
           },
-          privilege: config.commands.pass.privilege
+          privilege: config.commands.pass.privilege,
         },
         {
           aliases: config.commands.cancel.aliases,
@@ -113,12 +227,11 @@ export class Vote {
             if (Vote.isDisplayed) {
               Vote.cancel(info)
             }
-
           },
-          privilege: config.commands.cancel.privilege
+          privilege: config.commands.cancel.privilege,
         }
       )
-      tm.addListener("EndMap", (): void => Vote.endMapListener())
+      tm.addListener('EndMap', (): void => Vote.endMapListener())
       tm.addListener('BeginMap', (): void => Vote.startMapListener())
     }
   }
@@ -128,8 +241,15 @@ export class Vote {
    * @param eligibleLogins List of logins of players that can vote
    * @returns False if there is another vote running, true if vote gets started successfully
    */
-  start(eligibleLogins: { login: string, privilege: number }[]): boolean {
-    if (Vote.isDisplayed) { return false }
+  start(
+    eligibleLogins: {
+      login: string
+      privilege: number
+    }[]
+  ): boolean {
+    if (Vote.isDisplayed) {
+      return false
+    }
     Vote.onEnd = this.onEnd
     Vote.onUpdate = this.onUpdate
     Vote.onInterrupt = this.onInterrupt
@@ -138,23 +258,39 @@ export class Vote {
     Vote.pass = this.pass.bind(this)
     Vote.isDisplayed = true
     Vote.listener = (info: tm.ManialinkClickInfo): void => {
-      if (this.isActive && this.loginList.some(a => a.login === info.login)) {
-        const vote = this.votes.find(a => a.login === info.login)
+      if (this.isActive && this.loginList.some((a) => a.login === info.login)) {
+        const vote = this.votes.find((a) => a.login === info.login)
         if (vote === undefined) {
-          if (info.actionId === this.yesId) { this.votes.push({ login: info.login, vote: true }) }
-          else if (info.actionId === this.noId) { this.votes.push({ login: info.login, vote: false }) }
+          if (info.actionId === this.yesId) {
+            this.votes.push({
+              login: info.login,
+              vote: true,
+            })
+          } else if (info.actionId === this.noId) {
+            this.votes.push({
+              login: info.login,
+              vote: false,
+            })
+          }
         } else {
-          if (info.actionId === this.yesId) { vote.vote = true }
-          else if (info.actionId === this.noId) { vote.vote = false }
+          if (info.actionId === this.yesId) {
+            vote.vote = true
+          } else if (info.actionId === this.noId) {
+            vote.vote = false
+          }
         }
         Vote.onUpdate(this.votes, this.seconds, info)
       }
     }
     Vote.startMapListener = (): void => {
-      if (this.cancelOnRoundStart) { this.cancel() }
+      if (this.cancelOnRoundStart) {
+        this.cancel()
+      }
     }
     Vote.endMapListener = (): void => {
-      if (this.cancelOnRoundEnd) { this.cancel() }
+      if (this.cancelOnRoundEnd) {
+        this.cancel()
+      }
     }
     const startTime: number = Date.now()
     this.isActive = true
@@ -192,9 +328,9 @@ export class Vote {
 
   private conclude(): boolean {
     const allVotes: number = this.votes.length
-    const yesVotes: number = this.votes.filter(a => a.vote === true).length
+    const yesVotes: number = this.votes.filter((a) => a.vote === true).length
     this.isActive = false
-    return (yesVotes / allVotes) > this.goal
+    return yesVotes / allVotes > this.goal
   }
 
   /**
@@ -202,8 +338,13 @@ export class Vote {
    * @param caller Caller player object
    */
   pass(caller?: tm.Player): void {
-    if (!this.isActive) { return }
-    this.interrupted = { caller, result: true }
+    if (!this.isActive) {
+      return
+    }
+    this.interrupted = {
+      caller,
+      result: true,
+    }
   }
 
   /**
@@ -211,8 +352,13 @@ export class Vote {
    * @param caller Caller player object
    */
   cancel(caller?: tm.Player): void {
-    if (!this.isActive) { return }
-    this.interrupted = { caller, result: false }
+    if (!this.isActive) {
+      return
+    }
+    this.interrupted = {
+      caller,
+      result: false,
+    }
   }
 
   private clearListeners(): void {
@@ -223,5 +369,4 @@ export class Vote {
     Vote.pass = () => undefined
     Vote.cancel = () => undefined
   }
-
 }

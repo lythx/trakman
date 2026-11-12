@@ -53,6 +53,8 @@ services:
       DISCORD_EMBED_TITLE_URL: ""
       DISCORD_EMBED_TITLE_ICON_URL: ""
       DISCORD_TAGGED_USERS: ""
+      # Setup
+      UPDATE_UTILITY_DISABLED: "NO"
     ports: # Don't forget to change the ports
            # if you already have another server running
            # **The ports MUST match** because of the way the server works
