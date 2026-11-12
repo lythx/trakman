@@ -475,9 +475,9 @@ const constructRecordObject = (
     previous:
       previousTime && previousPosition
         ? {
-            time: previousTime,
-            position: previousPosition,
-          }
+          time: previousTime,
+          position: previousPosition,
+        }
         : undefined,
     leaderboard,
     isLapRecord: uploadLaps,
@@ -501,16 +501,15 @@ const getLogString = (
     },
     previousPosition && previousTime
       ? {
-          time: previousTime,
-          position: previousPosition,
-        }
+        time: previousTime,
+        position: previousPosition,
+      }
       : undefined
   )
   return [
     `${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getOrdinalSuffix(
       position
-    )} dedimania record. Time: ${tm.utils.getTimeString(time)}${
-      rs.difference !== undefined ? ` (-${rs.difference})` : ``
+    )} dedimania record. Time: ${tm.utils.getTimeString(time)}${rs.difference !== undefined ? ` (-${rs.difference})` : ``
     }`,
   ]
 }
@@ -525,15 +524,17 @@ if (config.isEnabled) {
       }
       if (config.sendLocals) {
         fetchListeners.push(() => {
-          let i = 0
-          for (const local of tm.records.local) {
-            if (currentDedis.find((a) => a.login === local.login && a.time === local.time) !== undefined) {
-              continue
+          if (tm.getGameMode() === 'TimeAttack') {
+            let i = 0
+            for (const local of tm.records.local) {
+              if (currentDedis.find((a) => a.login === local.login && a.time === local.time) !== undefined) {
+                continue
+              }
+              if (++i > config.dediCount) {
+                break
+              }
+              addRecord({ login: local.login, nickname: local.nickname } as any, local.time, local.checkpoints)
             }
-            if (++i > config.dediCount) {
-              break
-            }
-            addRecord({ login: local.login, nickname: local.nickname } as any, local.time, local.checkpoints)
           }
         })
       }
