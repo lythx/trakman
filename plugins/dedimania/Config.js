@@ -16,5 +16,7 @@ export default {
   modifiedLapsMessage:
     `${p.dedimessage}Dedimania records will be sent in ${p.highlight}Time Attack` +
     ` ${p.dedimessage}instead of ${p.highlight}Rounds ${p.dedimessage}mode due to modified lap amount.`,
+  // Whether local records not currently present on dedimania should be sent to them either way
+  // Useful for servers that are active during the dedimania resets
   sendLocals: false,
 }

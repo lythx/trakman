@@ -123,7 +123,7 @@ tm.commands.add({
 /**
  * Sets dynamic time limits (eg. based on author time)
  * @author lythx
- * @since 1.16.2
+ * @since 1.6.3
  */
 export const dynamicTimeLimit = {
   /**
