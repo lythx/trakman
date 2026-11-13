@@ -123,6 +123,7 @@ const reinitialize = async (): Promise<void> => {
 const tryReconnect = async (): Promise<boolean> => {
   if (waiting || client.connected) {
     // someone else is already on it, or managed it before us
+    await new Promise((r) => setTimeout(r, 1000))
     return false
   }
   waiting = true
@@ -193,7 +194,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
       `Failed to fetch dedimania records for map ${tm.utils.strip(name)} (${id}), received error:`,
       rawDedis.message
     )
-    tryReconnect()
+    void tryReconnect()
     return
   } else if (rawDedis?.[0]?.Records === undefined) {
     tm.log.error(`Failed to fetch dedimania records for map ${tm.utils.strip(name)} (${id}), received empty response`)
@@ -253,7 +254,7 @@ const sendRecords = async (
   ])
   if (status instanceof Error) {
     tm.log.error(`Failed to send dedimania records for map ${tm.utils.strip(name)} (${mapId})`, status.message)
-    tryReconnect()
+    void tryReconnect()
   }
 }
 
@@ -379,7 +380,7 @@ const updateServerPlayers = (): void => {
     ])
     if (status instanceof Error) {
       tm.log.error('Failed to update dedimania status', status.message)
-      tryReconnect()
+      void tryReconnect()
     }
   }, config.updateInterval * 1000)
 }
@@ -413,7 +414,7 @@ const playerJoin = async (player: {
       `Failed to update dedimania player information for ${tm.utils.strip(player.nickname)} (${player.login})`,
       status.message
     )
-    tryReconnect()
+    void tryReconnect()
   }
 }
 
@@ -434,7 +435,7 @@ const playerLeave = async (player: { login: string; nickname: string }): Promise
       `Failed to update player information for ${tm.utils.strip(player.nickname)} (${player.login})`,
       status.message
     )
-    tryReconnect()
+    void tryReconnect()
   }
 }
 
@@ -475,9 +476,9 @@ const constructRecordObject = (
     previous:
       previousTime && previousPosition
         ? {
-          time: previousTime,
-          position: previousPosition,
-        }
+            time: previousTime,
+            position: previousPosition,
+          }
         : undefined,
     leaderboard,
     isLapRecord: uploadLaps,
@@ -501,15 +502,16 @@ const getLogString = (
     },
     previousPosition && previousTime
       ? {
-        time: previousTime,
-        position: previousPosition,
-      }
+          time: previousTime,
+          position: previousPosition,
+        }
       : undefined
   )
   return [
     `${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getOrdinalSuffix(
       position
-    )} dedimania record. Time: ${tm.utils.getTimeString(time)}${rs.difference !== undefined ? ` (-${rs.difference})` : ``
+    )} dedimania record. Time: ${tm.utils.getTimeString(time)}${
+      rs.difference !== undefined ? ` (-${rs.difference})` : ``
     }`,
   ]
 }
